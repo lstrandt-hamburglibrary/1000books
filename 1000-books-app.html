@@ -348,6 +348,54 @@
             }
         }
 
+        /* Update Banner */
+        .update-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .update-banner.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .update-banner button {
+            margin-left: 10px;
+            padding: 5px 15px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .update-banner .update-now {
+            background: white;
+            color: #667eea;
+        }
+
+        .update-banner .update-later {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
         /* Milestones */
         .milestone-tracker {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -388,6 +436,13 @@
     </style>
 </head>
 <body>
+    <!-- Update Banner -->
+    <div class="update-banner" id="updateBanner">
+        <span>📣 New version available with bug fixes and improvements!</span>
+        <button class="update-now" onclick="updateNow()">Update Now</button>
+        <button class="update-later" onclick="dismissUpdate()">Later</button>
+    </div>
+
     <div class="app-container">
         <!-- Header -->
         <div class="app-header">
@@ -556,6 +611,9 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // App Version - UPDATE THIS WHEN YOU MAKE CHANGES!
+        const APP_VERSION = '1.0.1';
+
         // App State
         let appData = {
             children: [],
@@ -598,6 +656,77 @@
             updateDashboard();
             initializeBadges();
             initializeMilestones();
+            checkForUpdates();
+            registerServiceWorker();
+        }
+
+        // Register Service Worker
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('Service Worker registered');
+
+                    // Listen for updates from service worker
+                    navigator.serviceWorker.addEventListener('message', event => {
+                        if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+                            showUpdateBanner(event.data.version);
+                        }
+                    });
+
+                    // Check for updates periodically (every 30 minutes)
+                    setInterval(() => {
+                        registration.update();
+                    }, 30 * 60 * 1000);
+                }).catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+            }
+        }
+
+        // Check for Updates
+        function checkForUpdates() {
+            const lastVersion = localStorage.getItem('appVersion');
+
+            if (lastVersion && lastVersion !== APP_VERSION) {
+                // User has an older version, show what's new
+                showToast(`Updated to version ${APP_VERSION}! 🎉`);
+            }
+
+            // Save current version
+            localStorage.setItem('appVersion', APP_VERSION);
+        }
+
+        // Show Update Banner
+        function showUpdateBanner(newVersion) {
+            const banner = document.getElementById('updateBanner');
+            banner.classList.add('show');
+
+            // Also save that an update is available
+            localStorage.setItem('updateAvailable', 'true');
+        }
+
+        // Update Now
+        function updateNow() {
+            // Clear cache and reload
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                });
+            }
+            location.reload(true);
+        }
+
+        // Dismiss Update
+        function dismissUpdate() {
+            const banner = document.getElementById('updateBanner');
+            banner.classList.remove('show');
+
+            // Show reminder in 1 hour
+            setTimeout(() => {
+                if (localStorage.getItem('updateAvailable') === 'true') {
+                    showUpdateBanner();
+                }
+            }, 60 * 60 * 1000);
         }
 
         // Load Data

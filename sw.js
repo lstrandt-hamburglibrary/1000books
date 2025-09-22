@@ -1,15 +1,11 @@
 // Service Worker for BookWorm Journey
-const CACHE_NAME = 'bookworm-v1';
+const VERSION = '1.0.1';
+const CACHE_NAME = `bookworm-v${VERSION}`;
 
 const urlsToCache = [
   '/',
+  '/1000-books-app.html',
   '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/badges.js',
-  '/js/suggestions.js',
-  '/js/games.js',
-  '/js/data.js',
   '/manifest.json',
   '/icon-192.svg',
   '/icon-512.svg'
@@ -17,6 +13,9 @@ const urlsToCache = [
 
 // Install service worker
 self.addEventListener('install', event => {
+  // Force new service worker to activate immediately
+  self.skipWaiting();
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -37,17 +36,32 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Clean up old caches
+// Clean up old caches and notify clients
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.filter(cacheName => {
-          return cacheName !== CACHE_NAME;
-        }).map(cacheName => {
-          return caches.delete(cacheName);
-        })
-      );
+    Promise.all([
+      // Clean up old caches
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.filter(cacheName => {
+            return cacheName !== CACHE_NAME;
+          }).map(cacheName => {
+            return caches.delete(cacheName);
+          })
+        );
+      }),
+      // Take control of all clients immediately
+      clients.claim()
+    ]).then(() => {
+      // Notify all clients about the update
+      clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'UPDATE_AVAILABLE',
+            version: VERSION
+          });
+        });
+      });
     })
   );
 });
