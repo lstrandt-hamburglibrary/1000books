@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookWorm Journey - Working Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            padding-bottom: 70px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .nav {
+            background: white;
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav button {
+            flex: 1;
+            padding: 15px 10px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .nav button.active {
+            color: #6366f1;
+            background: #f0f1ff;
+        }
+
+        .page {
+            padding: 20px;
+            display: none;
+        }
+
+        .page.active {
+            display: block !important;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .btn {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            background: #4f46e5;
+        }
+
+        .book-count {
+            font-size: 60px;
+            font-weight: bold;
+            color: #6366f1;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .book-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .book-item {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .book-title {
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .book-meta {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .child-item {
+            padding: 10px;
+            background: #f9fafb;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .child-active {
+            background: #e0e7ff;
+            border: 2px solid #6366f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 BookWorm Journey</h1>
+        <select id="childSelect" onchange="switchChild()" style="
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 16px;
+            width: 200px;
+        ">
+            <option>Loading...</option>
+        </select>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <div class="card">
+            <h2 style="text-align: center; color: #4b5563;">Books Read</h2>
+            <div class="book-count" id="bookCount">0</div>
+            <div style="text-align: center; color: #6b7280;">Goal: 1000 Books</div>
+
+            <div style="
+                width: 100%;
+                height: 20px;
+                background: #e5e7eb;
+                border-radius: 10px;
+                margin: 20px 0;
+                overflow: hidden;
+            ">
+                <div id="progressBar" style="
+                    height: 100%;
+                    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+                    width: 0%;
+                    transition: width 1s;
+                    border-radius: 10px;
+                "></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #6366f1;" id="weekCount">0</div>
+                    <div style="font-size: 12px; color: #6b7280;">This Week</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #6366f1;" id="totalDays">0</div>
+                    <div style="font-size: 12px; color: #6b7280;">Days Active</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Recent Books</h3>
+            <div id="recentBooks" class="book-list">
+                <p style="color: #9ca3af; text-align: center;">No books yet. Start reading!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Book Page -->
+    <div id="add" class="page">
+        <div class="card">
+            <h2>Add a Book</h2>
+
+            <label style="display: block; margin-top: 10px; font-weight: 500;">Book Title *</label>
+            <input type="text" id="bookTitle" placeholder="Enter book title">
+
+            <label style="display: block; margin-top: 10px; font-weight: 500;">Author</label>
+            <input type="text" id="bookAuthor" placeholder="Enter author name">
+
+            <label style="display: block; margin-top: 10px; font-weight: 500;">Date Read</label>
+            <input type="date" id="bookDate">
+
+            <button class="btn" onclick="addBook()">Add Book 📚</button>
+        </div>
+
+        <div class="card">
+            <h3>Quick Re-read</h3>
+            <div id="quickBooks">
+                <p style="color: #9ca3af;">Recent books will appear here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Library Page -->
+    <div id="library" class="page">
+        <div class="card">
+            <h2>Your Library</h2>
+            <div style="margin-bottom: 10px;">
+                <input type="search" id="searchBox" placeholder="Search books..." oninput="searchBooks()" style="width: 100%;">
+            </div>
+            <div id="libraryBooks" class="book-list">
+                <p style="color: #9ca3af; text-align: center;">No books in library</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settings" class="page">
+        <div class="card">
+            <h2>Children</h2>
+            <div id="childrenList"></div>
+
+            <label style="display: block; margin-top: 20px; font-weight: 500;">Add New Child</label>
+            <input type="text" id="newChildName" placeholder="Child's name">
+            <button class="btn" onclick="addChild()">Add Child ➕</button>
+        </div>
+
+        <div class="card">
+            <h2>Data Management</h2>
+            <button class="btn" onclick="exportData()">Export All Data 📥</button>
+            <button class="btn" style="background: #ef4444;" onclick="clearAllData()">Clear All Data 🗑️</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <button class="active" onclick="goToPage('home', this)">🏠 Home</button>
+        <button onclick="goToPage('add', this)">➕ Add</button>
+        <button onclick="goToPage('library', this)">📚 Library</button>
+        <button onclick="goToPage('settings', this)">⚙️ Settings</button>
+    </div>
+
+    <script>
+        // Global state
+        let appData = {
+            children: [],
+            currentChild: null,
+            books: []
+        };
+
+        // Initialize when page loads
+        window.onload = function() {
+            console.log('Initializing BookWorm Journey...');
+            loadData();
+            setupUI();
+            updateDisplay();
+
+            // Set today's date
+            document.getElementById('bookDate').value = new Date().toISOString().split('T')[0];
+        };
+
+        // Page navigation - SIMPLE VERSION
+        function goToPage(pageName, btn) {
+            console.log('Going to page:', pageName);
+
+            // Update nav buttons
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none';
+            });
+
+            // Show selected page
+            const page = document.getElementById(pageName);
+            if (page) {
+                page.classList.add('active');
+                page.style.display = 'block';
+            }
+
+            // Update page content
+            if (pageName === 'library') updateLibrary();
+            if (pageName === 'settings') updateSettings();
+            if (pageName === 'add') updateQuickBooks();
+        }
+
+        // Add a book
+        function addBook() {
+            const title = document.getElementById('bookTitle').value.trim();
+            if (!title) {
+                alert('Please enter a book title');
+                return;
+            }
+
+            const book = {
+                id: Date.now(),
+                title: title,
+                author: document.getElementById('bookAuthor').value.trim(),
+                date: document.getElementById('bookDate').value || new Date().toISOString().split('T')[0],
+                childId: appData.currentChild
+            };
+
+            appData.books.push(book);
+            saveData();
+
+            // Clear form
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('bookAuthor').value = '';
+
+            alert('Book added successfully! 📚');
+            updateDisplay();
+
+            // Go to home
+            goToPage('home', document.querySelector('.nav button'));
+        }
+
+        // Add a child
+        function addChild() {
+            const name = document.getElementById('newChildName').value.trim();
+            if (!name) {
+                alert('Please enter a child name');
+                return;
+            }
+
+            const child = {
+                id: 'child_' + Date.now(),
+                name: name
+            };
+
+            appData.children.push(child);
+            if (!appData.currentChild) {
+                appData.currentChild = child.id;
+            }
+
+            saveData();
+            document.getElementById('newChildName').value = '';
+
+            setupUI();
+            updateDisplay();
+            updateSettings();
+
+            alert('Child added successfully!');
+        }
+
+        // Switch active child
+        function switchChild() {
+            const select = document.getElementById('childSelect');
+            appData.currentChild = select.value;
+            saveData();
+            updateDisplay();
+        }
+
+        // Quick add book
+        function quickAddBook(title) {
+            const book = {
+                id: Date.now(),
+                title: title,
+                author: '',
+                date: new Date().toISOString().split('T')[0],
+                childId: appData.currentChild
+            };
+
+            appData.books.push(book);
+            saveData();
+            updateDisplay();
+
+            alert('Re-read added! 📚');
+            goToPage('home', document.querySelector('.nav button'));
+        }
+
+        // Setup UI elements
+        function setupUI() {
+            const select = document.getElementById('childSelect');
+            select.innerHTML = '';
+
+            if (appData.children.length === 0) {
+                // Create default child
+                const defaultChild = {
+                    id: 'default',
+                    name: 'My Child'
+                };
+                appData.children.push(defaultChild);
+                appData.currentChild = defaultChild.id;
+                saveData();
+            }
+
+            appData.children.forEach(child => {
+                const option = document.createElement('option');
+                option.value = child.id;
+                option.textContent = child.name;
+                if (child.id === appData.currentChild) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+
+        // Update main display
+        function updateDisplay() {
+            const childBooks = appData.books.filter(b => b.childId === appData.currentChild);
+
+            // Update book count
+            document.getElementById('bookCount').textContent = childBooks.length;
+
+            // Update progress bar
+            const progress = Math.min((childBooks.length / 1000) * 100, 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Update stats
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekBooks = childBooks.filter(b => new Date(b.date) >= weekAgo);
+            document.getElementById('weekCount').textContent = weekBooks.length;
+
+            const uniqueDates = [...new Set(childBooks.map(b => b.date))];
+            document.getElementById('totalDays').textContent = uniqueDates.length;
+
+            // Update recent books
+            const recent = childBooks.slice(-5).reverse();
+            const recentHTML = recent.length === 0
+                ? '<p style="color: #9ca3af; text-align: center;">No books yet. Start reading!</p>'
+                : recent.map(book => `
+                    <div class="book-item">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-meta">
+                            ${book.author ? book.author + ' • ' : ''}${book.date}
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('recentBooks').innerHTML = recentHTML;
+        }
+
+        // Update library display
+        function updateLibrary() {
+            const childBooks = appData.books.filter(b => b.childId === appData.currentChild);
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            const filtered = searchTerm
+                ? childBooks.filter(b =>
+                    b.title.toLowerCase().includes(searchTerm) ||
+                    b.author.toLowerCase().includes(searchTerm))
+                : childBooks;
+
+            const html = filtered.length === 0
+                ? '<p style="color: #9ca3af; text-align: center;">No books found</p>'
+                : filtered.reverse().map(book => `
+                    <div class="book-item">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-meta">
+                            ${book.author ? book.author + ' • ' : ''}${book.date}
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('libraryBooks').innerHTML = html;
+        }
+
+        // Search books
+        function searchBooks() {
+            updateLibrary();
+        }
+
+        // Update quick books
+        function updateQuickBooks() {
+            const childBooks = appData.books.filter(b => b.childId === appData.currentChild);
+            const uniqueTitles = [...new Set(childBooks.slice(-10).map(b => b.title))].slice(0, 5);
+
+            const html = uniqueTitles.length === 0
+                ? '<p style="color: #9ca3af;">Recent books will appear here</p>'
+                : uniqueTitles.map(title =>
+                    `<button class="btn" style="margin: 5px 0;" onclick="quickAddBook('${title.replace(/'/g, "\\'")}')">${title}</button>`
+                ).join('');
+
+            document.getElementById('quickBooks').innerHTML = html;
+        }
+
+        // Update settings
+        function updateSettings() {
+            const html = appData.children.map(child => {
+                const isActive = child.id === appData.currentChild;
+                const bookCount = appData.books.filter(b => b.childId === child.id).length;
+                return `
+                    <div class="child-item ${isActive ? 'child-active' : ''}">
+                        <div>
+                            <strong>${child.name}</strong>
+                            <div style="font-size: 12px; color: #6b7280;">${bookCount} books</div>
+                        </div>
+                        ${isActive ? '<span style="color: #6366f1;">✓ Active</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('childrenList').innerHTML = html || '<p>No children yet</p>';
+        }
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bookworm-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('This will delete all data. Are you sure?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Save/Load functions
+        function saveData() {
+            localStorage.setItem('bookwormData', JSON.stringify(appData));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('bookwormData');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch(e) {
+                    console.error('Failed to load saved data');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

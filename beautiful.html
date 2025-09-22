@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#6366f1">
+    <title>BookWorm Journey - 1000 Books Before Kindergarten</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f3f4f6;
+            --card-bg: white;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .child-selector {
+            width: 100%;
+            max-width: 300px;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .child-selector:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .child-selector option {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .nav button {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            background: white;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            position: relative;
+        }
+
+        .nav button:hover {
+            background: var(--bg);
+        }
+
+        .nav button.active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .nav button.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card h2 {
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .card h3 {
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* Progress Circle */
+        .progress-container {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .progress-svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: #e5e7eb;
+            stroke-width: 10;
+        }
+
+        .progress-bar {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 565;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .book-count {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .book-label {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        .progress-goal {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-top: 0.25rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f9fafb, white);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Forms */
+        label {
+            display: block;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: var(--text);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Book List */
+        .book-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .book-item {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            transition: transform 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+
+        .book-item:hover {
+            background: white;
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        .book-title {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .book-author {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .book-meta {
+            color: #9ca3af;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Children List */
+        .child-item {
+            padding: 1rem;
+            background: var(--bg);
+            margin: 0.5rem 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .child-active {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.1);
+        }
+
+        .child-info {
+            flex: 1;
+        }
+
+        .child-name {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .child-stats {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .active-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Quick Books */
+        .quick-books-grid {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .quick-book-btn {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .quick-book-btn:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateX(5px);
+        }
+
+        /* Search Box */
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-container::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-hint {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Suggestions Page Styles */
+        .suggestion-categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .suggestion-categories {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .category-btn {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .category-btn:hover, .category-btn.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .suggestions-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .suggestion-item {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: white;
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Games Page Styles */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #f9fafb, white);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-card h3 {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .game-card p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .play-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .play-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Badges Page Styles */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .badge-earned {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            box-shadow: var(--shadow);
+        }
+
+        .badge-locked {
+            background: var(--bg);
+            opacity: 0.5;
+        }
+
+        .badge-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .badge-description {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .progress-circle {
+                width: 180px;
+                height: 180px;
+            }
+
+            .book-count {
+                font-size: 2.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav button {
+                font-size: 0.7rem;
+            }
+
+            .suggestion-categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>📚 BookWorm Journey</h1>
+        <select id="childSelect" onchange="switchChild()" class="child-selector">
+            <option>Loading...</option>
+        </select>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <div class="progress-container">
+            <div class="progress-circle">
+                <svg class="progress-svg">
+                    <circle cx="100" cy="100" r="90" class="progress-bg"/>
+                    <circle id="progressBar" cx="100" cy="100" r="90" class="progress-bar"/>
+                </svg>
+                <div class="progress-text">
+                    <div class="book-count" id="bookCount">0</div>
+                    <div class="book-label">books read</div>
+                    <div class="progress-goal">Goal: 1000 Books</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-emoji">📅</div>
+                    <span class="stat-value" id="weekCount">0</span>
+                    <div class="stat-label">This Week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-emoji">📖</div>
+                    <span class="stat-value" id="monthCount">0</span>
+                    <div class="stat-label">This Month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-emoji">⭐</div>
+                    <span class="stat-value" id="favCount">0</span>
+                    <div class="stat-label">Favorites</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-emoji">🔥</div>
+                    <span class="stat-value" id="streakCount">0</span>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📖 Recently Read</h3>
+            <div id="recentBooks" class="book-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <div class="empty-state-text">No books yet</div>
+                    <div class="empty-state-hint">Start your reading journey!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Book Page -->
+    <div id="add" class="page">
+        <div class="card">
+            <h2>📚 Add a Book</h2>
+
+            <label>Book Title *</label>
+            <input type="text" id="bookTitle" placeholder="Enter book title..." autocomplete="off">
+
+            <label>Author</label>
+            <input type="text" id="bookAuthor" placeholder="Enter author name..." autocomplete="off">
+
+            <label>Date Read</label>
+            <input type="date" id="bookDate">
+
+            <label>Rating</label>
+            <select id="bookRating">
+                <option value="love">😍 Loved it!</option>
+                <option value="like" selected>😊 Liked it</option>
+                <option value="okay">😐 It was okay</option>
+            </select>
+
+            <label style="display: flex; align-items: center; margin-top: 1rem;">
+                <input type="checkbox" id="bookFavorite" style="width: auto; margin-right: 0.5rem;">
+                <span>Add to favorites ⭐</span>
+            </label>
+
+            <button class="btn" onclick="addBook()">Add Book 📚</button>
+        </div>
+
+        <div class="card">
+            <h3>⚡ Quick Re-read</h3>
+            <div id="quickBooks" class="quick-books-grid">
+                <div class="empty-state">
+                    <div class="empty-state-hint">Recent books will appear here for quick re-reads</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Library Page -->
+    <div id="library" class="page">
+        <div class="card">
+            <h2>📚 Your Library</h2>
+            <div class="search-container">
+                <input type="search" id="searchBox" placeholder="Search books..." oninput="searchBooks()" class="search-box" autocomplete="off">
+            </div>
+            <div id="libraryBooks" class="book-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <div class="empty-state-text">Your library is empty</div>
+                    <div class="empty-state-hint">Add books to see them here</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <div class="stat-value" id="totalBooks">0</div>
+            <div class="stat-label">Total Books in Library</div>
+        </div>
+    </div>
+
+    <!-- Suggestions Page -->
+    <div id="suggestions" class="page">
+        <div class="card">
+            <h2>💡 Book Suggestions</h2>
+            <div class="suggestion-categories">
+                <button class="category-btn" onclick="showSuggestions('animals')">🐶 Animals</button>
+                <button class="category-btn" onclick="showSuggestions('bedtime')">😴 Bedtime</button>
+                <button class="category-btn" onclick="showSuggestions('adventure')">🗺️ Adventure</button>
+                <button class="category-btn" onclick="showSuggestions('feelings')">❤️ Feelings</button>
+                <button class="category-btn" onclick="showSuggestions('abc123')">🔤 ABC & 123</button>
+                <button class="category-btn" onclick="showSuggestions('funny')">😂 Funny</button>
+                <button class="category-btn" onclick="showSuggestions('classics')">📖 Classics</button>
+                <button class="category-btn" onclick="showSuggestions('seasons')">🍂 Seasons</button>
+            </div>
+            <div id="suggestionsList" class="suggestions-list">
+                <div class="empty-state">
+                    <div class="empty-state-hint">Select a category above to see book suggestions!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Games Page -->
+    <div id="games" class="page">
+        <div class="card">
+            <h2>🎮 Reading Games</h2>
+            <div class="games-grid">
+                <div class="game-card" onclick="playGame('pete')">
+                    <div class="game-icon">🔘</div>
+                    <h3>Pete's Button Hunt</h3>
+                    <p>Help Pete the Cat find his groovy buttons!</p>
+                    <button class="play-btn">Play</button>
+                </div>
+                <div class="game-card" onclick="playGame('match')">
+                    <div class="game-icon">📚</div>
+                    <h3>Story Match</h3>
+                    <p>Match book characters and objects!</p>
+                    <button class="play-btn">Play</button>
+                </div>
+                <div class="game-card" onclick="playGame('word')">
+                    <div class="game-icon">🔤</div>
+                    <h3>Word Builder</h3>
+                    <p>Build simple words from letters!</p>
+                    <button class="play-btn">Play</button>
+                </div>
+                <div class="game-card" onclick="playGame('memory')">
+                    <div class="game-icon">🎴</div>
+                    <h3>Memory Match</h3>
+                    <p>Classic memory card game!</p>
+                    <button class="play-btn">Play</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Badges Page -->
+    <div id="badges" class="page">
+        <div class="card">
+            <h2>🏆 Your Achievements</h2>
+            <div id="badgesList" class="badges-grid">
+                <!-- Badges will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settings" class="page">
+        <div class="card">
+            <h2>👶 Children</h2>
+            <div id="childrenList"></div>
+
+            <label>Add New Child</label>
+            <input type="text" id="newChildName" placeholder="Enter child's name..." autocomplete="off">
+            <button class="btn" onclick="addChild()">Add Child ➕</button>
+        </div>
+
+        <div class="card">
+            <h2>📊 Data Management</h2>
+            <button class="btn btn-secondary" onclick="exportData()">Export All Data 📥</button>
+            <button class="btn btn-danger" onclick="clearAllData()">Clear All Data 🗑️</button>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <p style="color: var(--text-light); font-size: 0.9rem;">
+                Version 1.0 • Made with ❤️<br>
+                Track your journey to 1000 books!
+            </p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <button class="active" onclick="goToPage('home', this)">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </button>
+        <button onclick="goToPage('add', this)">
+            <span class="nav-icon">➕</span>
+            <span>Add</span>
+        </button>
+        <button onclick="goToPage('library', this)">
+            <span class="nav-icon">📚</span>
+            <span>Library</span>
+        </button>
+        <button onclick="goToPage('suggestions', this)">
+            <span class="nav-icon">💡</span>
+            <span>Ideas</span>
+        </button>
+        <button onclick="goToPage('games', this)">
+            <span class="nav-icon">🎮</span>
+            <span>Games</span>
+        </button>
+        <button onclick="goToPage('badges', this)">
+            <span class="nav-icon">🏆</span>
+            <span>Badges</span>
+        </button>
+        <button onclick="goToPage('settings', this)">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+        </button>
+    </div>
+
+    <script>
+        // Global state
+        let appData = {
+            children: [],
+            currentChild: null,
+            books: []
+        };
+
+        // Initialize when page loads
+        window.onload = function() {
+            console.log('BookWorm Journey initializing...');
+            loadData();
+            setupUI();
+            updateDisplay();
+            document.getElementById('bookDate').value = new Date().toISOString().split('T')[0];
+        };
+
+        // Page navigation
+        function goToPage(pageName, btn) {
+            // Update nav buttons
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none';
+            });
+
+            // Show selected page
+            const page = document.getElementById(pageName);
+            if (page) {
+                page.classList.add('active');
+                page.style.display = 'block';
+            }
+
+            // Update page content
+            if (pageName === 'library') updateLibrary();
+            if (pageName === 'settings') updateSettings();
+            if (pageName === 'add') updateQuickBooks();
+            if (pageName === 'badges') updateBadges();
+        }
+
+        // Add a book
+        function addBook() {
+            const title = document.getElementById('bookTitle').value.trim();
+            if (!title) {
+                alert('Please enter a book title');
+                return;
+            }
+
+            const book = {
+                id: Date.now(),
+                title: title,
+                author: document.getElementById('bookAuthor').value.trim(),
+                date: document.getElementById('bookDate').value || new Date().toISOString().split('T')[0],
+                rating: document.getElementById('bookRating').value,
+                favorite: document.getElementById('bookFavorite').checked,
+                childId: appData.currentChild
+            };
+
+            appData.books.push(book);
+            saveData();
+
+            // Clear form
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('bookAuthor').value = '';
+            document.getElementById('bookFavorite').checked = false;
+            document.getElementById('bookRating').value = 'like';
+
+            // Success feedback
+            showSuccess('Book added! 📚');
+            updateDisplay();
+
+            // Go home
+            goToPage('home', document.querySelector('.nav button'));
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            // Create temporary success message
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--success);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                box-shadow: var(--shadow-lg);
+                z-index: 2000;
+                animation: slideUp 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Add a child
+        function addChild() {
+            const name = document.getElementById('newChildName').value.trim();
+            if (!name) {
+                alert('Please enter a child name');
+                return;
+            }
+
+            const child = {
+                id: 'child_' + Date.now(),
+                name: name
+            };
+
+            appData.children.push(child);
+            if (!appData.currentChild) {
+                appData.currentChild = child.id;
+            }
+
+            saveData();
+            document.getElementById('newChildName').value = '';
+
+            setupUI();
+            updateDisplay();
+            updateSettings();
+
+            showSuccess('Child added! 👶');
+        }
+
+        // Switch active child
+        function switchChild() {
+            const select = document.getElementById('childSelect');
+            appData.currentChild = select.value;
+            saveData();
+            updateDisplay();
+        }
+
+        // Quick add book
+        function quickAddBook(title) {
+            const book = {
+                id: Date.now(),
+                title: title,
+                author: '',
+                date: new Date().toISOString().split('T')[0],
+                rating: 'like',
+                favorite: false,
+                childId: appData.currentChild
+            };
+
+            appData.books.push(book);
+            saveData();
+            updateDisplay();
+
+            showSuccess('Re-read added! 📖');
+            goToPage('home', document.querySelector('.nav button'));
+        }
+
+        // Setup UI elements
+        function setupUI() {
+            const select = document.getElementById('childSelect');
+            select.innerHTML = '';
+
+            if (appData.children.length === 0) {
+                const defaultChild = {
+                    id: 'default',
+                    name: 'My Little Reader'
+                };
+                appData.children.push(defaultChild);
+                appData.currentChild = defaultChild.id;
+                saveData();
+            }
+
+            appData.children.forEach(child => {
+                const option = document.createElement('option');
+                option.value = child.id;
+                option.textContent = child.name;
+                if (child.id === appData.currentChild) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+
+        // Update main display
+        function updateDisplay() {
+            const childBooks = appData.books.filter(b => b.childId === appData.currentChild);
+
+            // Update book count
+            document.getElementById('bookCount').textContent = childBooks.length;
+
+            // Update progress bar
+            const progress = Math.min((childBooks.length / 1000) * 100, 100);
+            const circumference = 2 * Math.PI * 90;
+            const offset = circumference - (progress / 100) * circumference;
+            document.getElementById('progressBar').style.strokeDashoffset = offset;
+
+            // Update stats
+            const now = new Date();
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+            const weekBooks = childBooks.filter(b => new Date(b.date) >= weekAgo);
+            const monthBooks = childBooks.filter(b => new Date(b.date) >= monthAgo);
+            const favBooks = childBooks.filter(b => b.favorite);
+
+            document.getElementById('weekCount').textContent = weekBooks.length;
+            document.getElementById('monthCount').textContent = monthBooks.length;
+            document.getElementById('favCount').textContent = favBooks.length;
+
+            // Calculate streak
+            const streak = calculateStreak(childBooks);
+            document.getElementById('streakCount').textContent = streak;
+
+            // Update recent books
+            const recent = childBooks.slice(-5).reverse();
+            const recentHTML = recent.length === 0
+                ? `<div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <div class="empty-state-text">No books yet</div>
+                    <div class="empty-state-hint">Start your reading journey!</div>
+                </div>`
+                : recent.map(book => `
+                    <div class="book-item">
+                        <div class="book-title">
+                            ${book.title}
+                            ${book.favorite ? '⭐' : ''}
+                            ${book.rating === 'love' ? '😍' : book.rating === 'like' ? '😊' : '😐'}
+                        </div>
+                        ${book.author ? `<div class="book-author">by ${book.author}</div>` : ''}
+                        <div class="book-meta">${formatDate(book.date)}</div>
+                    </div>
+                `).join('');
+
+            document.getElementById('recentBooks').innerHTML = recentHTML;
+        }
+
+        // Calculate reading streak
+        function calculateStreak(books) {
+            if (books.length === 0) return 0;
+
+            const dates = [...new Set(books.map(b => b.date))].sort().reverse();
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+            if (dates[0] !== today && dates[0] !== yesterday) return 0;
+
+            let streak = 1;
+            let checkDate = new Date(dates[0]);
+
+            for (let i = 1; i < dates.length; i++) {
+                checkDate.setDate(checkDate.getDate() - 1);
+                if (dates[i] === checkDate.toISOString().split('T')[0]) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        // Format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+
+        // Update library display
+        function updateLibrary() {
+            const childBooks = appData.books.filter(b => b.childId === appData.currentChild);
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            const filtered = searchTerm
+                ? childBooks.filter(b =>
+                    b.title.toLowerCase().includes(searchTerm) ||
+                    b.author.toLowerCase().includes(searchTerm))
+                : childBooks;
+
+            document.getElementById('totalBooks').textContent = childBooks.length;
+
+            const html = filtered.length === 0
+                ? `<div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <div class="empty-state-text">${searchTerm ? 'No books found' : 'Your library is empty'}</div>
+                    <div class="empty-state-hint">${searchTerm ? 'Try a different search' : 'Add books to see them here'}</div>
+                </div>`
+                : filtered.reverse().map(book => `
+                    <div class="book-item">
+                        <div class="book-title">
+                            ${book.title}
+                            ${book.favorite ? '⭐' : ''}
+                            ${book.rating === 'love' ? '😍' : book.rating === 'like' ? '😊' : '😐'}
+                        </div>
+                        ${book.author ? `<div class="book-author">by ${book.author}</div>` : ''}
+                        <div class="book-meta">${formatDate(book.date)}</div>
+                    </div>
+                `).join('');
+
+            document.getElementById('libraryBooks').innerHTML = html;
+        }
+
+        // Search books
+        function searchBooks() {
+            updateLibrary();
+        }
+
+        // Update quick books
+        function updateQuickBooks() {
+            const childBooks = appData.books.filter(b => b.childId === appData.currentChild);
+            const uniqueTitles = [...new Set(childBooks.slice(-10).map(b => b.title))].slice(0, 5);
+
+            const html = uniqueTitles.length === 0
+                ? `<div class="empty-state">
+                    <div class="empty-state-hint">Recent books will appear here for quick re-reads</div>
+                </div>`
+                : uniqueTitles.map(title =>
+                    `<button class="quick-book-btn" onclick="quickAddBook('${title.replace(/'/g, "\\'")}')">${title}</button>`
+                ).join('');
+
+            document.getElementById('quickBooks').innerHTML = html;
+        }
+
+        // Update settings
+        function updateSettings() {
+            const html = appData.children.map(child => {
+                const isActive = child.id === appData.currentChild;
+                const bookCount = appData.books.filter(b => b.childId === child.id).length;
+                return `
+                    <div class="child-item ${isActive ? 'child-active' : ''}">
+                        <div class="child-info">
+                            <div class="child-name">${child.name}</div>
+                            <div class="child-stats">${bookCount} books read</div>
+                        </div>
+                        ${isActive ? '<span class="active-badge">Active</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('childrenList').innerHTML = html || '<p>No children yet</p>';
+        }
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bookworm-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            showSuccess('Data exported! 📥');
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('⚠️ This will delete all data!\n\nAre you sure you want to clear everything?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Save/Load functions
+        function saveData() {
+            localStorage.setItem('bookwormData', JSON.stringify(appData));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('bookwormData');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch(e) {
+                    console.error('Failed to load saved data');
+                }
+            }
+        }
+
+        // Show book suggestions
+        function showSuggestions(category) {
+            const suggestions = {
+                animals: [
+                    { title: "The Very Hungry Caterpillar", author: "Eric Carle" },
+                    { title: "Brown Bear, Brown Bear, What Do You See?", author: "Bill Martin Jr." },
+                    { title: "Goodnight Gorilla", author: "Peggy Rathmann" },
+                    { title: "Dear Zoo", author: "Rod Campbell" },
+                    { title: "The Rainbow Fish", author: "Marcus Pfister" },
+                    { title: "Giraffes Can't Dance", author: "Giles Andreae" },
+                    { title: "If You Give a Mouse a Cookie", author: "Laura Numeroff" },
+                    { title: "Polar Bear, Polar Bear, What Do You Hear?", author: "Bill Martin Jr." }
+                ],
+                bedtime: [
+                    { title: "Goodnight Moon", author: "Margaret Wise Brown" },
+                    { title: "The Going to Bed Book", author: "Sandra Boynton" },
+                    { title: "Llama Llama Red Pajama", author: "Anna Dewdney" },
+                    { title: "Where the Wild Things Are", author: "Maurice Sendak" },
+                    { title: "Guess How Much I Love You", author: "Sam McBratney" },
+                    { title: "Time for Bed", author: "Mem Fox" },
+                    { title: "The Napping House", author: "Audrey Wood" },
+                    { title: "Pajama Time!", author: "Sandra Boynton" }
+                ],
+                adventure: [
+                    { title: "Where the Wild Things Are", author: "Maurice Sendak" },
+                    { title: "The Snowy Day", author: "Ezra Jack Keats" },
+                    { title: "We're Going on a Bear Hunt", author: "Michael Rosen" },
+                    { title: "Curious George", author: "H.A. Rey" },
+                    { title: "The Little Engine That Could", author: "Watty Piper" },
+                    { title: "Harold and the Purple Crayon", author: "Crockett Johnson" },
+                    { title: "Blueberries for Sal", author: "Robert McCloskey" },
+                    { title: "Madeline", author: "Ludwig Bemelmans" }
+                ],
+                feelings: [
+                    { title: "The Feelings Book", author: "Todd Parr" },
+                    { title: "In My Heart", author: "Jo Witek" },
+                    { title: "The Way I Feel", author: "Janan Cain" },
+                    { title: "Glad Monster, Sad Monster", author: "Ed Emberley" },
+                    { title: "When Sophie Gets Angry", author: "Molly Bang" },
+                    { title: "The Color Monster", author: "Anna Llenas" },
+                    { title: "My Many Colored Days", author: "Dr. Seuss" },
+                    { title: "The Invisible String", author: "Patrice Karst" }
+                ],
+                abc123: [
+                    { title: "Chicka Chicka Boom Boom", author: "Bill Martin Jr." },
+                    { title: "The Alphabet Book", author: "P.D. Eastman" },
+                    { title: "Eating the Alphabet", author: "Lois Ehlert" },
+                    { title: "1, 2, 3 to the Zoo", author: "Eric Carle" },
+                    { title: "Ten Little Ladybugs", author: "Melanie Gerth" },
+                    { title: "The Very Hungry Caterpillar's ABC", author: "Eric Carle" },
+                    { title: "Dr. Seuss's ABC", author: "Dr. Seuss" },
+                    { title: "Counting Kisses", author: "Karen Katz" }
+                ],
+                funny: [
+                    { title: "Don't Let the Pigeon Drive the Bus!", author: "Mo Willems" },
+                    { title: "The Book with No Pictures", author: "B.J. Novak" },
+                    { title: "Dragons Love Tacos", author: "Adam Rubin" },
+                    { title: "There's a Monster at the End of This Book", author: "Jon Stone" },
+                    { title: "Pete the Cat: I Love My White Shoes", author: "Eric Litwin" },
+                    { title: "Click, Clack, Moo: Cows That Type", author: "Doreen Cronin" },
+                    { title: "Interrupting Chicken", author: "David Ezra Stein" },
+                    { title: "The Day the Crayons Quit", author: "Drew Daywalt" }
+                ],
+                classics: [
+                    { title: "The Cat in the Hat", author: "Dr. Seuss" },
+                    { title: "Green Eggs and Ham", author: "Dr. Seuss" },
+                    { title: "Corduroy", author: "Don Freeman" },
+                    { title: "The Tale of Peter Rabbit", author: "Beatrix Potter" },
+                    { title: "Make Way for Ducklings", author: "Robert McCloskey" },
+                    { title: "The Little House", author: "Virginia Lee Burton" },
+                    { title: "Curious George", author: "H.A. Rey" },
+                    { title: "The Runaway Bunny", author: "Margaret Wise Brown" }
+                ],
+                seasons: [
+                    { title: "The Snowy Day", author: "Ezra Jack Keats" },
+                    { title: "Leaf Man", author: "Lois Ehlert" },
+                    { title: "The Curious Garden", author: "Peter Brown" },
+                    { title: "Red Leaf, Yellow Leaf", author: "Lois Ehlert" },
+                    { title: "Snowmen at Night", author: "Caralyn Buehner" },
+                    { title: "In the Small, Small Pond", author: "Denise Fleming" },
+                    { title: "Over and Under the Snow", author: "Kate Messner" },
+                    { title: "The Umbrella", author: "Jan Brett" }
+                ]
+            };
+
+            // Update category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Display suggestions
+            const bookList = suggestions[category] || [];
+            const html = bookList.map(book => `
+                <div class="suggestion-item">
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-author">by ${book.author}</div>
+                    <button class="btn" style="margin-top: 0.5rem; padding: 0.5rem;" onclick="quickAddSuggestion('${book.title.replace(/'/g, "\\'")}', '${book.author.replace(/'/g, "\\'")}')">
+                        Add to Library 📚
+                    </button>
+                </div>
+            `).join('');
+
+            document.getElementById('suggestionsList').innerHTML = html;
+        }
+
+        // Quick add suggestion
+        function quickAddSuggestion(title, author) {
+            const book = {
+                id: Date.now(),
+                title: title,
+                author: author,
+                date: new Date().toISOString().split('T')[0],
+                rating: 'like',
+                favorite: false,
+                childId: appData.currentChild
+            };
+
+            appData.books.push(book);
+            saveData();
+            updateDisplay();
+
+            showSuccess(`"${title}" added! 📚`);
+            goToPage('home', document.querySelector('.nav button'));
+        }
+
+        // Play games
+        function playGame(gameType) {
+            const messages = {
+                pete: "🎮 Pete's Button Hunt coming soon! Help Pete find his groovy buttons!",
+                match: "🎮 Story Match coming soon! Match your favorite book characters!",
+                word: "🎮 Word Builder coming soon! Build words and learn letters!",
+                memory: "🎮 Memory Match coming soon! Test your memory with fun cards!"
+            };
+
+            showSuccess(messages[gameType] || "Game coming soon!");
+        }
+
+        // Update badges display
+        function updateBadges() {
+            const childBooks = appData.books.filter(b => b.childId === appData.currentChild);
+            const bookCount = childBooks.length;
+
+            const badges = [
+                { icon: "🌟", name: "First Book", desc: "Read your first book", earned: bookCount >= 1 },
+                { icon: "📚", name: "Bookworm", desc: "Read 10 books", earned: bookCount >= 10 },
+                { icon: "🚀", name: "Super Reader", desc: "Read 25 books", earned: bookCount >= 25 },
+                { icon: "💫", name: "Star Reader", desc: "Read 50 books", earned: bookCount >= 50 },
+                { icon: "🏆", name: "Champion", desc: "Read 100 books", earned: bookCount >= 100 },
+                { icon: "🦸", name: "Reading Hero", desc: "Read 250 books", earned: bookCount >= 250 },
+                { icon: "👑", name: "Reading Royalty", desc: "Read 500 books", earned: bookCount >= 500 },
+                { icon: "🌈", name: "Rainbow Reader", desc: "Read 750 books", earned: bookCount >= 750 },
+                { icon: "🎯", name: "Goal Getter", desc: "Read 1000 books!", earned: bookCount >= 1000 },
+                { icon: "🔥", name: "On Fire", desc: "7 day reading streak", earned: calculateStreak(childBooks) >= 7 },
+                { icon: "⭐", name: "Favorite Finder", desc: "Mark 5 favorites", earned: childBooks.filter(b => b.favorite).length >= 5 },
+                { icon: "❤️", name: "Book Lover", desc: "Rate 10 books as loved", earned: childBooks.filter(b => b.rating === 'love').length >= 10 }
+            ];
+
+            const html = badges.map(badge => `
+                <div class="badge-item ${badge.earned ? 'badge-earned' : 'badge-locked'}">
+                    <div class="badge-icon">${badge.icon}</div>
+                    <div class="badge-name">${badge.name}</div>
+                    <div class="badge-description">${badge.desc}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('badgesList').innerHTML = html;
+        }
+
+        // Add slide up animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                from { transform: translate(-50%, 100%); }
+                to { transform: translate(-50%, 0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# Redirects for Netlify
+/js/* /js/:splat 200
+/css/* /css/:splat 200
+/images/* /images/:splat 200

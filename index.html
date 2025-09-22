@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BookWorm Journey - 1000 Books Before Kindergarten</title>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="BookWorm">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+    <meta name="theme-color" content="#6366f1">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <h1>📚 BookWorm Journey</h1>
+        <div class="user-info">
+            <select id="childSelector" style="
+                padding: 0.5rem;
+                border-radius: 8px;
+                border: none;
+                background: rgba(255,255,255,0.2);
+                color: white;
+                font-size: 1rem;
+                cursor: pointer;
+            ">
+                <option value="">Select Child</option>
+            </select>
+            <button id="settingsBtn" class="icon-btn" onclick="openSettings()">⚙️</button>
+        </div>
+    </header>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <button class="nav-btn active" onclick="switchPage('dashboard', this)">📊 Dashboard</button>
+        <button class="nav-btn" onclick="switchPage('add-book', this)">➕ Add Book</button>
+        <button class="nav-btn" onclick="switchPage('library', this)">📚 Library</button>
+        <button class="nav-btn" onclick="switchPage('suggestions', this)">💡 Suggestions</button>
+        <button class="nav-btn" onclick="switchPage('badges', this)">🏆 Badges</button>
+        <button class="nav-btn" onclick="switchPage('games', this)">🎮 Games</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content">
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="progress-circle">
+                <svg viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" class="progress-bg"/>
+                    <circle cx="100" cy="100" r="90" class="progress-bar" id="progressCircle"/>
+                    <text x="100" y="90" class="progress-number" id="bookCount">0</text>
+                    <text x="100" y="110" class="progress-label">books read</text>
+                    <text x="100" y="130" class="progress-goal">Goal: 1000</text>
+                </svg>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-emoji">📅</span>
+                    <span class="stat-value" id="daysActive">0</span>
+                    <span class="stat-label">Days Reading</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-emoji">📖</span>
+                    <span class="stat-value" id="booksThisWeek">0</span>
+                    <span class="stat-label">This Week</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-emoji">⭐</span>
+                    <span class="stat-value" id="favoriteCount">0</span>
+                    <span class="stat-label">Favorites</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-emoji">🔥</span>
+                    <span class="stat-value" id="currentStreak">0</span>
+                    <span class="stat-label">Day Streak</span>
+                </div>
+            </div>
+
+            <div class="recent-books">
+                <h3>Recently Read</h3>
+                <div id="recentBooksList" class="books-scroll">
+                    <!-- Recent books will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Book Page -->
+        <div id="add-book" class="page">
+            <h2>Add a Book</h2>
+            <form id="addBookForm">
+                <div class="form-group">
+                    <label for="bookTitle">Book Title</label>
+                    <input type="text" id="bookTitle" required placeholder="Enter book title...">
+                </div>
+
+                <div class="form-group">
+                    <label for="bookAuthor">Author</label>
+                    <input type="text" id="bookAuthor" placeholder="Enter author name...">
+                </div>
+
+                <div class="form-group">
+                    <label for="readDate">Date Read</label>
+                    <input type="date" id="readDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>How was it?</label>
+                    <div class="rating-buttons">
+                        <button type="button" class="rating-btn" data-rating="love">😍 Loved it!</button>
+                        <button type="button" class="rating-btn" data-rating="like">😊 Liked it</button>
+                        <button type="button" class="rating-btn" data-rating="okay">😐 It was okay</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes (optional)</label>
+                    <textarea id="notes" placeholder="What did you like about this book?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="isFavorite">
+                        <span>Add to favorites ⭐</span>
+                    </label>
+                </div>
+
+                <button type="button" class="submit-btn" onclick="simpleAddBook()">Add Book 📚</button>
+            </form>
+
+            <!-- Quick Add for Re-reads -->
+            <div class="quick-add-section">
+                <h3>Quick Add Recent Books (Re-reads count!)</h3>
+                <div id="quickAddList" class="quick-add-grid">
+                    <!-- Quick add buttons will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Library Page -->
+        <div id="library" class="page">
+            <h2>Your Library</h2>
+            <div class="library-controls">
+                <input type="search" id="searchBooks" placeholder="Search your books...">
+                <select id="sortBooks">
+                    <option value="recent">Most Recent</option>
+                    <option value="title">By Title</option>
+                    <option value="author">By Author</option>
+                    <option value="rating">By Rating</option>
+                </select>
+            </div>
+            <div id="libraryList" class="library-grid">
+                <!-- Books will appear here -->
+            </div>
+        </div>
+
+        <!-- Suggestions Page -->
+        <div id="suggestions" class="page">
+            <h2>Book Suggestions</h2>
+            <div class="suggestion-categories">
+                <button class="suggestion-btn" data-category="animals">🐶 Animals</button>
+                <button class="suggestion-btn" data-category="bedtime">😴 Bedtime</button>
+                <button class="suggestion-btn" data-category="adventure">🗺️ Adventure</button>
+                <button class="suggestion-btn" data-category="feelings">❤️ Feelings</button>
+                <button class="suggestion-btn" data-category="abc-123">🔤 ABC & 123</button>
+                <button class="suggestion-btn" data-category="funny">😂 Funny</button>
+                <button class="suggestion-btn" data-category="classics">📖 Classics</button>
+                <button class="suggestion-btn" data-category="seasons">🍂 Seasons</button>
+            </div>
+            <div id="suggestionsList" class="suggestions-list">
+                <p>Select a category above to see book suggestions!</p>
+            </div>
+        </div>
+
+        <!-- Badges Page -->
+        <div id="badges" class="page">
+            <h2>Your Achievements</h2>
+            <div id="badgesList" class="badges-grid">
+                <!-- Badges will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Games Page -->
+        <div id="games" class="page">
+            <h2>Reading Games</h2>
+            <div class="games-grid">
+                <div class="game-card" data-game="pete-buttons">
+                    <div class="game-icon">🔘</div>
+                    <h3>Pete's Button Hunt</h3>
+                    <p>Help Pete the Cat find his groovy buttons!</p>
+                    <button class="play-btn">Play</button>
+                </div>
+                <div class="game-card" data-game="story-match">
+                    <div class="game-icon">📚</div>
+                    <h3>Story Match</h3>
+                    <p>Match book characters and objects!</p>
+                    <button class="play-btn">Play</button>
+                </div>
+                <div class="game-card" data-game="word-builder">
+                    <div class="game-icon">🔤</div>
+                    <h3>Word Builder</h3>
+                    <p>Build simple words from letters!</p>
+                    <button class="play-btn">Play</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSettings()">&times;</span>
+            <h2>Settings</h2>
+            <div class="settings-form">
+                <!-- Multiple Children Management -->
+                <div style="margin-bottom: 2rem; padding: 1.5rem; background: #e0f2fe; border-radius: 10px;">
+                    <h3 style="margin-bottom: 1rem; color: #0284c7;">👶 Manage Children</h3>
+
+                    <div id="childrenList" style="margin-bottom: 1rem;">
+                        <!-- Children will be listed here -->
+                    </div>
+
+                    <div style="border-top: 1px solid #bae6fd; padding-top: 1rem; margin-top: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">Add New Child</h4>
+                        <div class="form-group">
+                            <input type="text" id="newChildName" placeholder="Child's name...">
+                        </div>
+                        <div class="form-group">
+                            <input type="date" id="newChildBirthdate" placeholder="Birth date...">
+                        </div>
+                        <button id="addChildBtn" class="submit-btn" style="background: #0284c7;" onclick="if(typeof addNewChild === 'function') addNewChild()">
+                            Add Child ➕
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dailyGoal">Daily Reading Goal</label>
+                    <input type="number" id="dailyGoal" min="1" max="10" value="3">
+                </div>
+
+                <!-- Family Sync Section -->
+                <div style="margin: 2rem 0; padding: 1.5rem; background: #f3f4f6; border-radius: 10px;">
+                    <h3 style="margin-bottom: 1rem; color: #6366f1;">👨‍👩‍👧‍👦 Family Sync</h3>
+                    <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #6b7280;">
+                        Share your reading journey across devices using a family code.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="familyCode">Family Code</label>
+                        <input type="text" id="familyCode" placeholder="Enter 6-digit code (e.g., ABC123)" maxlength="6" style="text-transform: uppercase;">
+                        <small style="display: block; margin-top: 0.5rem; color: #6b7280;">
+                            Create your own code or use an existing family code
+                        </small>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button id="connectFamily" class="submit-btn" style="flex: 1;">
+                            Connect to Family
+                        </button>
+                        <button id="syncNow" class="secondary-btn" style="flex: 1;">
+                            Sync Now
+                        </button>
+                    </div>
+
+                    <div id="syncStatus" style="
+                        margin-top: 1rem;
+                        padding: 0.75rem;
+                        border-radius: 8px;
+                        font-size: 0.9rem;
+                        display: none;
+                    "></div>
+                </div>
+
+                <button id="saveSettings" class="submit-btn">Save Settings</button>
+                <button id="exportData" class="secondary-btn">Export Data</button>
+                <button id="clearData" class="danger-btn">Clear All Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Inline critical functions for Safari iOS -->
+    <script>
+        // Initialize app state
+        window.appState = window.appState || {
+            currentPage: 'dashboard',
+            user: {
+                childName: 'Little Reader',
+                birthDate: '',
+                dailyGoal: 3
+            },
+            books: [],
+            currentStreak: 0,
+            longestStreak: 0,
+            totalDaysActive: 0
+        };
+
+        // Simple page switching for Safari
+        function switchPage(pageName, button) {
+            console.log('Switching to page:', pageName);
+
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (button) {
+                button.classList.add('active');
+            }
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageName);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                targetPage.classList.add('active');
+
+                // Update page content based on what page we're showing
+                if (pageName === 'dashboard') {
+                    updateDashboardSimple();
+                } else if (pageName === 'library') {
+                    updateLibrarySimple();
+                } else if (pageName === 'badges') {
+                    updateBadgesSimple();
+                }
+            }
+        }
+
+        // Simple dashboard update
+        function updateDashboardSimple() {
+            console.log('Updating dashboard');
+            const bookCount = (window.appState && window.appState.books) ? window.appState.books.length : 0;
+
+            // Update book count
+            const countElement = document.getElementById('bookCount');
+            if (countElement) {
+                countElement.textContent = bookCount;
+            }
+
+            // Update progress circle
+            const progressCircle = document.getElementById('progressCircle');
+            if (progressCircle) {
+                const percentage = Math.min((bookCount / 1000) * 100, 100);
+                const offset = 565 - (565 * percentage) / 100;
+                progressCircle.style.strokeDashoffset = offset;
+            }
+
+            // Update stats
+            document.getElementById('booksThisWeek').textContent = '0';
+            document.getElementById('favoriteCount').textContent = '0';
+            document.getElementById('currentStreak').textContent = '0';
+            document.getElementById('daysActive').textContent = '0';
+        }
+
+        // Simple library update
+        function updateLibrarySimple() {
+            console.log('Updating library');
+            const libraryList = document.getElementById('libraryList');
+            if (libraryList) {
+                if (!window.appState || !window.appState.books || window.appState.books.length === 0) {
+                    libraryList.innerHTML = '<p style="text-align: center; color: #6b7280;">Your library is empty. Add your first book!</p>';
+                } else {
+                    libraryList.innerHTML = window.appState.books.map(book => `
+                        <div class="library-book">
+                            <h3>${book.title}</h3>
+                            ${book.author ? `<p style="color: #6b7280;">${book.author}</p>` : ''}
+                            <p style="color: #9ca3af; font-size: 0.85rem;">Read: ${book.readDate || 'Unknown'}</p>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        // Simple badges update
+        function updateBadgesSimple() {
+            console.log('Updating badges');
+            const badgesList = document.getElementById('badgesList');
+            if (badgesList) {
+                badgesList.innerHTML = `
+                    <div class="badge-card">
+                        <div class="badge-icon">👶</div>
+                        <div class="badge-name">First Steps</div>
+                        <div class="badge-description">Read your first book!</div>
+                    </div>
+                    <div class="badge-card locked">
+                        <div class="badge-icon">🏆</div>
+                        <div class="badge-name">Champion</div>
+                        <div class="badge-description">Read 100 books</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Simple settings modal for Safari
+        function openSettings() {
+            console.log('Opening settings...');
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
+
+            // Update children list if function exists
+            if (typeof window.updateChildrenList === 'function') {
+                window.updateChildrenList();
+            }
+        }
+
+        // Close settings
+        function closeSettings() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+
+            // Load saved data
+            const savedState = localStorage.getItem('bookwormJourney');
+            if (savedState) {
+                try {
+                    window.appState = JSON.parse(savedState);
+                } catch(e) {
+                    console.log('Could not load saved state');
+                }
+            }
+
+            // Show dashboard
+            updateDashboardSimple();
+
+            // Set today's date in form
+            const dateInput = document.getElementById('readDate');
+            if (dateInput) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+        });
+
+        // Simple add book function
+        function simpleAddBook() {
+            const title = document.getElementById('bookTitle').value;
+            if (!title) {
+                alert('Please enter a book title');
+                return;
+            }
+
+            const book = {
+                id: Date.now(),
+                title: title,
+                author: document.getElementById('bookAuthor').value || '',
+                readDate: document.getElementById('readDate').value,
+                isFavorite: document.getElementById('isFavorite').checked
+            };
+
+            window.appState.books.push(book);
+            localStorage.setItem('bookwormJourney', JSON.stringify(window.appState));
+
+            // Clear form
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('bookAuthor').value = '';
+
+            alert('Book added! 📚');
+
+            // Go to dashboard
+            switchPage('dashboard', document.querySelector('.nav-btn'));
+        }
+    </script>
+
+    <script src="js/app.js"></script>
+    <script src="js/family-sync.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/badges.js"></script>
+    <script src="js/suggestions.js"></script>
+    <script src="js/games.js"></script>
+
+    <!-- Initialize everything after all scripts are loaded -->
+    <script src="js/init.js"></script>
+
+    <!-- Mobile Safari fixes -->
+    <script src="js/mobile-fix.js"></script>
+
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>

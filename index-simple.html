@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookWorm Journey - 1000 Books Before Kindergarten</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            padding-bottom: 60px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            overflow-x: auto;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 80px;
+            color: #6b7280;
+        }
+
+        .tab.active {
+            color: #6366f1;
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+            min-height: calc(100vh - 120px);
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .progress-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #6366f1;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .btn {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            background: #4f46e5;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .child-selector {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6366f1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 BookWorm Journey</h1>
+        <select class="child-selector" id="childSelect" onchange="switchChild()">
+            <option>Select Child</option>
+        </select>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="page active">
+        <div class="card progress-container">
+            <svg class="progress-circle" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="90" fill="none" stroke="#e5e7eb" stroke-width="10"/>
+                <circle cx="100" cy="100" r="90" fill="none" stroke="#6366f1" stroke-width="10"
+                        stroke-dasharray="565" stroke-dashoffset="565" id="progressBar"
+                        style="transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 1s;"/>
+            </svg>
+            <div class="progress-text">
+                <div class="progress-number" id="bookCount">0</div>
+                <div class="progress-label">books read</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="weekCount">0</div>
+                <div class="stat-label">This Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="favoriteCount">0</div>
+                <div class="stat-label">Favorites</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Book Page -->
+    <div id="addbook" class="page">
+        <div class="card">
+            <h2>Add a Book</h2>
+            <label>Book Title</label>
+            <input type="text" id="bookTitle" placeholder="Enter book title">
+
+            <label>Author</label>
+            <input type="text" id="bookAuthor" placeholder="Enter author name">
+
+            <label>Date Read</label>
+            <input type="date" id="readDate">
+
+            <button class="btn" onclick="addBook()">Add Book 📚</button>
+        </div>
+
+        <div class="card">
+            <h3>Recent Books</h3>
+            <div id="recentBooks"></div>
+        </div>
+    </div>
+
+    <!-- Library Page -->
+    <div id="library" class="page">
+        <div class="card">
+            <h2>Your Library</h2>
+            <div id="libraryList">
+                <p>No books yet. Add your first book!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settings" class="page">
+        <div class="card">
+            <h2>Settings</h2>
+
+            <h3>Children</h3>
+            <div id="childrenList"></div>
+
+            <label>Add New Child</label>
+            <input type="text" id="newChildName" placeholder="Child's name">
+            <button class="btn" onclick="addChild()">Add Child</button>
+
+            <h3 style="margin-top: 20px;">Family Sync</h3>
+            <label>Family Code (6 characters)</label>
+            <input type="text" id="familyCode" placeholder="ABC123" maxlength="6" style="text-transform: uppercase;">
+            <button class="btn" onclick="saveFamily()">Save Family Code</button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('dashboard')">📊 Home</button>
+        <button class="tab" onclick="showTab('addbook')">➕ Add</button>
+        <button class="tab" onclick="showTab('library')">📚 Library</button>
+        <button class="tab" onclick="showTab('settings')">⚙️ Settings</button>
+    </div>
+
+    <script>
+        // Simple state management
+        let state = {
+            children: [],
+            currentChild: null,
+            books: []
+        };
+
+        // Initialize
+        function init() {
+            console.log('Initializing app...');
+            loadData();
+            updateDisplay();
+
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('readDate').value = today;
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            console.log('Showing tab:', tabName);
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const page = document.getElementById(tabName);
+            if (page) {
+                page.classList.add('active');
+            }
+
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update displays
+            if (tabName === 'library') {
+                updateLibrary();
+            } else if (tabName === 'settings') {
+                updateSettings();
+            } else if (tabName === 'addbook') {
+                updateRecentBooks();
+            }
+        }
+
+        // Add a book
+        function addBook() {
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const date = document.getElementById('readDate').value;
+
+            if (!title) {
+                alert('Please enter a book title');
+                return;
+            }
+
+            const book = {
+                id: Date.now(),
+                title: title,
+                author: author,
+                date: date,
+                childId: state.currentChild
+            };
+
+            state.books.push(book);
+            saveData();
+
+            // Clear form
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('bookAuthor').value = '';
+
+            // Update display
+            updateDisplay();
+
+            alert('Book added! 📚');
+
+            // Go to dashboard
+            showTab('dashboard');
+            document.querySelectorAll('.tab')[0].classList.add('active');
+        }
+
+        // Add a child
+        function addChild() {
+            const name = document.getElementById('newChildName').value;
+
+            if (!name) {
+                alert('Please enter a child name');
+                return;
+            }
+
+            const child = {
+                id: 'child_' + Date.now(),
+                name: name
+            };
+
+            state.children.push(child);
+
+            if (!state.currentChild) {
+                state.currentChild = child.id;
+            }
+
+            saveData();
+
+            document.getElementById('newChildName').value = '';
+
+            updateDisplay();
+            updateSettings();
+
+            alert('Child added!');
+        }
+
+        // Switch child
+        function switchChild() {
+            const select = document.getElementById('childSelect');
+            state.currentChild = select.value;
+            saveData();
+            updateDisplay();
+        }
+
+        // Update display
+        function updateDisplay() {
+            // Update child selector
+            const select = document.getElementById('childSelect');
+            select.innerHTML = '';
+
+            if (state.children.length === 0) {
+                // Add default child
+                const defaultChild = {
+                    id: 'child_' + Date.now(),
+                    name: 'My Child'
+                };
+                state.children.push(defaultChild);
+                state.currentChild = defaultChild.id;
+                saveData();
+            }
+
+            state.children.forEach(child => {
+                const option = document.createElement('option');
+                option.value = child.id;
+                option.textContent = child.name;
+                if (child.id === state.currentChild) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+
+            // Update book count
+            const childBooks = state.books.filter(b => b.childId === state.currentChild);
+            document.getElementById('bookCount').textContent = childBooks.length;
+
+            // Update progress bar
+            const progress = Math.min((childBooks.length / 1000) * 100, 100);
+            const offset = 565 - (565 * progress) / 100;
+            document.getElementById('progressBar').style.strokeDashoffset = offset;
+
+            // Update stats
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekBooks = childBooks.filter(b => new Date(b.date) >= weekAgo);
+            document.getElementById('weekCount').textContent = weekBooks.length;
+
+            document.getElementById('favoriteCount').textContent = '0';
+        }
+
+        // Update library
+        function updateLibrary() {
+            const list = document.getElementById('libraryList');
+            const childBooks = state.books.filter(b => b.childId === state.currentChild);
+
+            if (childBooks.length === 0) {
+                list.innerHTML = '<p>No books yet. Add your first book!</p>';
+                return;
+            }
+
+            list.innerHTML = childBooks.map(book => `
+                <div style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                    <strong>${book.title}</strong><br>
+                    ${book.author ? `by ${book.author}<br>` : ''}
+                    <small>${book.date}</small>
+                </div>
+            `).join('');
+        }
+
+        // Update recent books
+        function updateRecentBooks() {
+            const list = document.getElementById('recentBooks');
+            const childBooks = state.books.filter(b => b.childId === state.currentChild).slice(-5);
+
+            if (childBooks.length === 0) {
+                list.innerHTML = '<p>No recent books</p>';
+                return;
+            }
+
+            list.innerHTML = childBooks.map(book => `
+                <div style="padding: 5px;">📖 ${book.title}</div>
+            `).join('');
+        }
+
+        // Update settings
+        function updateSettings() {
+            const list = document.getElementById('childrenList');
+            list.innerHTML = state.children.map(child => `
+                <div style="padding: 10px; border: 1px solid #e5e7eb; margin: 5px 0; border-radius: 5px;">
+                    ${child.name}
+                </div>
+            `).join('');
+        }
+
+        // Save family code
+        function saveFamily() {
+            const code = document.getElementById('familyCode').value;
+            if (code.length === 6) {
+                localStorage.setItem('familyCode', code);
+                alert('Family code saved!');
+            } else {
+                alert('Please enter a 6-character code');
+            }
+        }
+
+        // Data persistence
+        function saveData() {
+            localStorage.setItem('bookwormState', JSON.stringify(state));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('bookwormState');
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+        }
+
+        // Start app
+        window.onload = init;
+    </script>
+</body>
+</html>
