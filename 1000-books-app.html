@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1000 Books Before Kindergarten - Hamburg Township Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .app-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .child-selector {
+            margin-top: 10px;
+        }
+
+        .child-selector select {
+            padding: 8px 15px;
+            border-radius: 25px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            padding: 10px;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Dashboard Styles */
+        .progress-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-circle {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .progress-text {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-label {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-emoji {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .rating-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .rating-btn {
+            padding: 10px 20px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .rating-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .rating-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .submit-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        /* Library Styles */
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .book-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .book-author {
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .book-date {
+            font-size: 0.9rem;
+            color: #adb5bd;
+        }
+
+        .book-rating {
+            margin-top: 10px;
+        }
+
+        /* Badges */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .badge-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .badge-card.earned {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .badge-card.locked {
+            opacity: 0.5;
+        }
+
+        .badge-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .badge-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .badge-description {
+            font-size: 0.9rem;
+        }
+
+        /* Recent Books */
+        .recent-books {
+            margin-top: 30px;
+        }
+
+        .recent-books h3 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .recent-books-list {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .recent-book {
+            min-width: 150px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* Milestones */
+        .milestone-tracker {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .milestone-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .milestone-progress {
+            font-size: 1.2rem;
+        }
+
+        .next-milestone {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <h1>📚 1000 Books Before Kindergarten</h1>
+            <div class="child-selector">
+                <select id="childSelect" onchange="switchChild(this.value)">
+                    <option value="">Select Child</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="showPage('add-book')">➕ Add Book</button>
+            <button class="nav-tab" onclick="showPage('library')">📚 Library</button>
+            <button class="nav-tab" onclick="showPage('badges')">🏆 Badges</button>
+            <button class="nav-tab" onclick="showPage('milestones')">🎯 Milestones</button>
+            <button class="nav-tab" onclick="showPage('settings')">⚙️ Settings</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="progress-container">
+                    <svg class="progress-circle" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="#e9ecef" stroke-width="10"/>
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="#667eea" stroke-width="10"
+                                stroke-dasharray="565" stroke-dashoffset="565" id="progressCircle"
+                                transform="rotate(-90 100 100)"/>
+                    </svg>
+                    <div class="progress-text" id="bookCount">0</div>
+                    <div class="progress-label">books read</div>
+                </div>
+
+                <div class="milestone-tracker" id="milestoneTracker" style="display: none;">
+                    <div class="milestone-title">🎉 Next Milestone</div>
+                    <div class="milestone-progress" id="milestoneProgress"></div>
+                    <div class="next-milestone" id="nextMilestone"></div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-emoji">📅</div>
+                        <div class="stat-value" id="daysActive">0</div>
+                        <div class="stat-label">Days Active</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-emoji">📖</div>
+                        <div class="stat-value" id="thisWeek">0</div>
+                        <div class="stat-label">This Week</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-emoji">⭐</div>
+                        <div class="stat-value" id="favorites">0</div>
+                        <div class="stat-label">Favorites</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-emoji">🔥</div>
+                        <div class="stat-value" id="streak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+
+                <div class="recent-books">
+                    <h3>Recently Read</h3>
+                    <div class="recent-books-list" id="recentBooks">
+                        <p style="color: #6c757d;">No books added yet. Start your reading journey!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Book Page -->
+            <div id="add-book" class="page">
+                <h2>Add a New Book</h2>
+                <form id="addBookForm" onsubmit="addBook(event)">
+                    <div class="form-group">
+                        <label for="bookTitle">Book Title *</label>
+                        <input type="text" id="bookTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookAuthor">Author</label>
+                        <input type="text" id="bookAuthor">
+                    </div>
+                    <div class="form-group">
+                        <label for="readDate">Date Read *</label>
+                        <input type="date" id="readDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>How did you like it?</label>
+                        <div class="rating-buttons">
+                            <button type="button" class="rating-btn" onclick="selectRating(this, 'love')">😍 Loved it!</button>
+                            <button type="button" class="rating-btn" onclick="selectRating(this, 'like')">😊 Liked it</button>
+                            <button type="button" class="rating-btn" onclick="selectRating(this, 'okay')">😐 It was okay</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes (optional)</label>
+                        <textarea id="notes" rows="3" placeholder="What did you think about this book?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="isFavorite">
+                            Add to favorites ⭐
+                        </label>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Book 📚</button>
+                </form>
+            </div>
+
+            <!-- Library Page -->
+            <div id="library" class="page">
+                <h2>Your Library</h2>
+                <div class="form-group">
+                    <input type="search" id="searchBooks" placeholder="Search books..." oninput="searchBooks()">
+                </div>
+                <div class="library-grid" id="libraryGrid">
+                    <p style="color: #6c757d; text-align: center; grid-column: 1/-1;">Your library is empty. Start adding books!</p>
+                </div>
+            </div>
+
+            <!-- Badges Page -->
+            <div id="badges" class="page">
+                <h2>Your Badges</h2>
+                <div class="badges-grid" id="badgesGrid"></div>
+            </div>
+
+            <!-- Milestones Page -->
+            <div id="milestones" class="page">
+                <h2>Reading Milestones</h2>
+                <div class="badges-grid" id="milestonesGrid"></div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings" class="page">
+                <h2>Settings</h2>
+                <div class="form-group">
+                    <label for="childName">Child's Name</label>
+                    <input type="text" id="childName" placeholder="Enter child's name">
+                </div>
+                <div class="form-group">
+                    <label for="birthDate">Birth Date</label>
+                    <input type="date" id="birthDate">
+                </div>
+                <div class="form-group">
+                    <label for="dailyGoal">Daily Reading Goal</label>
+                    <select id="dailyGoal">
+                        <option value="1">1 book</option>
+                        <option value="2">2 books</option>
+                        <option value="3" selected>3 books</option>
+                        <option value="4">4 books</option>
+                        <option value="5">5 books</option>
+                    </select>
+                </div>
+                <button class="submit-btn" onclick="saveSettings()">Save Settings</button>
+                <div style="margin-top: 20px;">
+                    <button class="submit-btn" style="background: #28a745;" onclick="exportData()">Export Data 📥</button>
+                    <button class="submit-btn" style="background: #dc3545;" onclick="clearData()">Clear All Data 🗑️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // App State
+        let appData = {
+            children: [],
+            currentChild: null,
+            books: [],
+            settings: {
+                dailyGoal: 3
+            }
+        };
+
+        let selectedRating = '';
+
+        // Milestones
+        const milestones = [
+            { books: 10, name: "First Chapter", emoji: "📖" },
+            { books: 25, name: "Bookworm", emoji: "🐛" },
+            { books: 50, name: "Page Turner", emoji: "📄" },
+            { books: 100, name: "Century Reader", emoji: "💯" },
+            { books: 250, name: "Quarter Master", emoji: "🎯" },
+            { books: 500, name: "Halfway Hero", emoji: "🌟" },
+            { books: 750, name: "Super Reader", emoji: "🦸" },
+            { books: 1000, name: "Champion!", emoji: "🏆" }
+        ];
+
+        // Badges
+        const badges = [
+            { id: 'first-book', name: 'First Book', description: 'Read your first book!', emoji: '📘', condition: (books) => books.length >= 1 },
+            { id: 'week-streak', name: 'Week Streak', description: '7 day reading streak', emoji: '🔥', condition: (books) => calculateStreak(books) >= 7 },
+            { id: 'night-owl', name: 'Night Owl', description: 'Read 10 bedtime stories', emoji: '🦉', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('bedtime')).length >= 10 },
+            { id: 'favorite-finder', name: 'Favorite Finder', description: 'Mark 5 books as favorites', emoji: '⭐', condition: (books) => books.filter(b => b.isFavorite).length >= 5 },
+            { id: 'speed-reader', name: 'Speed Reader', description: 'Read 10 books in one week', emoji: '⚡', condition: (books) => checkWeeklyBooks(books) >= 10 },
+            { id: 'variety-reader', name: 'Variety Reader', description: 'Read books from 10 different authors', emoji: '🌈', condition: (books) => new Set(books.map(b => b.author).filter(a => a)).size >= 10 }
+        ];
+
+        // Initialize App
+        function initApp() {
+            loadData();
+            updateChildSelector();
+            setTodaysDate();
+            updateDashboard();
+            initializeBadges();
+            initializeMilestones();
+        }
+
+        // Load Data
+        function loadData() {
+            const saved = localStorage.getItem('1000BooksApp');
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
+        }
+
+        // Save Data
+        function saveData() {
+            localStorage.setItem('1000BooksApp', JSON.stringify(appData));
+        }
+
+        // Update Child Selector
+        function updateChildSelector() {
+            const selector = document.getElementById('childSelect');
+            selector.innerHTML = '<option value="">Select Child</option>';
+
+            appData.children.forEach((child, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = child.name;
+                selector.appendChild(option);
+            });
+
+            // Add option to create new child
+            const addOption = document.createElement('option');
+            addOption.value = 'new';
+            addOption.textContent = '➕ Add New Child';
+            selector.appendChild(addOption);
+        }
+
+        // Switch Child
+        function switchChild(value) {
+            if (value === 'new') {
+                const name = prompt('Enter child\'s name:');
+                if (name) {
+                    const newChild = {
+                        id: Date.now(),
+                        name: name,
+                        birthDate: '',
+                        books: []
+                    };
+                    appData.children.push(newChild);
+                    appData.currentChild = appData.children.length - 1;
+                    saveData();
+                    updateChildSelector();
+                    document.getElementById('childSelect').value = appData.currentChild;
+                    updateDashboard();
+                }
+            } else if (value !== '') {
+                appData.currentChild = parseInt(value);
+                saveData();
+                updateDashboard();
+            }
+        }
+
+        // Show Page
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageName).classList.add('active');
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (pageName === 'library') {
+                displayLibrary();
+            }
+        }
+
+        // Update Dashboard
+        function updateDashboard() {
+            if (appData.currentChild === null || !appData.children[appData.currentChild]) {
+                document.getElementById('bookCount').textContent = '0';
+                return;
+            }
+
+            const child = appData.children[appData.currentChild];
+            const books = child.books || [];
+
+            // Update book count
+            document.getElementById('bookCount').textContent = books.length;
+
+            // Update progress circle
+            const progress = (books.length / 1000) * 565;
+            document.getElementById('progressCircle').style.strokeDashoffset = 565 - progress;
+
+            // Update stats
+            document.getElementById('daysActive').textContent = calculateDaysActive(books);
+            document.getElementById('thisWeek').textContent = calculateThisWeek(books);
+            document.getElementById('favorites').textContent = books.filter(b => b.isFavorite).length;
+            document.getElementById('streak').textContent = calculateStreak(books);
+
+            // Update recent books
+            displayRecentBooks(books);
+
+            // Update milestone tracker
+            updateMilestoneTracker(books.length);
+        }
+
+        // Update Milestone Tracker
+        function updateMilestoneTracker(bookCount) {
+            const tracker = document.getElementById('milestoneTracker');
+            const nextMilestone = milestones.find(m => m.books > bookCount);
+
+            if (nextMilestone) {
+                tracker.style.display = 'block';
+                document.getElementById('milestoneProgress').textContent = `${bookCount} / ${nextMilestone.books} books`;
+                document.getElementById('nextMilestone').textContent = `${nextMilestone.emoji} ${nextMilestone.name}`;
+            } else {
+                tracker.style.display = 'none';
+            }
+        }
+
+        // Calculate Days Active
+        function calculateDaysActive(books) {
+            if (books.length === 0) return 0;
+            const dates = [...new Set(books.map(b => b.readDate))];
+            return dates.length;
+        }
+
+        // Calculate This Week
+        function calculateThisWeek(books) {
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return books.filter(b => new Date(b.readDate) >= weekAgo).length;
+        }
+
+        // Check Weekly Books
+        function checkWeeklyBooks(books) {
+            let maxWeekly = 0;
+            const sortedBooks = books.sort((a, b) => new Date(a.readDate) - new Date(b.readDate));
+
+            for (let i = 0; i < sortedBooks.length; i++) {
+                const weekEnd = new Date(sortedBooks[i].readDate);
+                weekEnd.setDate(weekEnd.getDate() + 7);
+                const weekBooks = sortedBooks.filter(b =>
+                    new Date(b.readDate) >= new Date(sortedBooks[i].readDate) &&
+                    new Date(b.readDate) < weekEnd
+                ).length;
+                maxWeekly = Math.max(maxWeekly, weekBooks);
+            }
+            return maxWeekly;
+        }
+
+        // Calculate Streak
+        function calculateStreak(books) {
+            if (books.length === 0) return 0;
+
+            const dates = [...new Set(books.map(b => b.readDate))].sort().reverse();
+            const today = new Date().toISOString().split('T')[0];
+
+            if (dates[0] !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (dates[0] !== yesterday.toISOString().split('T')[0]) {
+                    return 0;
+                }
+            }
+
+            let streak = 1;
+            for (let i = 1; i < dates.length; i++) {
+                const prevDate = new Date(dates[i - 1]);
+                const currDate = new Date(dates[i]);
+                const dayDiff = (prevDate - currDate) / (1000 * 60 * 60 * 24);
+
+                if (dayDiff === 1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        // Display Recent Books
+        function displayRecentBooks(books) {
+            const container = document.getElementById('recentBooks');
+            if (books.length === 0) {
+                container.innerHTML = '<p style="color: #6c757d;">No books added yet. Start your reading journey!</p>';
+                return;
+            }
+
+            const recent = books.slice(-5).reverse();
+            container.innerHTML = recent.map(book => `
+                <div class="recent-book">
+                    <div style="font-weight: bold; margin-bottom: 5px;">${book.title}</div>
+                    <div style="font-size: 0.9rem; color: #6c757d;">${book.rating === 'love' ? '😍' : book.rating === 'like' ? '😊' : '😐'}</div>
+                </div>
+            `).join('');
+        }
+
+        // Set Today's Date
+        function setTodaysDate() {
+            document.getElementById('readDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        // Select Rating
+        function selectRating(btn, rating) {
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedRating = rating;
+        }
+
+        // Add Book
+        function addBook(event) {
+            event.preventDefault();
+
+            if (appData.currentChild === null) {
+                showToast('Please select or add a child first!');
+                document.getElementById('childSelect').focus();
+                return;
+            }
+
+            const book = {
+                id: Date.now(),
+                title: document.getElementById('bookTitle').value,
+                author: document.getElementById('bookAuthor').value,
+                readDate: document.getElementById('readDate').value,
+                rating: selectedRating,
+                notes: document.getElementById('notes').value,
+                isFavorite: document.getElementById('isFavorite').checked
+            };
+
+            appData.children[appData.currentChild].books.push(book);
+            saveData();
+
+            // Check for new badges
+            checkBadges();
+
+            // Reset form
+            document.getElementById('addBookForm').reset();
+            setTodaysDate();
+            selectedRating = '';
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+
+            showToast('Book added successfully! 📚');
+            updateDashboard();
+
+            // Check for milestones
+            const bookCount = appData.children[appData.currentChild].books.length;
+            const milestone = milestones.find(m => m.books === bookCount);
+            if (milestone) {
+                setTimeout(() => {
+                    showToast(`🎉 Milestone reached: ${milestone.name}! ${milestone.emoji}`);
+                }, 1000);
+            }
+        }
+
+        // Display Library
+        function displayLibrary() {
+            if (appData.currentChild === null || !appData.children[appData.currentChild]) {
+                document.getElementById('libraryGrid').innerHTML = '<p style="color: #6c757d; text-align: center; grid-column: 1/-1;">Please select a child first.</p>';
+                return;
+            }
+
+            const books = appData.children[appData.currentChild].books || [];
+            const container = document.getElementById('libraryGrid');
+
+            if (books.length === 0) {
+                container.innerHTML = '<p style="color: #6c757d; text-align: center; grid-column: 1/-1;">Your library is empty. Start adding books!</p>';
+                return;
+            }
+
+            container.innerHTML = books.map(book => `
+                <div class="book-card">
+                    <div class="book-title">${book.title} ${book.isFavorite ? '⭐' : ''}</div>
+                    ${book.author ? `<div class="book-author">by ${book.author}</div>` : ''}
+                    <div class="book-date">Read on ${new Date(book.readDate).toLocaleDateString()}</div>
+                    <div class="book-rating">${book.rating === 'love' ? '😍 Loved it!' : book.rating === 'like' ? '😊 Liked it' : book.rating === 'okay' ? '😐 It was okay' : ''}</div>
+                    ${book.notes ? `<div style="margin-top: 10px; font-size: 0.9rem; color: #6c757d;">${book.notes}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Search Books
+        function searchBooks() {
+            const query = document.getElementById('searchBooks').value.toLowerCase();
+            const books = appData.children[appData.currentChild]?.books || [];
+
+            const filtered = books.filter(book =>
+                book.title.toLowerCase().includes(query) ||
+                book.author.toLowerCase().includes(query)
+            );
+
+            const container = document.getElementById('libraryGrid');
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="color: #6c757d; text-align: center; grid-column: 1/-1;">No books found.</p>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(book => `
+                <div class="book-card">
+                    <div class="book-title">${book.title} ${book.isFavorite ? '⭐' : ''}</div>
+                    ${book.author ? `<div class="book-author">by ${book.author}</div>` : ''}
+                    <div class="book-date">Read on ${new Date(book.readDate).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize Badges
+        function initializeBadges() {
+            const container = document.getElementById('badgesGrid');
+            container.innerHTML = badges.map(badge => `
+                <div class="badge-card locked" id="badge-${badge.id}">
+                    <div class="badge-icon">${badge.emoji}</div>
+                    <div class="badge-name">${badge.name}</div>
+                    <div class="badge-description">${badge.description}</div>
+                </div>
+            `).join('');
+        }
+
+        // Check Badges
+        function checkBadges() {
+            if (appData.currentChild === null) return;
+
+            const books = appData.children[appData.currentChild].books || [];
+
+            badges.forEach(badge => {
+                const element = document.getElementById(`badge-${badge.id}`);
+                if (badge.condition(books)) {
+                    element.classList.remove('locked');
+                    element.classList.add('earned');
+                } else {
+                    element.classList.add('locked');
+                    element.classList.remove('earned');
+                }
+            });
+        }
+
+        // Initialize Milestones
+        function initializeMilestones() {
+            const container = document.getElementById('milestonesGrid');
+            container.innerHTML = milestones.map(milestone => `
+                <div class="badge-card locked" id="milestone-${milestone.books}">
+                    <div class="badge-icon">${milestone.emoji}</div>
+                    <div class="badge-name">${milestone.name}</div>
+                    <div class="badge-description">${milestone.books} books</div>
+                </div>
+            `).join('');
+
+            updateMilestones();
+        }
+
+        // Update Milestones
+        function updateMilestones() {
+            if (appData.currentChild === null) return;
+
+            const bookCount = appData.children[appData.currentChild]?.books?.length || 0;
+
+            milestones.forEach(milestone => {
+                const element = document.getElementById(`milestone-${milestone.books}`);
+                if (bookCount >= milestone.books) {
+                    element.classList.remove('locked');
+                    element.classList.add('earned');
+                } else {
+                    element.classList.add('locked');
+                    element.classList.remove('earned');
+                }
+            });
+        }
+
+        // Save Settings
+        function saveSettings() {
+            if (appData.currentChild === null) {
+                showToast('Please select a child first!');
+                return;
+            }
+
+            const child = appData.children[appData.currentChild];
+            child.name = document.getElementById('childName').value || child.name;
+            child.birthDate = document.getElementById('birthDate').value;
+            appData.settings.dailyGoal = parseInt(document.getElementById('dailyGoal').value);
+
+            saveData();
+            updateChildSelector();
+            showToast('Settings saved!');
+        }
+
+        // Export Data
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+            const exportName = `1000-books-backup-${new Date().toISOString().split('T')[0]}.json`;
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportName);
+            linkElement.click();
+
+            showToast('Data exported successfully!');
+        }
+
+        // Clear Data
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone!')) {
+                if (confirm('Really sure? All your books and progress will be lost!')) {
+                    localStorage.removeItem('1000BooksApp');
+                    appData = {
+                        children: [],
+                        currentChild: null,
+                        books: [],
+                        settings: { dailyGoal: 3 }
+                    };
+                    initApp();
+                    showToast('All data cleared');
+                }
+            }
+        }
+
+        // Show Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize app when page loads
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
