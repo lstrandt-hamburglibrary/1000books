@@ -401,12 +401,12 @@
 
         <!-- Navigation Tabs -->
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showPage('dashboard')">📊 Dashboard</button>
-            <button class="nav-tab" onclick="showPage('add-book')">➕ Add Book</button>
-            <button class="nav-tab" onclick="showPage('library')">📚 Library</button>
-            <button class="nav-tab" onclick="showPage('badges')">🏆 Badges</button>
-            <button class="nav-tab" onclick="showPage('milestones')">🎯 Milestones</button>
-            <button class="nav-tab" onclick="showPage('settings')">⚙️ Settings</button>
+            <button class="nav-tab active" onclick="showPage('dashboard', this)">📊 Dashboard</button>
+            <button class="nav-tab" onclick="showPage('add-book', this)">➕ Add Book</button>
+            <button class="nav-tab" onclick="showPage('library', this)">📚 Library</button>
+            <button class="nav-tab" onclick="showPage('badges', this)">🏆 Badges</button>
+            <button class="nav-tab" onclick="showPage('milestones', this)">🎯 Milestones</button>
+            <button class="nav-tab" onclick="showPage('settings', this)">⚙️ Settings</button>
         </div>
 
         <!-- Content -->
@@ -658,7 +658,7 @@
         }
 
         // Show Page
-        function showPage(pageName) {
+        function showPage(pageName, buttonElement) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
             });
@@ -667,7 +667,9 @@
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
 
             if (pageName === 'library') {
                 displayLibrary();
