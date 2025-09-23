@@ -794,6 +794,18 @@
             }
         }
 
+        @keyframes snowmanComplete {
+            0% {
+                transform: scale(0.5) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+            }
+        }
+
         .dog-fact-display {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -1424,7 +1436,7 @@
                     <div class="snow-background"></div>
                     <div class="snow-catcher" id="snowCatcher">🧤</div>
                     <div class="falling-items" id="fallingItems"></div>
-                    <div id="snowmanDisplay" style="position: absolute; bottom: 10px; right: 10px; font-size: 50px;"></div>
+                    <div id="snowmanDisplay" style="position: absolute; bottom: 10px; right: 10px; font-size: 40px; line-height: 0.7; text-align: center;"></div>
                     <div id="missedDisplay" style="position: absolute; top: 10px; right: 10px; color: #dc3545; font-weight: bold;">Missed: 0/10</div>
                 </div>
                 <div class="game-controls">
@@ -3658,19 +3670,24 @@
             snowGameData.snowmanParts++;
             const snowmanDisplay = document.getElementById('snowmanDisplay');
 
-            // Build snowman progressively
-            const snowmanStages = [
-                '⚪',           // Base
-                '⚪<br>⚪',        // Body
-                '⚪<br>⚪<br>⚪',     // Full body
-                '⛄'            // Complete snowman
-            ];
-
-            if (snowGameData.snowmanParts <= 3) {
-                snowmanDisplay.innerHTML = snowmanStages[snowGameData.snowmanParts - 1];
-                showToast(`🎉 Snowman part ${snowGameData.snowmanParts}/3 built!`);
+            // Build snowman progressively with proper stacking
+            if (snowGameData.snowmanParts === 1) {
+                // Base - large circle
+                snowmanDisplay.innerHTML = '<div style="font-size: 45px; margin: 0;">⚪</div>';
+                showToast(`🎉 Snowman base built! (1/4)`);
+            } else if (snowGameData.snowmanParts === 2) {
+                // Body - medium on top of large
+                snowmanDisplay.innerHTML = '<div style="font-size: 35px; margin: -8px 0 0 0;">⚪</div><div style="font-size: 45px; margin: -8px 0 0 0;">⚪</div>';
+                showToast(`🎉 Snowman body built! (2/4)`);
+            } else if (snowGameData.snowmanParts === 3) {
+                // Head - small on top of medium on top of large
+                snowmanDisplay.innerHTML = '<div style="font-size: 25px; margin: -5px 0 0 0;">⚪</div><div style="font-size: 35px; margin: -7px 0 0 0;">⚪</div><div style="font-size: 45px; margin: -8px 0 0 0;">⚪</div>';
+                showToast(`🎉 Snowman head added! (3/4)`);
             } else if (snowGameData.snowmanParts === 4) {
-                snowmanDisplay.innerHTML = snowmanStages[3];
+                // Complete snowman - big and animated
+                snowmanDisplay.style.fontSize = '80px';
+                snowmanDisplay.style.animation = 'snowmanComplete 0.5s ease';
+                snowmanDisplay.innerHTML = '⛄';
                 showToast('⛄ SNOWMAN COMPLETE! YOU WIN!');
                 endSnowGame(true);
             }
