@@ -571,61 +571,113 @@
             font-size: 0.9rem;
         }
 
-        .bone-game-board {
-            display: grid;
-            gap: 10px;
+        /* Dog Park Dash Styles */
+        .park-game-area {
+            position: relative;
+            height: 400px;
             margin-bottom: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             border-radius: 15px;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98D982 100%);
         }
 
-        .hiding-spot {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            height: 70px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .park-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                #98D982 0px,
+                #98D982 40px,
+                #8BC97F 40px,
+                #8BC97F 80px
+            );
+            opacity: 0.3;
+        }
+
+        .dog-character {
+            position: absolute;
+            font-size: 3rem;
+            transition: all 0.2s ease;
+            z-index: 10;
+            animation: dogBob 0.5s infinite;
+        }
+
+        @keyframes dogBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .dog-character.running {
+            animation: dogRun 0.3s infinite;
+        }
+
+        @keyframes dogRun {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .game-item {
+            position: absolute;
             font-size: 2rem;
             transition: all 0.3s;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            animation: itemFloat 2s infinite;
         }
 
-        .hiding-spot:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        @keyframes itemFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        .hiding-spot.revealed {
-            background: #dee2e6;
-            cursor: not-allowed;
-            transform: rotateY(180deg);
+        .game-item.collected {
+            animation: collectItem 0.5s;
+            opacity: 0;
         }
 
-        .hiding-spot.found {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            animation: boneBounce 1s;
-        }
-
-        .hiding-spot.hint {
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes boneBounce {
+        @keyframes collectItem {
             0% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.3) rotate(-10deg); }
-            50% { transform: scale(1.5) rotate(10deg); }
-            75% { transform: scale(1.3) rotate(-5deg); }
-            100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.5) rotate(180deg); }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        .score-popup {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            animation: scoreFloat 1s;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        @keyframes scoreFloat {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+
+        .dog-fact-display {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .dog-fact-display h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .dog-fact-display p {
+            margin: 0;
+            font-size: 0.95rem;
         }
 
         .game-controls {
@@ -1005,45 +1057,49 @@
                 </div>
                 <div class="games-grid" id="gamesGrid"></div>
 
-                <!-- Find the Bone Game -->
-                <div id="findBoneGame" class="mini-game" style="display: none;">
+                <!-- Dog Park Dash Game -->
+                <div id="dogParkGame" class="mini-game" style="display: none;">
                     <div class="game-header">
-                        <h3>🐕 Clifford's Bone Hunt!</h3>
-                        <button class="game-close-btn" onclick="closeGame('findBone')">✕</button>
-                    </div>
-                    <div class="game-level-selector">
-                        <button class="level-btn" onclick="setGameLevel(1)" id="level1Btn">Easy (4x4)</button>
-                        <button class="level-btn" onclick="setGameLevel(2)" id="level2Btn">Medium (5x5)</button>
-                        <button class="level-btn" onclick="setGameLevel(3)" id="level3Btn">Hard (6x6)</button>
+                        <h3>🐕 Dog Park Dash!</h3>
+                        <button class="game-close-btn" onclick="closeGame('dogPark')">✕</button>
                     </div>
                     <div class="game-instructions">
-                        <p id="gameInstructions">Find all 3 bones before time runs out! Watch for hints!</p>
+                        <p>Use ⬆️⬇️ arrow keys to move! Collect bones 🦴 and special items for points!</p>
                     </div>
                     <div class="game-stats">
                         <div class="stat-item">
                             <span class="stat-label">Score:</span>
-                            <span id="boneGameScore">0</span>
+                            <span id="parkScore">0</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Time:</span>
-                            <span id="gameTimer">30</span>s
+                            <span id="parkTimer">60</span>s
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Bones:</span>
-                            <span id="bonesFound">0</span>/3
+                            <span id="bonesCollected">0</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Level:</span>
-                            <span id="currentLevel">1</span>
+                            <span class="stat-label">Speed:</span>
+                            <span id="gameSpeed">1</span>x
                         </div>
                     </div>
-                    <div class="bone-game-board" id="boneGameBoard"></div>
+                    <div class="park-game-area" id="parkGameArea">
+                        <div class="park-background"></div>
+                        <div class="dog-character" id="dogCharacter">🐕</div>
+                        <div class="game-items" id="gameItems"></div>
+                    </div>
+                    <div class="dog-fact-display" id="dogFactDisplay" style="display: none;">
+                        <h4>🐾 Fun Dog Fact!</h4>
+                        <p id="dogFactText"></p>
+                    </div>
                     <div class="game-controls">
-                        <button class="game-btn hint-btn" onclick="useHint()" id="hintBtn">💡 Hint (3)</button>
-                        <button class="game-btn reset-btn" onclick="resetBoneGame()">🔄 New Game</button>
+                        <button class="game-btn" onclick="startParkGame()">▶️ Start</button>
+                        <button class="game-btn" onclick="pauseParkGame()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="game-btn" onclick="resetParkGame()">🔄 New Game</button>
                     </div>
                     <div class="high-score">
-                        🏆 High Score: <span id="highScore">0</span>
+                        🏆 High Score: <span id="parkHighScore">0</span>
                     </div>
                 </div>
             </div>
@@ -1097,22 +1153,40 @@
 
         let selectedRating = '';
         let currentGame = null;
-        let boneGameData = {
-            level: 1,
-            gridSize: 4,
+        let parkGameData = {
             score: 0,
-            totalScore: 0,
-            attempts: 0,
-            bonePositions: [],
-            bonesFound: 0,
-            revealed: [],
-            hints: 3,
-            timeLeft: 30,
+            bonesCollected: 0,
+            timeLeft: 60,
             timerInterval: null,
             gameActive: false,
-            highScore: 0
+            paused: false,
+            highScore: 0,
+            dogPosition: { x: 50, y: 300 },
+            items: [],
+            itemSpawnInterval: null,
+            gameSpeed: 1,
+            factsUnlocked: []
         };
         let testMode = false;
+
+        // Dog facts database
+        const dogFacts = [
+            "A Greyhound can run up to 45 mph - faster than most cars in the city!",
+            "Dalmatians are born completely white and develop their spots as they grow.",
+            "A dog's nose print is unique, just like a human's fingerprint!",
+            "The Basenji is known as the 'barkless dog' - it yodels instead!",
+            "Dogs have three eyelids - one for extra eye protection.",
+            "Newfoundland dogs have webbed feet and are excellent swimmers.",
+            "The Beatles song 'A Day in the Life' has a frequency only dogs can hear at the end.",
+            "Bloodhounds can track scents that are over 300 hours old.",
+            "Corgis were originally bred to herd cattle - their short legs helped them avoid kicks!",
+            "The Norwegian Lundehund has 6 toes on each foot.",
+            "Dogs prefer to poop aligned with Earth's magnetic field (North-South).",
+            "Snoopy from Peanuts is a Beagle - one of the most popular comic book dogs!",
+            "Clifford the Big Red Dog would weigh about 87 tons if he were real!",
+            "Three dogs survived the Titanic sinking - all were in first class.",
+            "Dogs can learn over 150 words and can count to 4 or 5."
+        ];
 
         // Book Suggestions Database
         const bookSuggestions = {
@@ -2055,12 +2129,12 @@
 
             const games = [
                 {
-                    id: 'findBone',
-                    name: 'Find the Bone',
+                    id: 'dogPark',
+                    name: 'Dog Park Dash',
                     icon: '🦴',
                     requirement: 'Read all 10 Animal Stories',
-                    unlocked: unlockedGames.findBone,
-                    action: () => startBoneGame()
+                    unlocked: unlockedGames.dogPark,
+                    action: () => startDogParkGame()
                 },
                 {
                     id: 'letterMatch',
@@ -2101,7 +2175,7 @@
 
             // Store game actions globally
             window.gameActions = {
-                findBone: () => startBoneGame(),
+                dogPark: () => startDogParkGame(),
                 letterMatch: () => showToast('Letter Match game coming soon!'),
                 storyBuilder: () => showToast('Story Builder game coming soon!'),
                 seasonSort: () => showToast('Season Sorter game coming soon!')
@@ -2145,7 +2219,7 @@
             };
 
             return {
-                findBone: hasReadAllFromCategory('animals'),
+                dogPark: hasReadAllFromCategory('animals'),
                 letterMatch: hasReadAllFromCategory('learning'),
                 storyBuilder: hasReadAllFromCategory('adventure'),
                 seasonSort: hasReadAllFromCategory('seasonal')
@@ -2157,14 +2231,14 @@
             showToast('Complete the reading challenge to unlock this game! 🔒');
         }
 
-        // Start Bone Game
-        function startBoneGame() {
-            const gameDiv = document.getElementById('findBoneGame');
+        // Start Dog Park Game
+        function startDogParkGame() {
+            const gameDiv = document.getElementById('dogParkGame');
             gameDiv.style.display = 'block';
 
             // Load high score
-            boneGameData.highScore = parseInt(localStorage.getItem('boneGameHighScore') || '0');
-            document.getElementById('highScore').textContent = boneGameData.highScore;
+            parkGameData.highScore = parseInt(localStorage.getItem('parkGameHighScore') || '0');
+            document.getElementById('parkHighScore').textContent = parkGameData.highScore;
 
             // Create overlay
             let overlay = document.getElementById('gameOverlay');
@@ -2172,224 +2246,301 @@
                 overlay = document.createElement('div');
                 overlay.id = 'gameOverlay';
                 overlay.className = 'game-overlay';
-                overlay.onclick = () => closeGame('findBone');
+                overlay.onclick = () => closeGame('dogPark');
                 document.body.appendChild(overlay);
             }
             overlay.style.display = 'block';
 
-            setGameLevel(1);
+            resetParkGame();
+
+            // Add keyboard controls
+            document.addEventListener('keydown', handleKeyPress);
         }
 
-        // Set Game Level
-        function setGameLevel(level) {
-            boneGameData.level = level;
+        // Handle keyboard input
+        function handleKeyPress(e) {
+            if (!parkGameData.gameActive || parkGameData.paused) return;
 
-            // Update level buttons
-            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`level${level}Btn`).classList.add('active');
+            const dog = document.getElementById('dogCharacter');
+            const gameArea = document.getElementById('parkGameArea');
+            const areaHeight = gameArea.offsetHeight;
 
-            // Set grid size based on level
-            boneGameData.gridSize = level === 1 ? 4 : level === 2 ? 5 : 6;
-
-            resetBoneGame();
-        }
-
-        // Reset Bone Game
-        function resetBoneGame() {
-            // Stop any running timer
-            if (boneGameData.timerInterval) {
-                clearInterval(boneGameData.timerInterval);
+            switch(e.key) {
+                case 'ArrowUp':
+                    e.preventDefault();
+                    parkGameData.dogPosition.y = Math.max(50, parkGameData.dogPosition.y - 40);
+                    dog.classList.add('running');
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    parkGameData.dogPosition.y = Math.min(areaHeight - 60, parkGameData.dogPosition.y + 40);
+                    dog.classList.add('running');
+                    break;
             }
+
+            dog.style.top = parkGameData.dogPosition.y + 'px';
+            setTimeout(() => dog.classList.remove('running'), 200);
+
+            checkCollisions();
+        }
+
+        // Start the park game
+        function startParkGame() {
+            if (parkGameData.gameActive) return;
+
+            parkGameData.gameActive = true;
+            parkGameData.paused = false;
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+
+            startParkTimer();
+            startItemSpawning();
+        }
+
+        // Pause game
+        function pauseParkGame() {
+            if (!parkGameData.gameActive) return;
+
+            parkGameData.paused = !parkGameData.paused;
+            document.getElementById('pauseBtn').textContent = parkGameData.paused ? '▶️ Resume' : '⏸️ Pause';
+        }
+
+        // Reset park game
+        function resetParkGame() {
+            // Stop any running timers
+            if (parkGameData.timerInterval) clearInterval(parkGameData.timerInterval);
+            if (parkGameData.itemSpawnInterval) clearInterval(parkGameData.itemSpawnInterval);
 
             // Reset game data
-            const totalSpots = boneGameData.gridSize * boneGameData.gridSize;
-            const boneCount = 3; // Always find 3 bones
+            parkGameData = {
+                score: 0,
+                bonesCollected: 0,
+                timeLeft: 60,
+                timerInterval: null,
+                gameActive: false,
+                paused: false,
+                highScore: parkGameData.highScore,
+                dogPosition: { x: 50, y: 200 },
+                items: [],
+                itemSpawnInterval: null,
+                gameSpeed: 1,
+                factsUnlocked: parkGameData.factsUnlocked
+            };
 
-            boneGameData.score = 0;
-            boneGameData.totalScore = 0;
-            boneGameData.attempts = 0;
-            boneGameData.bonesFound = 0;
-            boneGameData.revealed = [];
-            boneGameData.hints = 3;
-            boneGameData.timeLeft = boneGameData.level === 1 ? 45 : boneGameData.level === 2 ? 35 : 30;
-            boneGameData.gameActive = true;
+            // Reset display
+            updateParkDisplay();
 
-            // Generate random bone positions
-            boneGameData.bonePositions = [];
-            while (boneGameData.bonePositions.length < boneCount) {
-                const pos = Math.floor(Math.random() * totalSpots);
-                if (!boneGameData.bonePositions.includes(pos)) {
-                    boneGameData.bonePositions.push(pos);
-                }
-            }
+            // Clear items
+            document.getElementById('gameItems').innerHTML = '';
 
-            // Create game board
-            const board = document.getElementById('boneGameBoard');
-            board.innerHTML = '';
-            board.style.gridTemplateColumns = `repeat(${boneGameData.gridSize}, 1fr)`;
+            // Position dog
+            const dog = document.getElementById('dogCharacter');
+            dog.style.left = parkGameData.dogPosition.x + 'px';
+            dog.style.top = parkGameData.dogPosition.y + 'px';
 
-            const icons = ['🌳', '🌲', '🌴', '🌵', '🎄', '🌿'];
-            for (let i = 0; i < totalSpots; i++) {
-                const spot = document.createElement('div');
-                spot.className = 'hiding-spot';
-                spot.innerHTML = '❓';
-                spot.dataset.index = i;
-                spot.onclick = () => checkSpot(i);
-                board.appendChild(spot);
-            }
-
-            updateGameDisplay();
-            startTimer();
+            // Hide dog fact
+            document.getElementById('dogFactDisplay').style.display = 'none';
         }
 
-        // Start Timer
-        function startTimer() {
-            boneGameData.timerInterval = setInterval(() => {
-                boneGameData.timeLeft--;
+        // Start park timer
+        function startParkTimer() {
+            parkGameData.timerInterval = setInterval(() => {
+                if (parkGameData.paused) return;
 
-                const timerElement = document.getElementById('gameTimer');
-                timerElement.textContent = boneGameData.timeLeft;
+                parkGameData.timeLeft--;
 
-                // Warning when time is running out
-                if (boneGameData.timeLeft <= 10) {
+                const timerElement = document.getElementById('parkTimer');
+                timerElement.textContent = parkGameData.timeLeft;
+
+                if (parkGameData.timeLeft <= 10) {
                     timerElement.classList.add('timer-warning');
-                } else {
-                    timerElement.classList.remove('timer-warning');
                 }
 
-                // Game over when time runs out
-                if (boneGameData.timeLeft <= 0) {
-                    clearInterval(boneGameData.timerInterval);
-                    endGame(false);
+                // Increase difficulty over time
+                if (parkGameData.timeLeft === 40) {
+                    parkGameData.gameSpeed = 1.5;
+                    document.getElementById('gameSpeed').textContent = '1.5';
+                } else if (parkGameData.timeLeft === 20) {
+                    parkGameData.gameSpeed = 2;
+                    document.getElementById('gameSpeed').textContent = '2';
+                }
+
+                if (parkGameData.timeLeft <= 0) {
+                    endParkGame();
                 }
             }, 1000);
         }
 
-        // Check Spot in Bone Game
-        function checkSpot(index) {
-            if (!boneGameData.gameActive || boneGameData.revealed.includes(index)) return;
+        // Spawn items
+        function startItemSpawning() {
+            parkGameData.itemSpawnInterval = setInterval(() => {
+                if (parkGameData.paused || !parkGameData.gameActive) return;
 
-            boneGameData.attempts++;
-            boneGameData.revealed.push(index);
+                const itemTypes = [
+                    { emoji: '🦴', points: 10, type: 'bone' },
+                    { emoji: '🦴', points: 10, type: 'bone' },
+                    { emoji: '🦴', points: 10, type: 'bone' }, // More bones
+                    { emoji: '🎾', points: 25, type: 'tennis' },
+                    { emoji: '🧸', points: 30, type: 'toy' },
+                    { emoji: '🥏', points: 35, type: 'frisbee' },
+                    { emoji: '🏆', points: 50, type: 'trophy' }
+                ];
 
-            const spots = document.querySelectorAll('.hiding-spot');
-            const spot = spots[index];
-
-            if (boneGameData.bonePositions.includes(index)) {
-                // Found a bone!
-                spot.innerHTML = '🦴';
-                spot.classList.add('found');
-                boneGameData.bonesFound++;
-
-                // Calculate score based on speed and accuracy
-                const baseScore = 100;
-                const timeBonus = Math.floor(boneGameData.timeLeft * 2);
-                const accuracyBonus = Math.max(0, 50 - (boneGameData.attempts - boneGameData.bonesFound) * 10);
-                const levelMultiplier = boneGameData.level;
-
-                const points = (baseScore + timeBonus + accuracyBonus) * levelMultiplier;
-                boneGameData.score += points;
-                boneGameData.totalScore += points;
-
-                // Show score popup
-                const scorePopup = document.createElement('div');
-                scorePopup.className = 'score-popup';
-                scorePopup.textContent = `+${points}`;
-                scorePopup.style.position = 'absolute';
-                spot.appendChild(scorePopup);
-
-                setTimeout(() => scorePopup.remove(), 1000);
-
-                // Check if all bones found
-                if (boneGameData.bonesFound === 3) {
-                    endGame(true);
-                }
-            } else {
-                // Not here - show random nature emoji
-                const emojis = ['🌳', '🌲', '🌴', '🌵', '🎄', '🌿', '🪨', '🍄'];
-                spot.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-                spot.classList.add('revealed');
-            }
-
-            updateGameDisplay();
+                const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+                spawnItem(item);
+            }, 1500 / parkGameData.gameSpeed);
         }
 
-        // Use Hint
-        function useHint() {
-            if (!boneGameData.gameActive || boneGameData.hints <= 0) return;
+        // Spawn a single item
+        function spawnItem(itemData) {
+            const gameArea = document.getElementById('parkGameArea');
+            const itemsContainer = document.getElementById('gameItems');
 
-            boneGameData.hints--;
+            const item = document.createElement('div');
+            item.className = 'game-item';
+            item.innerHTML = itemData.emoji;
+            item.dataset.points = itemData.points;
+            item.dataset.type = itemData.type;
 
-            // Find an unrevealed bone
-            const unrevealedBones = boneGameData.bonePositions.filter(pos => !boneGameData.revealed.includes(pos));
+            // Random Y position
+            const yPos = Math.random() * (gameArea.offsetHeight - 60) + 30;
+            item.style.top = yPos + 'px';
+            item.style.right = '-50px';
 
-            if (unrevealedBones.length > 0) {
-                const hintPosition = unrevealedBones[Math.floor(Math.random() * unrevealedBones.length)];
-                const spots = document.querySelectorAll('.hiding-spot');
-                const hintSpot = spots[hintPosition];
+            itemsContainer.appendChild(item);
 
-                // Add pulsing animation
-                hintSpot.classList.add('hint');
-                setTimeout(() => hintSpot.classList.remove('hint'), 2000);
-            }
+            // Move item across screen
+            const moveInterval = setInterval(() => {
+                if (parkGameData.paused) return;
 
-            updateGameDisplay();
+                const currentRight = parseInt(item.style.right);
+                const newRight = currentRight + (5 * parkGameData.gameSpeed);
+                item.style.right = newRight + 'px';
+
+                // Remove if off screen
+                if (newRight > gameArea.offsetWidth) {
+                    clearInterval(moveInterval);
+                    item.remove();
+                }
+            }, 30);
+
+            item.dataset.moveInterval = moveInterval;
         }
 
-        // End Game
-        function endGame(won) {
-            boneGameData.gameActive = false;
-            clearInterval(boneGameData.timerInterval);
+        // Check collisions
+        function checkCollisions() {
+            const dog = document.getElementById('dogCharacter');
+            const dogRect = dog.getBoundingClientRect();
+            const items = document.querySelectorAll('.game-item:not(.collected)');
 
-            // Calculate final score
-            if (won) {
-                const timeBonus = boneGameData.timeLeft * 10 * boneGameData.level;
-                boneGameData.totalScore += timeBonus;
+            items.forEach(item => {
+                const itemRect = item.getBoundingClientRect();
 
-                // Check for high score
-                if (boneGameData.totalScore > boneGameData.highScore) {
-                    boneGameData.highScore = boneGameData.totalScore;
-                    localStorage.setItem('boneGameHighScore', boneGameData.highScore);
-                    document.getElementById('highScore').textContent = boneGameData.highScore;
-                    showToast(`🎉 NEW HIGH SCORE: ${boneGameData.highScore}! 🎉`);
-                } else {
-                    showToast(`🎉 You found all bones! Score: ${boneGameData.totalScore}`);
-                }
-            } else {
-                showToast(`⏰ Time's up! Score: ${boneGameData.totalScore}`);
-            }
+                if (dogRect.left < itemRect.right &&
+                    dogRect.right > itemRect.left &&
+                    dogRect.top < itemRect.bottom &&
+                    dogRect.bottom > itemRect.top) {
 
-            // Reveal all remaining bones
-            const spots = document.querySelectorAll('.hiding-spot');
-            boneGameData.bonePositions.forEach(pos => {
-                if (!boneGameData.revealed.includes(pos)) {
-                    spots[pos].innerHTML = '🦴';
-                    spots[pos].style.opacity = '0.5';
+                    collectItem(item);
                 }
             });
         }
 
-        // Update Game Display
-        function updateGameDisplay() {
-            document.getElementById('boneGameScore').textContent = boneGameData.totalScore;
-            document.getElementById('gameTimer').textContent = boneGameData.timeLeft;
-            document.getElementById('bonesFound').textContent = boneGameData.bonesFound;
-            document.getElementById('currentLevel').textContent = boneGameData.level;
+        // Collect an item
+        function collectItem(item) {
+            const points = parseInt(item.dataset.points);
+            const type = item.dataset.type;
 
-            const hintBtn = document.getElementById('hintBtn');
-            hintBtn.textContent = `💡 Hint (${boneGameData.hints})`;
-            hintBtn.disabled = boneGameData.hints <= 0;
+            parkGameData.score += points;
+            if (type === 'bone') {
+                parkGameData.bonesCollected++;
+
+                // Unlock a dog fact every 5 bones
+                if (parkGameData.bonesCollected % 5 === 0) {
+                    showDogFact();
+                }
+            }
+
+            // Show score popup
+            const popup = document.createElement('div');
+            popup.className = 'score-popup';
+            popup.textContent = `+${points}`;
+            popup.style.left = item.style.left;
+            popup.style.top = item.style.top;
+            document.getElementById('parkGameArea').appendChild(popup);
+            setTimeout(() => popup.remove(), 1000);
+
+            // Animate collection
+            item.classList.add('collected');
+            clearInterval(item.dataset.moveInterval);
+            setTimeout(() => item.remove(), 500);
+
+            updateParkDisplay();
         }
 
-        // Close Game
-        function closeGame(gameId) {
-            if (gameId === 'findBone') {
-                // Stop timer if running
-                if (boneGameData.timerInterval) {
-                    clearInterval(boneGameData.timerInterval);
-                }
-                document.getElementById('findBoneGame').style.display = 'none';
+        // Show dog fact
+        function showDogFact() {
+            const factDisplay = document.getElementById('dogFactDisplay');
+            const factText = document.getElementById('dogFactText');
+
+            // Get random fact not already shown
+            const unusedFacts = dogFacts.filter((fact, index) =>
+                !parkGameData.factsUnlocked.includes(index));
+
+            if (unusedFacts.length > 0) {
+                const factIndex = dogFacts.indexOf(unusedFacts[Math.floor(Math.random() * unusedFacts.length)]);
+                parkGameData.factsUnlocked.push(factIndex);
+                factText.textContent = dogFacts[factIndex];
+                factDisplay.style.display = 'block';
+
+                setTimeout(() => {
+                    factDisplay.style.display = 'none';
+                }, 5000);
             }
+        }
+
+        // Update display
+        function updateParkDisplay() {
+            document.getElementById('parkScore').textContent = parkGameData.score;
+            document.getElementById('parkTimer').textContent = parkGameData.timeLeft;
+            document.getElementById('bonesCollected').textContent = parkGameData.bonesCollected;
+            document.getElementById('gameSpeed').textContent = parkGameData.gameSpeed + 'x';
+        }
+
+        // End park game
+        function endParkGame() {
+            parkGameData.gameActive = false;
+            clearInterval(parkGameData.timerInterval);
+            clearInterval(parkGameData.itemSpawnInterval);
+
+            // Clear remaining items
+            document.querySelectorAll('.game-item').forEach(item => {
+                clearInterval(item.dataset.moveInterval);
+            });
+
+            // Check high score
+            if (parkGameData.score > parkGameData.highScore) {
+                parkGameData.highScore = parkGameData.score;
+                localStorage.setItem('parkGameHighScore', parkGameData.highScore);
+                document.getElementById('parkHighScore').textContent = parkGameData.highScore;
+                showToast(`🎉 NEW HIGH SCORE: ${parkGameData.highScore}! 🎉`);
+            } else {
+                showToast(`Game Over! Score: ${parkGameData.score} | Bones: ${parkGameData.bonesCollected} 🦴`);
+            }
+        }
+
+        // Close game
+        function closeGame(gameId) {
+            if (gameId === 'dogPark') {
+                // Stop timers
+                if (parkGameData.timerInterval) clearInterval(parkGameData.timerInterval);
+                if (parkGameData.itemSpawnInterval) clearInterval(parkGameData.itemSpawnInterval);
+
+                // Remove keyboard listener
+                document.removeEventListener('keydown', handleKeyPress);
+
+                document.getElementById('dogParkGame').style.display = 'none';
+            }
+
             const overlay = document.getElementById('gameOverlay');
             if (overlay) {
                 overlay.style.display = 'none';
