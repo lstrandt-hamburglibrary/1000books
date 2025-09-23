@@ -421,6 +421,88 @@
             opacity: 0.9;
         }
 
+        /* Suggestions Styles */
+        .suggestion-lists {
+            margin-top: 20px;
+        }
+
+        .suggestion-category {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .suggestion-category h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .suggestion-books {
+            display: grid;
+            gap: 10px;
+        }
+
+        .suggestion-book {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .suggestion-book:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-book-info {
+            flex: 1;
+        }
+
+        .suggestion-book-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .suggestion-book-author {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-book-age {
+            color: #adb5bd;
+            font-size: 0.85rem;
+            margin-top: 3px;
+        }
+
+        .add-suggestion-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .add-suggestion-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .add-suggestion-btn.added {
+            background: #28a745;
+            cursor: default;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .stats-grid {
@@ -458,6 +540,7 @@
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="showPage('dashboard', this)">📊 Dashboard</button>
             <button class="nav-tab" onclick="showPage('add-book', this)">➕ Add Book</button>
+            <button class="nav-tab" onclick="showPage('suggestions', this)">💡 Suggestions</button>
             <button class="nav-tab" onclick="showPage('library', this)">📚 Library</button>
             <button class="nav-tab" onclick="showPage('badges', this)">🏆 Badges</button>
             <button class="nav-tab" onclick="showPage('milestones', this)">🎯 Milestones</button>
@@ -554,6 +637,24 @@
                 </form>
             </div>
 
+            <!-- Suggestions Page -->
+            <div id="suggestions" class="page">
+                <h2>Book Suggestions</h2>
+                <div class="form-group">
+                    <select id="categoryFilter" onchange="filterSuggestions()">
+                        <option value="all">All Categories</option>
+                        <option value="classic">Classic Picture Books</option>
+                        <option value="bedtime">Bedtime Stories</option>
+                        <option value="learning">Early Learning</option>
+                        <option value="adventure">Adventure</option>
+                        <option value="animals">Animal Stories</option>
+                        <option value="rhymes">Nursery Rhymes</option>
+                        <option value="seasonal">Seasonal & Holiday</option>
+                    </select>
+                </div>
+                <div class="suggestion-lists" id="suggestionLists"></div>
+            </div>
+
             <!-- Library Page -->
             <div id="library" class="page">
                 <h2>Your Library</h2>
@@ -625,6 +726,122 @@
         };
 
         let selectedRating = '';
+
+        // Book Suggestions Database
+        const bookSuggestions = {
+            classic: {
+                name: "Classic Picture Books",
+                emoji: "📖",
+                books: [
+                    { title: "The Very Hungry Caterpillar", author: "Eric Carle", age: "2-5" },
+                    { title: "Where the Wild Things Are", author: "Maurice Sendak", age: "3-6" },
+                    { title: "Goodnight Moon", author: "Margaret Wise Brown", age: "0-3" },
+                    { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
+                    { title: "Corduroy", author: "Don Freeman", age: "3-5" },
+                    { title: "Curious George", author: "H.A. Rey", age: "3-6" },
+                    { title: "The Rainbow Fish", author: "Marcus Pfister", age: "3-6" },
+                    { title: "Brown Bear, Brown Bear, What Do You See?", author: "Bill Martin Jr.", age: "0-3" },
+                    { title: "Madeline", author: "Ludwig Bemelmans", age: "3-6" },
+                    { title: "The Little House", author: "Virginia Lee Burton", age: "3-6" }
+                ]
+            },
+            bedtime: {
+                name: "Bedtime Stories",
+                emoji: "🌙",
+                books: [
+                    { title: "The Going to Bed Book", author: "Sandra Boynton", age: "0-3" },
+                    { title: "Llama Llama Red Pajama", author: "Anna Dewdney", age: "2-5" },
+                    { title: "The Napping House", author: "Audrey Wood", age: "2-5" },
+                    { title: "Time for Bed", author: "Mem Fox", age: "0-3" },
+                    { title: "Guess How Much I Love You", author: "Sam McBratney", age: "2-5" },
+                    { title: "Pajama Time!", author: "Sandra Boynton", age: "0-3" },
+                    { title: "The Sleepy Little Alphabet", author: "Judy Sierra", age: "3-6" },
+                    { title: "I Love You to the Moon and Back", author: "Amelia Hepworth", age: "2-5" },
+                    { title: "The Rabbit Listened", author: "Cori Doerrfeld", age: "3-6" },
+                    { title: "Dream Animals", author: "Emily Winfield Martin", age: "0-3" }
+                ]
+            },
+            learning: {
+                name: "Early Learning",
+                emoji: "🔤",
+                books: [
+                    { title: "Chicka Chicka Boom Boom", author: "Bill Martin Jr.", age: "2-5" },
+                    { title: "The Alphabet Book", author: "P.D. Eastman", age: "2-5" },
+                    { title: "Counting Kisses", author: "Karen Katz", age: "0-3" },
+                    { title: "Mouse Paint", author: "Ellen Stoll Walsh", age: "2-5" },
+                    { title: "Ten Little Fingers and Ten Little Toes", author: "Mem Fox", age: "0-3" },
+                    { title: "1, 2, 3 to the Zoo", author: "Eric Carle", age: "2-5" },
+                    { title: "Color Zoo", author: "Lois Ehlert", age: "2-5" },
+                    { title: "Freight Train", author: "Donald Crews", age: "2-4" },
+                    { title: "My First Counting Book", author: "Lilian Moore", age: "2-5" },
+                    { title: "Shapes, Shapes, Shapes", author: "Tana Hoban", age: "2-5" }
+                ]
+            },
+            adventure: {
+                name: "Adventure Stories",
+                emoji: "🚀",
+                books: [
+                    { title: "We're Going on a Bear Hunt", author: "Michael Rosen", age: "3-6" },
+                    { title: "The Little Engine That Could", author: "Watty Piper", age: "3-6" },
+                    { title: "Harold and the Purple Crayon", author: "Crockett Johnson", age: "3-6" },
+                    { title: "Oh, the Places You'll Go!", author: "Dr. Seuss", age: "3-7" },
+                    { title: "The Adventures of Beekle", author: "Dan Santat", age: "3-6" },
+                    { title: "Not a Box", author: "Antoinette Portis", age: "2-5" },
+                    { title: "Journey", author: "Aaron Becker", age: "4-7" },
+                    { title: "Where the Sidewalk Ends", author: "Shel Silverstein", age: "4-7" },
+                    { title: "The Snail and the Whale", author: "Julia Donaldson", age: "3-6" },
+                    { title: "Rosie's Walk", author: "Pat Hutchins", age: "2-5" }
+                ]
+            },
+            animals: {
+                name: "Animal Stories",
+                emoji: "🐻",
+                books: [
+                    { title: "The Tale of Peter Rabbit", author: "Beatrix Potter", age: "3-6" },
+                    { title: "If You Give a Mouse a Cookie", author: "Laura Numeroff", age: "2-5" },
+                    { title: "Giraffes Can't Dance", author: "Giles Andreae", age: "3-6" },
+                    { title: "The Gruffalo", author: "Julia Donaldson", age: "3-6" },
+                    { title: "Dear Zoo", author: "Rod Campbell", age: "0-3" },
+                    { title: "Polar Bear, Polar Bear, What Do You Hear?", author: "Bill Martin Jr.", age: "2-5" },
+                    { title: "Click, Clack, Moo: Cows That Type", author: "Doreen Cronin", age: "3-6" },
+                    { title: "The Lion and the Mouse", author: "Jerry Pinkney", age: "3-6" },
+                    { title: "Are You My Mother?", author: "P.D. Eastman", age: "2-5" },
+                    { title: "Put Me in the Zoo", author: "Robert Lopshire", age: "2-5" }
+                ]
+            },
+            rhymes: {
+                name: "Nursery Rhymes",
+                emoji: "🎵",
+                books: [
+                    { title: "Mother Goose's Nursery Rhymes", author: "Various", age: "0-5" },
+                    { title: "The Real Mother Goose", author: "Blanche Fisher Wright", age: "0-5" },
+                    { title: "Mary Engelbreit's Mother Goose", author: "Mary Engelbreit", age: "0-5" },
+                    { title: "Tomie dePaola's Mother Goose", author: "Tomie dePaola", age: "0-5" },
+                    { title: "Richard Scarry's Best Mother Goose Ever", author: "Richard Scarry", age: "0-5" },
+                    { title: "Each Peach Pear Plum", author: "Janet & Allan Ahlberg", age: "0-3" },
+                    { title: "Hickory Dickory Dock", author: "Keith Baker", age: "0-3" },
+                    { title: "Hey Diddle Diddle", author: "Salley Mavor", age: "0-3" },
+                    { title: "Pat-a-Cake", author: "Mary Brigid Barrett", age: "0-3" },
+                    { title: "This Little Piggy", author: "Jane Yolen", age: "0-3" }
+                ]
+            },
+            seasonal: {
+                name: "Seasonal & Holiday",
+                emoji: "🎃",
+                books: [
+                    { title: "The Snowy Day", author: "Ezra Jack Keats", age: "2-5" },
+                    { title: "The Polar Express", author: "Chris Van Allsburg", age: "3-7" },
+                    { title: "Room on the Broom", author: "Julia Donaldson", age: "3-6" },
+                    { title: "The Pumpkin Book", author: "Gail Gibbons", age: "3-6" },
+                    { title: "The Mitten", author: "Jan Brett", age: "3-6" },
+                    { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
+                    { title: "The Runaway Bunny", author: "Margaret Wise Brown", age: "2-5" },
+                    { title: "Leaf Man", author: "Lois Ehlert", age: "3-6" },
+                    { title: "The Night Before Christmas", author: "Clement C. Moore", age: "3-7" },
+                    { title: "It's the Great Pumpkin, Charlie Brown", author: "Charles M. Schulz", age: "3-7" }
+                ]
+            }
+        };
 
         // Milestones
         const milestones = [
@@ -802,6 +1019,8 @@
 
             if (pageName === 'library') {
                 displayLibrary();
+            } else if (pageName === 'suggestions') {
+                displaySuggestions();
             }
         }
 
@@ -1155,6 +1374,100 @@
 
             setTimeout(() => {
                 toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Display Suggestions
+        function displaySuggestions() {
+            const container = document.getElementById('suggestionLists');
+            const filter = document.getElementById('categoryFilter').value;
+
+            container.innerHTML = '';
+
+            for (const [key, category] of Object.entries(bookSuggestions)) {
+                if (filter !== 'all' && filter !== key) continue;
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'suggestion-category';
+                categoryDiv.innerHTML = `
+                    <h3>${category.emoji} ${category.name}</h3>
+                    <div class="suggestion-books">
+                        ${category.books.map((book, index) => `
+                            <div class="suggestion-book">
+                                <div class="suggestion-book-info">
+                                    <div class="suggestion-book-title">${book.title}</div>
+                                    <div class="suggestion-book-author">by ${book.author}</div>
+                                    <div class="suggestion-book-age">Ages ${book.age}</div>
+                                </div>
+                                <button class="add-suggestion-btn" id="suggest-${key}-${index}"
+                                        onclick="addSuggestedBook('${key}', ${index})">
+                                    Add Book
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(categoryDiv);
+            }
+        }
+
+        // Filter Suggestions
+        function filterSuggestions() {
+            displaySuggestions();
+        }
+
+        // Add Suggested Book
+        function addSuggestedBook(categoryKey, bookIndex) {
+            if (appData.currentChild === null) {
+                showToast('Please select or add a child first!');
+                document.getElementById('childSelect').focus();
+                return;
+            }
+
+            const book = bookSuggestions[categoryKey].books[bookIndex];
+            const today = new Date().toISOString().split('T')[0];
+
+            const newBook = {
+                id: Date.now(),
+                title: book.title,
+                author: book.author,
+                readDate: today,
+                rating: '',
+                notes: `Suggested for ages ${book.age}`,
+                isFavorite: false
+            };
+
+            appData.children[appData.currentChild].books.push(newBook);
+            saveData();
+
+            // Update button to show it's been added
+            const button = document.getElementById(`suggest-${categoryKey}-${bookIndex}`);
+            button.textContent = '✓ Added';
+            button.classList.add('added');
+            button.disabled = true;
+
+            // Check for new badges
+            checkBadges();
+            updateDashboard();
+
+            showToast(`Added "${book.title}" to your library! 📚`);
+
+            // Check for milestones
+            const bookCount = appData.children[appData.currentChild].books.length;
+            const milestone = milestones.find(m => m.books === bookCount);
+            if (milestone) {
+                setTimeout(() => {
+                    showToast(`🎉 Milestone reached: ${milestone.name}! ${milestone.emoji}`);
+                }, 1000);
+            }
+
+            // Reset button after a delay
+            setTimeout(() => {
+                if (button) {
+                    button.textContent = 'Add Book';
+                    button.classList.remove('added');
+                    button.disabled = false;
+                }
             }, 3000);
         }
 
