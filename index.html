@@ -2416,6 +2416,11 @@
                 const newRight = currentRight + (5 * parkGameData.gameSpeed);
                 item.style.right = newRight + 'px';
 
+                // Check collision every frame as item moves
+                if (!item.classList.contains('collected')) {
+                    checkSingleItemCollision(item);
+                }
+
                 // Remove if off screen
                 if (newRight > gameArea.offsetWidth) {
                     clearInterval(moveInterval);
@@ -2426,27 +2431,37 @@
             item.dataset.moveInterval = moveInterval;
         }
 
-        // Check collisions
+        // Check collisions (for all items when dog moves)
         function checkCollisions() {
+            const items = document.querySelectorAll('.game-item:not(.collected)');
+            items.forEach(item => {
+                checkSingleItemCollision(item);
+            });
+        }
+
+        // Check collision for a single item
+        function checkSingleItemCollision(item) {
+            if (item.classList.contains('collected')) return;
+
             const dog = document.getElementById('dogCharacter');
             const dogRect = dog.getBoundingClientRect();
-            const items = document.querySelectorAll('.game-item:not(.collected)');
+            const itemRect = item.getBoundingClientRect();
 
-            items.forEach(item => {
-                const itemRect = item.getBoundingClientRect();
+            if (dogRect.left < itemRect.right &&
+                dogRect.right > itemRect.left &&
+                dogRect.top < itemRect.bottom &&
+                dogRect.bottom > itemRect.top) {
 
-                if (dogRect.left < itemRect.right &&
-                    dogRect.right > itemRect.left &&
-                    dogRect.top < itemRect.bottom &&
-                    dogRect.bottom > itemRect.top) {
-
-                    collectItem(item);
-                }
-            });
+                collectItem(item);
+            }
         }
 
         // Collect an item
         function collectItem(item) {
+            // Prevent double collection
+            if (item.classList.contains('collected')) return;
+            item.classList.add('collected');
+
             const points = parseInt(item.dataset.points);
             const type = item.dataset.type;
 
@@ -2464,14 +2479,18 @@
             const popup = document.createElement('div');
             popup.className = 'score-popup';
             popup.textContent = `+${points}`;
-            popup.style.left = item.style.left;
-            popup.style.top = item.style.top;
-            document.getElementById('parkGameArea').appendChild(popup);
+            const itemRect = item.getBoundingClientRect();
+            const gameArea = document.getElementById('parkGameArea');
+            const gameRect = gameArea.getBoundingClientRect();
+            popup.style.left = (itemRect.left - gameRect.left) + 'px';
+            popup.style.top = (itemRect.top - gameRect.top) + 'px';
+            gameArea.appendChild(popup);
             setTimeout(() => popup.remove(), 1000);
 
-            // Animate collection
-            item.classList.add('collected');
-            clearInterval(item.dataset.moveInterval);
+            // Clear movement interval and animate collection
+            if (item.dataset.moveInterval) {
+                clearInterval(parseInt(item.dataset.moveInterval));
+            }
             setTimeout(() => item.remove(), 500);
 
             updateParkDisplay();
