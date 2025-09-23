@@ -4044,7 +4044,7 @@
             const gameDiv = document.getElementById('dragonMazeGame');
             gameDiv.style.display = 'block';
 
-            // Create overlay
+            // Create overlay but don't show it yet
             let overlay = document.getElementById('gameOverlay');
             if (!overlay) {
                 overlay = document.createElement('div');
@@ -4053,6 +4053,7 @@
                 document.body.appendChild(overlay);
             }
             overlay.style.display = 'block';
+            overlay.onclick = () => closeGame('dragonMaze');
 
             // Initialize canvas
             mazeGameData.canvas = document.getElementById('mazeCanvas');
@@ -4113,16 +4114,36 @@
             maze[1][1] = 2; // 2 = dragon start
             maze[size - 2][size - 2] = 3; // 3 = princess/goal
 
-            // Add some obstacles (fire pits)
-            let obstacleCount = 3 + Math.floor(mazeGameData.level / 2);
+            // Add obstacles (fire pits) - but ensure path remains clear
+            // We'll only place obstacles in dead ends or areas with alternate paths
+            let obstacleCount = Math.min(2 + Math.floor(mazeGameData.level / 3), 4);
             mazeGameData.obstacles = [];
-            while (obstacleCount > 0) {
-                const x = Math.floor(Math.random() * (size - 2)) + 1;
-                const y = Math.floor(Math.random() * (size - 2)) + 1;
-                if (maze[y][x] === 0 && !(x === 1 && y === 1) && !(x === size - 2 && y === size - 2)) {
-                    maze[y][x] = 4; // 4 = obstacle
-                    mazeGameData.obstacles.push({ x, y });
-                    obstacleCount--;
+
+            // Find safe spots for obstacles (not on critical path)
+            for (let y = 1; y < size - 1; y++) {
+                for (let x = 1; x < size - 1; x++) {
+                    if (obstacleCount <= 0) break;
+
+                    // Only place obstacles in open areas with multiple paths
+                    if (maze[y][x] === 0 &&
+                        !(x === 1 && y === 1) &&
+                        !(x === size - 2 && y === size - 2) &&
+                        Math.random() < 0.1) {
+
+                        // Check if there are alternate paths
+                        let pathCount = 0;
+                        if (y > 0 && maze[y-1][x] === 0) pathCount++;
+                        if (y < size-1 && maze[y+1][x] === 0) pathCount++;
+                        if (x > 0 && maze[y][x-1] === 0) pathCount++;
+                        if (x < size-1 && maze[y][x+1] === 0) pathCount++;
+
+                        // Only place if there are at least 3 paths (not a critical corridor)
+                        if (pathCount >= 3) {
+                            maze[y][x] = 4; // 4 = obstacle
+                            mazeGameData.obstacles.push({ x, y });
+                            obstacleCount--;
+                        }
+                    }
                 }
             }
 
@@ -4160,30 +4181,58 @@
             // Clear canvas
             ctx.clearRect(0, 0, mazeGameData.canvas.width, mazeGameData.canvas.height);
 
-            // Draw maze cells
+            // Draw maze with walls as borders
             for (let y = 0; y < size; y++) {
                 for (let x = 0; x < size; x++) {
                     const cell = mazeGameData.currentMaze[y][x];
                     const xPos = x * cellSize;
                     const yPos = y * cellSize;
 
-                    switch (cell) {
-                        case 0: // Path
-                            ctx.fillStyle = '#f0f0f0';
-                            break;
-                        case 1: // Wall
-                            ctx.fillStyle = '#333';
-                            break;
-                        case 4: // Obstacle (fire)
-                            ctx.fillStyle = '#ffcccc';
-                            break;
-                        default:
-                            ctx.fillStyle = '#f0f0f0';
+                    // Fill background for all cells
+                    if (cell === 4) { // Obstacle (fire)
+                        ctx.fillStyle = '#ffe0e0';
+                    } else if (cell === 0 || cell === 2 || cell === 3) { // Path
+                        ctx.fillStyle = '#f8f8f8';
+                    } else { // Wall
+                        ctx.fillStyle = '#2c3e50';
                     }
-
                     ctx.fillRect(xPos, yPos, cellSize, cellSize);
-                    ctx.strokeStyle = '#ccc';
-                    ctx.strokeRect(xPos, yPos, cellSize, cellSize);
+
+                    // Draw borders between walls and paths
+                    ctx.strokeStyle = '#2c3e50';
+                    ctx.lineWidth = 2;
+
+                    // Check neighbors and draw walls
+                    if (cell === 0 || cell === 2 || cell === 3 || cell === 4) {
+                        // Top wall
+                        if (y === 0 || mazeGameData.currentMaze[y-1][x] === 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(xPos, yPos);
+                            ctx.lineTo(xPos + cellSize, yPos);
+                            ctx.stroke();
+                        }
+                        // Bottom wall
+                        if (y === size-1 || mazeGameData.currentMaze[y+1][x] === 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(xPos, yPos + cellSize);
+                            ctx.lineTo(xPos + cellSize, yPos + cellSize);
+                            ctx.stroke();
+                        }
+                        // Left wall
+                        if (x === 0 || mazeGameData.currentMaze[y][x-1] === 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(xPos, yPos);
+                            ctx.lineTo(xPos, yPos + cellSize);
+                            ctx.stroke();
+                        }
+                        // Right wall
+                        if (x === size-1 || mazeGameData.currentMaze[y][x+1] === 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(xPos + cellSize, yPos);
+                            ctx.lineTo(xPos + cellSize, yPos + cellSize);
+                            ctx.stroke();
+                        }
+                    }
 
                     // Draw special elements
                     if (x === mazeGameData.princess.x && y === mazeGameData.princess.y) {
