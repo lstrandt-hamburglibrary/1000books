@@ -348,6 +348,17 @@
             }
         }
 
+        /* Speed button highlighting */
+        .speed-btn.speed-selected {
+            background: #28a745 !important;
+            color: white !important;
+        }
+
+        .speed-btn:not(.speed-selected) {
+            background: #667eea !important;
+            color: white !important;
+        }
+
         /* Update Banner */
         .update-banner {
             position: fixed;
@@ -2276,6 +2287,15 @@
 
             // Add keyboard controls
             document.addEventListener('keydown', handleKeyPress);
+
+            // Initialize Normal speed button as selected
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                if (btn.textContent === 'Normal') {
+                    btn.classList.add('speed-selected');
+                } else {
+                    btn.classList.remove('speed-selected');
+                }
+            });
         }
 
         // Handle keyboard input
@@ -2600,14 +2620,14 @@
 
             showToast(`🎮 Speed changed to ${speedNames[speed]} (${speed}x)`);
 
-            // Reset all speed buttons to default color
+            // Reset all speed buttons and highlight selected one
             document.querySelectorAll('.speed-btn').forEach(btn => {
-                btn.setAttribute('style', 'padding: 5px 10px; background: #667eea !important; color: white !important;');
+                btn.classList.remove('speed-selected');
             });
 
             // Highlight selected speed button
             if (button) {
-                button.setAttribute('style', 'padding: 5px 10px; background: #28a745 !important; color: white !important;');
+                button.classList.add('speed-selected');
             }
         }
 
