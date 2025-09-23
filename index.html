@@ -1274,9 +1274,9 @@
                     </div>
                     <div class="game-controls" style="margin-top: 10px;">
                         <label style="margin-right: 10px;">Speed: <strong id="currentSpeedLabel" style="color: #28a745;">Normal (1x)</strong></label>
-                        <button class="game-btn speed-btn" style="padding: 5px 10px;">Slow</button>
-                        <button class="game-btn speed-btn" style="padding: 5px 10px;">Normal</button>
-                        <button class="game-btn speed-btn" style="padding: 5px 10px;">Fast</button>
+                        <button class="game-btn speed-btn" onclick="setGameSpeed(0.5, this)" style="padding: 5px 10px;">Slow</button>
+                        <button class="game-btn speed-btn" onclick="setGameSpeed(1, this)" style="padding: 5px 10px;">Normal</button>
+                        <button class="game-btn speed-btn" onclick="setGameSpeed(1.5, this)" style="padding: 5px 10px;">Fast</button>
                     </div>
                     <div class="high-score">
                         🏆 High Score: <span id="parkHighScore">0</span>
@@ -2505,35 +2505,24 @@
             // Add touch controls for mobile
             setupTouchControls();
 
-            // Initialize Normal speed button as selected and add event listeners
+            // Initialize Normal speed button as selected
             const speedButtons = document.querySelectorAll('.speed-btn');
             console.log('Found speed buttons:', speedButtons.length);
 
             speedButtons.forEach(btn => {
                 console.log('Setting up button:', btn.textContent);
                 btn.classList.remove('speed-selected');
-                // Clear any inline styles except padding
+
+                // Keep the padding style but clear other inline styles
                 const padding = btn.style.padding;
-                btn.removeAttribute('style');
-                btn.style.padding = padding;
+                btn.style.background = '';
+                btn.style.border = '';
+                btn.style.transform = '';
+                btn.style.boxShadow = '';
 
                 if (btn.textContent === 'Normal') {
                     btn.classList.add('speed-selected');
                 }
-
-                // Remove any existing onclick
-                btn.onclick = null;
-
-                // Add click event listener to each button
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Speed button clicked:', this.textContent);
-                    const speed = this.textContent === 'Slow' ? 0.5 :
-                                 this.textContent === 'Normal' ? 1 : 1.5;
-                    console.log('Calling setGameSpeed with speed:', speed);
-                    setGameSpeed(speed, this);
-                });
             });
         }
 
@@ -2887,8 +2876,8 @@
 
             parkGameData.baseSpeed = speed;
 
-            // Update display to show base speed
-            document.getElementById('gameSpeed').textContent = speed + 'x';
+            // Update display to show base speed (commented out - element doesn't exist)
+            // document.getElementById('gameSpeed').textContent = speed + 'x';
 
             // If game is active, update current speed and restart spawning with new speed
             if (parkGameData.gameActive) {
