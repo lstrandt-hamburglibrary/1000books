@@ -369,6 +369,62 @@
             transform: scale(1.05);
         }
 
+        /* Enhanced Animations */
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+            }
+        }
+
         /* Update Banner */
         .update-banner {
             position: fixed;
@@ -685,6 +741,57 @@
         @keyframes scoreFloat {
             0% { transform: translateY(0); opacity: 1; }
             100% { transform: translateY(-50px); opacity: 0; }
+        }
+
+        /* Snowflake Catcher Styles */
+        .snow-game-area {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        .snow-catcher {
+            position: absolute;
+            font-size: 2.5rem;
+            z-index: 10;
+            pointer-events: none;
+            transition: transform 0.1s ease;
+        }
+
+        .falling-snowflake {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: snowfall linear;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .falling-snowflake.special {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px rgba(135, 206, 235, 0.8));
+        }
+
+        @keyframes snowfall {
+            from {
+                transform: translateY(-50px) rotate(0deg);
+            }
+            to {
+                transform: translateY(450px) rotate(360deg);
+            }
+        }
+
+        @keyframes snowCatch {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
         }
 
         .dog-fact-display {
@@ -1284,6 +1391,49 @@
                 </div>
             </div>
 
+            <!-- Snowflake Catcher Game -->
+            <div id="snowflakeGame" class="mini-game" style="display: none;">
+                <div class="game-header">
+                    <h3>❄️ Snowflake Catcher!</h3>
+                    <button class="game-close-btn" onclick="closeGame('snowflake')">✕</button>
+                </div>
+                <div class="game-instructions">
+                    <p>Catch the falling snowflakes! ❄️ Move your mouse or touch the screen!</p>
+                    <p style="color: #17a2b8;">🎯 Special snowflakes give bonus points!</p>
+                </div>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Score:</span>
+                        <span id="snowScore">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Caught:</span>
+                        <span id="snowCaught">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Time:</span>
+                        <span id="snowTimer">60</span>s
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Combo:</span>
+                        <span id="snowCombo">0</span>
+                    </div>
+                </div>
+                <div class="snow-game-area" id="snowGameArea">
+                    <div class="snow-background"></div>
+                    <div class="snow-catcher" id="snowCatcher">🧤</div>
+                    <div class="falling-items" id="fallingItems"></div>
+                </div>
+                <div class="game-controls">
+                    <button class="game-btn" onclick="startSnowGame()">▶️ Start</button>
+                    <button class="game-btn" onclick="pauseSnowGame()" id="snowPauseBtn">⏸️ Pause</button>
+                    <button class="game-btn" onclick="resetSnowGame()">🔄 New Game</button>
+                </div>
+                <div class="high-score">
+                    🏆 High Score: <span id="snowHighScore">0</span>
+                </div>
+            </div>
+
             <!-- Settings Page -->
             <div id="settings" class="page">
                 <h2>Settings</h2>
@@ -1365,6 +1515,23 @@
             factsUnlocked: [],
             lives: 3
         };
+
+        let snowGameData = {
+            score: 0,
+            caught: 0,
+            timeLeft: 60,
+            combo: 0,
+            maxCombo: 0,
+            timerInterval: null,
+            gameActive: false,
+            paused: false,
+            highScore: 0,
+            snowflakes: [],
+            spawnInterval: null,
+            catcherX: 0,
+            catcherY: 0
+        };
+
         let testMode = false;
 
         // Dog facts database
@@ -1436,6 +1603,54 @@
                     { title: "Shapes, Shapes, Shapes", author: "Tana Hoban", age: "2-5" }
                 ]
             },
+            dogs: {
+                name: "Dog Stories",
+                emoji: "🐕",
+                books: [
+                    { title: "Go, Dog. Go!", author: "P.D. Eastman", age: "2-5" },
+                    { title: "Harry the Dirty Dog", author: "Gene Zion", age: "3-6" },
+                    { title: "Clifford the Big Red Dog", author: "Norman Bridwell", age: "2-5" },
+                    { title: "Biscuit", author: "Alyssa Satin Capucilli", age: "1-3" },
+                    { title: "The Poky Little Puppy", author: "Janette Sebring Lowrey", age: "2-5" },
+                    { title: "Officer Buckle and Gloria", author: "Peggy Rathmann", age: "4-7" },
+                    { title: "Martha Speaks", author: "Susan Meddaugh", age: "4-7" },
+                    { title: "Spot's First Walk", author: "Eric Hill", age: "0-3" },
+                    { title: "The Doghouse", author: "Jan Thomas", age: "2-5" },
+                    { title: "Bark, George", author: "Jules Feiffer", age: "2-5" }
+                ]
+            },
+            cats: {
+                name: "Cat Stories",
+                emoji: "🐱",
+                books: [
+                    { title: "Pete the Cat: I Love My White Shoes", author: "Eric Litwin", age: "3-6" },
+                    { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
+                    { title: "Splat the Cat", author: "Rob Scotton", age: "3-6" },
+                    { title: "Millions of Cats", author: "Wanda Gág", age: "3-6" },
+                    { title: "The Three Little Kittens", author: "Paul Galdone", age: "2-5" },
+                    { title: "Bad Kitty", author: "Nick Bruel", age: "4-7" },
+                    { title: "Cookie's Week", author: "Cindy Ward", age: "2-5" },
+                    { title: "Kitten's First Full Moon", author: "Kevin Henkes", age: "2-5" },
+                    { title: "The Cat Who Came In Off The Roof", author: "Annie M.G. Schmidt", age: "4-7" },
+                    { title: "Six Dinner Sid", author: "Inga Moore", age: "3-6" }
+                ]
+            },
+            nature: {
+                name: "Nature & Outdoors",
+                emoji: "🌳",
+                books: [
+                    { title: "The Curious Garden", author: "Peter Brown", age: "4-7" },
+                    { title: "We Are the Gardeners", author: "Joanna Gaines", age: "4-7" },
+                    { title: "The Thing About Bees", author: "Shabazz Larkin", age: "4-7" },
+                    { title: "The Tiny Seed", author: "Eric Carle", age: "3-6" },
+                    { title: "A Tree Is Nice", author: "Janice May Udry", age: "3-6" },
+                    { title: "The Giving Tree", author: "Shel Silverstein", age: "4-7" },
+                    { title: "Planting a Rainbow", author: "Lois Ehlert", age: "2-5" },
+                    { title: "In the Tall, Tall Grass", author: "Denise Fleming", age: "2-5" },
+                    { title: "The Dandelion Seed", author: "Joseph Anthony", age: "4-7" },
+                    { title: "Up in the Garden and Down in the Dirt", author: "Kate Messner", age: "5-8" }
+                ]
+            },
             adventure: {
                 name: "Adventure Stories",
                 emoji: "🚀",
@@ -1452,20 +1667,180 @@
                     { title: "Rosie's Walk", author: "Pat Hutchins", age: "2-5" }
                 ]
             },
-            animals: {
-                name: "Animal Stories",
-                emoji: "🐻",
+            pirates: {
+                name: "Pirates & Treasure",
+                emoji: "🏴‍☠️",
                 books: [
-                    { title: "The Tale of Peter Rabbit", author: "Beatrix Potter", age: "3-6" },
-                    { title: "If You Give a Mouse a Cookie", author: "Laura Numeroff", age: "2-5" },
-                    { title: "Giraffes Can't Dance", author: "Giles Andreae", age: "3-6" },
-                    { title: "The Gruffalo", author: "Julia Donaldson", age: "3-6" },
-                    { title: "Dear Zoo", author: "Rod Campbell", age: "0-3" },
-                    { title: "Polar Bear, Polar Bear, What Do You Hear?", author: "Bill Martin Jr.", age: "2-5" },
-                    { title: "Click, Clack, Moo: Cows That Type", author: "Doreen Cronin", age: "3-6" },
-                    { title: "The Lion and the Mouse", author: "Jerry Pinkney", age: "3-6" },
-                    { title: "Are You My Mother?", author: "P.D. Eastman", age: "2-5" },
-                    { title: "Put Me in the Zoo", author: "Robert Lopshire", age: "2-5" }
+                    { title: "How I Became a Pirate", author: "Melinda Long", age: "4-7" },
+                    { title: "Pirates Don't Change Diapers", author: "Melinda Long", age: "4-7" },
+                    { title: "Shiver Me Letters", author: "June Sobel", age: "3-6" },
+                    { title: "The Night Pirates", author: "Peter Harris", age: "3-6" },
+                    { title: "Pirate Pete's Talk Like a Pirate", author: "Kim Kennedy", age: "3-6" },
+                    { title: "This Little Pirate", author: "Philemon Sturges", age: "2-5" },
+                    { title: "Pirates Love Underpants", author: "Claire Freedman", age: "3-6" },
+                    { title: "The Pirate Cruncher", author: "Jonny Duddle", age: "4-7" },
+                    { title: "Port Side Pirates", author: "Oscar Seaworthy", age: "3-6" },
+                    { title: "Goldilocks and the Three Pirates", author: "April Jones Prince", age: "4-7" }
+                ]
+            },
+            dinosaurs: {
+                name: "Dinosaur Adventures",
+                emoji: "🦕",
+                books: [
+                    { title: "How Do Dinosaurs Say Goodnight?", author: "Jane Yolen", age: "2-5" },
+                    { title: "Dinosaurs Love Underpants", author: "Claire Freedman", age: "3-6" },
+                    { title: "If the Dinosaurs Came Back", author: "Bernard Most", age: "3-6" },
+                    { title: "The Dinosaur Alphabet Book", author: "Jerry Pallotta", age: "4-7" },
+                    { title: "Goldilocks and the Three Dinosaurs", author: "Mo Willems", age: "3-6" },
+                    { title: "Danny and the Dinosaur", author: "Syd Hoff", age: "3-6" },
+                    { title: "Digging Up Dinosaurs", author: "Aliki", age: "4-7" },
+                    { title: "Dinosaur Bones", author: "Bob Barner", age: "3-6" },
+                    { title: "Dinosaurs, Dinosaurs", author: "Byron Barton", age: "2-5" },
+                    { title: "Dinosaur Roar!", author: "Paul and Henrietta Stickland", age: "2-5" }
+                ]
+            },
+            christmas: {
+                name: "Christmas Stories",
+                emoji: "🎄",
+                books: [
+                    { title: "The Polar Express", author: "Chris Van Allsburg", age: "3-7" },
+                    { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
+                    { title: "The Night Before Christmas", author: "Clement C. Moore", age: "3-7" },
+                    { title: "The Snowman", author: "Raymond Briggs", age: "2-6" },
+                    { title: "Olive, the Other Reindeer", author: "Vivian Walsh", age: "3-6" },
+                    { title: "The Little Drummer Boy", author: "Ezra Jack Keats", age: "3-6" },
+                    { title: "Bear Stays Up for Christmas", author: "Karma Wilson", age: "2-5" },
+                    { title: "The Christmas Wish", author: "Lori Evert", age: "4-7" },
+                    { title: "Dream Snow", author: "Eric Carle", age: "2-5" },
+                    { title: "Merry Christmas, Big Hungry Bear!", author: "Don and Audrey Wood", age: "2-5" }
+                ]
+            },
+            thanksgiving: {
+                name: "Thanksgiving Stories",
+                emoji: "🦃",
+                books: [
+                    { title: "Turkey Trouble", author: "Wendi Silvano", age: "3-6" },
+                    { title: "The Thankful Book", author: "Todd Parr", age: "2-5" },
+                    { title: "'Twas the Night Before Thanksgiving", author: "Dav Pilkey", age: "4-7" },
+                    { title: "Bear Says Thanks", author: "Karma Wilson", age: "2-5" },
+                    { title: "The Perfect Thanksgiving", author: "Eileen Spinelli", age: "3-6" },
+                    { title: "Thanksgiving Is for Giving Thanks", author: "Margaret Sutherland", age: "2-5" },
+                    { title: "Balloons Over Broadway", author: "Melissa Sweet", age: "4-7" },
+                    { title: "Gracias the Thanksgiving Turkey", author: "Joy Cowley", age: "3-6" },
+                    { title: "Pete the Cat: The First Thanksgiving", author: "James Dean", age: "3-6" },
+                    { title: "10 Fat Turkeys", author: "Tony Johnston", age: "2-5" }
+                ]
+            },
+            halloween: {
+                name: "Halloween Stories",
+                emoji: "🎃",
+                books: [
+                    { title: "Room on the Broom", author: "Julia Donaldson", age: "3-6" },
+                    { title: "It's the Great Pumpkin, Charlie Brown", author: "Charles M. Schulz", age: "3-7" },
+                    { title: "The Little Old Lady Who Was Not Afraid of Anything", author: "Linda Williams", age: "3-6" },
+                    { title: "Big Pumpkin", author: "Erica Silverman", age: "3-6" },
+                    { title: "Five Little Pumpkins", author: "Iris Van Rynbach", age: "2-5" },
+                    { title: "Skeleton Hiccups", author: "Margery Cuyler", age: "3-6" },
+                    { title: "The Biggest Pumpkin Ever", author: "Steven Kroll", age: "3-6" },
+                    { title: "Click, Clack, Boo!", author: "Doreen Cronin", age: "3-6" },
+                    { title: "Creepy Carrots!", author: "Aaron Reynolds", age: "4-7" },
+                    { title: "The Monster at the End of This Book", author: "Jon Stone", age: "2-5" }
+                ]
+            },
+            winter: {
+                name: "Winter Stories",
+                emoji: "❄️",
+                books: [
+                    { title: "The Snowy Day", author: "Ezra Jack Keats", age: "2-5" },
+                    { title: "The Mitten", author: "Jan Brett", age: "3-6" },
+                    { title: "Owl Moon", author: "Jane Yolen", age: "3-7" },
+                    { title: "The Snowman", author: "Raymond Briggs", age: "2-6" },
+                    { title: "Snow", author: "Uri Shulevitz", age: "2-5" },
+                    { title: "The Jacket I Wear in the Snow", author: "Shirley Neitzel", age: "2-5" },
+                    { title: "Over and Under the Snow", author: "Kate Messner", age: "4-7" },
+                    { title: "Snowflake Bentley", author: "Jacqueline Briggs Martin", age: "5-8" },
+                    { title: "Ten on the Sled", author: "Kim Norman", age: "2-5" },
+                    { title: "The First Day of Winter", author: "Denise Fleming", age: "2-5" }
+                ]
+            },
+            spring: {
+                name: "Spring Stories",
+                emoji: "🌷",
+                books: [
+                    { title: "The Curious Garden", author: "Peter Brown", age: "4-7" },
+                    { title: "Planting a Rainbow", author: "Lois Ehlert", age: "2-5" },
+                    { title: "The Carrot Seed", author: "Ruth Krauss", age: "2-5" },
+                    { title: "It's Spring!", author: "Linda Glaser", age: "3-6" },
+                    { title: "When Spring Comes", author: "Kevin Henkes", age: "3-6" },
+                    { title: "The Thing About Spring", author: "Daniel Kirk", age: "3-6" },
+                    { title: "Mouse's First Spring", author: "Lauren Thompson", age: "0-3" },
+                    { title: "Spring Is Here", author: "Taro Gomi", age: "2-5" },
+                    { title: "Hurray for Spring!", author: "Patricia Hubbell", age: "2-5" },
+                    { title: "And Then It's Spring", author: "Julie Fogliano", age: "3-6" }
+                ]
+            },
+            summer: {
+                name: "Summer Stories",
+                emoji: "☀️",
+                books: [
+                    { title: "The Watermelon Seed", author: "Greg Pizzoli", age: "2-5" },
+                    { title: "A Perfect Day", author: "Lane Smith", age: "3-6" },
+                    { title: "The Sandcastle That Lola Built", author: "Megan Maynor", age: "3-6" },
+                    { title: "Maisy Goes to the Beach", author: "Lucy Cousins", age: "0-3" },
+                    { title: "Beach Day", author: "Karen Roosa", age: "2-5" },
+                    { title: "Summer Days and Nights", author: "Wong Herbert Yee", age: "3-6" },
+                    { title: "Come On, Rain!", author: "Karen Hesse", age: "3-6" },
+                    { title: "The Summer My Father Was Ten", author: "Pat Brisson", age: "4-7" },
+                    { title: "How to Catch a Star", author: "Oliver Jeffers", age: "3-6" },
+                    { title: "The Night Before Summer Vacation", author: "Natasha Wing", age: "3-6" }
+                ]
+            },
+            fall: {
+                name: "Fall/Autumn Stories",
+                emoji: "🍂",
+                books: [
+                    { title: "Leaf Man", author: "Lois Ehlert", age: "3-6" },
+                    { title: "We're Going on a Leaf Hunt", author: "Steve Metzger", age: "2-5" },
+                    { title: "Red Leaf, Yellow Leaf", author: "Lois Ehlert", age: "3-6" },
+                    { title: "The Busy Little Squirrel", author: "Nancy Tafuri", age: "2-5" },
+                    { title: "Fall Is Not Easy", author: "Marty Kelley", age: "3-6" },
+                    { title: "Goodbye Summer, Hello Autumn", author: "Kenard Pak", age: "3-6" },
+                    { title: "Awesome Autumn", author: "Bruce Goldstone", age: "3-6" },
+                    { title: "The Apple Pie Tree", author: "Zoe Hall", age: "2-5" },
+                    { title: "Leaves", author: "David Ezra Stein", age: "2-5" },
+                    { title: "Fall Mixed Up", author: "Bob Raczka", age: "3-6" }
+                ]
+            },
+            classic: {
+                name: "Classic Picture Books",
+                emoji: "📖",
+                books: [
+                    { title: "The Very Hungry Caterpillar", author: "Eric Carle", age: "2-5" },
+                    { title: "Where the Wild Things Are", author: "Maurice Sendak", age: "3-6" },
+                    { title: "Goodnight Moon", author: "Margaret Wise Brown", age: "0-3" },
+                    { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
+                    { title: "Corduroy", author: "Don Freeman", age: "3-5" },
+                    { title: "Curious George", author: "H.A. Rey", age: "3-6" },
+                    { title: "The Rainbow Fish", author: "Marcus Pfister", age: "3-6" },
+                    { title: "Brown Bear, Brown Bear, What Do You See?", author: "Bill Martin Jr.", age: "0-3" },
+                    { title: "Madeline", author: "Ludwig Bemelmans", age: "3-6" },
+                    { title: "The Little House", author: "Virginia Lee Burton", age: "3-6" }
+                ]
+            },
+            bedtime: {
+                name: "Bedtime Stories",
+                emoji: "🌙",
+                books: [
+                    { title: "The Going to Bed Book", author: "Sandra Boynton", age: "0-3" },
+                    { title: "Llama Llama Red Pajama", author: "Anna Dewdney", age: "2-5" },
+                    { title: "The Napping House", author: "Audrey Wood", age: "2-5" },
+                    { title: "Time for Bed", author: "Mem Fox", age: "0-3" },
+                    { title: "Guess How Much I Love You", author: "Sam McBratney", age: "2-5" },
+                    { title: "Pajama Time!", author: "Sandra Boynton", age: "0-3" },
+                    { title: "The Sleepy Little Alphabet", author: "Judy Sierra", age: "3-6" },
+                    { title: "I Love You to the Moon and Back", author: "Amelia Hepworth", age: "2-5" },
+                    { title: "The Rabbit Listened", author: "Cori Doerrfeld", age: "3-6" },
+                    { title: "Dream Animals", author: "Emily Winfield Martin", age: "0-3" }
                 ]
             },
             rhymes: {
@@ -1482,22 +1857,6 @@
                     { title: "Hey Diddle Diddle", author: "Salley Mavor", age: "0-3" },
                     { title: "Pat-a-Cake", author: "Mary Brigid Barrett", age: "0-3" },
                     { title: "This Little Piggy", author: "Jane Yolen", age: "0-3" }
-                ]
-            },
-            seasonal: {
-                name: "Seasonal & Holiday",
-                emoji: "🎃",
-                books: [
-                    { title: "The Snowy Day", author: "Ezra Jack Keats", age: "2-5" },
-                    { title: "The Polar Express", author: "Chris Van Allsburg", age: "3-7" },
-                    { title: "Room on the Broom", author: "Julia Donaldson", age: "3-6" },
-                    { title: "The Pumpkin Book", author: "Gail Gibbons", age: "3-6" },
-                    { title: "The Mitten", author: "Jan Brett", age: "3-6" },
-                    { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
-                    { title: "The Runaway Bunny", author: "Margaret Wise Brown", age: "2-5" },
-                    { title: "Leaf Man", author: "Lois Ehlert", age: "3-6" },
-                    { title: "The Night Before Christmas", author: "Clement C. Moore", age: "3-7" },
-                    { title: "It's the Great Pumpkin, Charlie Brown", author: "Charles M. Schulz", age: "3-7" }
                 ]
             }
         };
@@ -2378,7 +2737,7 @@
                     id: 'dogPark',
                     name: 'Dog Park Dash',
                     icon: '🦴',
-                    requirement: 'Read all 10 Animal Stories',
+                    requirement: 'Read all 10 Dog Stories',
                     unlocked: unlockedGames.dogPark,
                     action: () => startDogParkGame()
                 },
@@ -2399,10 +2758,18 @@
                     action: () => showToast('Story Builder game coming soon!')
                 },
                 {
+                    id: 'snowflake',
+                    name: 'Snowflake Catcher',
+                    icon: '❄️',
+                    requirement: 'Read all 10 Winter Stories',
+                    unlocked: unlockedGames.snowflake,
+                    action: () => startSnowflakeGame()
+                },
+                {
                     id: 'seasonSort',
                     name: 'Season Sorter',
                     icon: '🍂',
-                    requirement: 'Read all 10 Seasonal books',
+                    requirement: 'Read all 10 Fall Stories',
                     unlocked: unlockedGames.seasonSort,
                     action: () => showToast('Season Sorter game coming soon!')
                 }
@@ -2422,6 +2789,7 @@
             // Store game actions globally
             window.gameActions = {
                 dogPark: () => startDogParkGame(),
+                snowflake: () => startSnowflakeGame(),
                 letterMatch: () => showToast('Letter Match game coming soon!'),
                 storyBuilder: () => showToast('Story Builder game coming soon!'),
                 seasonSort: () => showToast('Season Sorter game coming soon!')
@@ -2465,10 +2833,11 @@
             };
 
             return {
-                dogPark: hasReadAllFromCategory('animals'),
+                dogPark: hasReadAllFromCategory('dogs'),
                 letterMatch: hasReadAllFromCategory('learning'),
                 storyBuilder: hasReadAllFromCategory('adventure'),
-                seasonSort: hasReadAllFromCategory('seasonal')
+                snowflake: hasReadAllFromCategory('winter'),
+                seasonSort: hasReadAllFromCategory('fall')
             };
         }
 
@@ -2507,10 +2876,7 @@
 
             // Initialize Normal speed button as selected
             const speedButtons = document.querySelectorAll('.speed-btn');
-            console.log('Found speed buttons:', speedButtons.length);
-
             speedButtons.forEach(btn => {
-                console.log('Setting up button:', btn.textContent);
                 btn.classList.remove('speed-selected');
 
                 // Keep the padding style but clear other inline styles
@@ -2794,11 +3160,8 @@
             }
 
             parkGameData.score += points;
-            console.log('Collected item type:', type, 'Points:', points);
-
             if (type === 'bone') {
                 parkGameData.bonesCollected++;
-                console.log('Bone collected! Total bones:', parkGameData.bonesCollected);
 
                 // Unlock a dog fact every 5 bones
                 if (parkGameData.bonesCollected % 5 === 0) {
@@ -2870,8 +3233,6 @@
 
         // Set game speed
         function setGameSpeed(speed, button) {
-            console.log('setGameSpeed called with speed:', speed, 'button:', button);
-
             if (!parkGameData) {
                 console.error('parkGameData is not defined!');
                 return;
@@ -2921,7 +3282,6 @@
             // Highlight selected speed button
             if (button) {
                 button.classList.add('speed-selected');
-                console.log('Button highlighted:', button.textContent, 'has class:', button.classList.contains('speed-selected'));
             }
         }
 
@@ -2967,7 +3327,6 @@
             document.getElementById('parkScore').textContent = parkGameData.score;
             document.getElementById('parkTimer').textContent = parkGameData.timeLeft;
             document.getElementById('bonesCollected').textContent = parkGameData.bonesCollected;
-            console.log('Display updated - Bones:', parkGameData.bonesCollected, 'Score:', parkGameData.score);
             updateLivesDisplay();
         }
 
@@ -3008,11 +3367,222 @@
                 document.removeEventListener('keydown', handleKeyPress);
 
                 document.getElementById('dogParkGame').style.display = 'none';
+            } else if (gameId === 'snowflake') {
+                // Stop timers
+                if (snowGameData.timerInterval) clearInterval(snowGameData.timerInterval);
+                if (snowGameData.spawnInterval) clearInterval(snowGameData.spawnInterval);
+
+                document.getElementById('snowflakeGame').style.display = 'none';
             }
 
             const overlay = document.getElementById('gameOverlay');
             if (overlay) {
                 overlay.style.display = 'none';
+            }
+        }
+
+        // Snowflake Game Functions
+        function startSnowflakeGame() {
+            const gameDiv = document.getElementById('snowflakeGame');
+            gameDiv.style.display = 'block';
+
+            // Create overlay
+            let overlay = document.getElementById('gameOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'gameOverlay';
+                overlay.className = 'game-overlay';
+                document.body.appendChild(overlay);
+            }
+            overlay.style.display = 'block';
+
+            resetSnowGame();
+            setupSnowflakeControls();
+        }
+
+        function setupSnowflakeControls() {
+            const gameArea = document.getElementById('snowGameArea');
+            const catcher = document.getElementById('snowCatcher');
+
+            // Mouse move
+            gameArea.addEventListener('mousemove', (e) => {
+                if (!snowGameData.gameActive || snowGameData.paused) return;
+                const rect = gameArea.getBoundingClientRect();
+                snowGameData.catcherX = e.clientX - rect.left - 20;
+                snowGameData.catcherY = e.clientY - rect.top - 20;
+                catcher.style.left = snowGameData.catcherX + 'px';
+                catcher.style.top = snowGameData.catcherY + 'px';
+            });
+
+            // Touch move
+            gameArea.addEventListener('touchmove', (e) => {
+                if (!snowGameData.gameActive || snowGameData.paused) return;
+                e.preventDefault();
+                const rect = gameArea.getBoundingClientRect();
+                snowGameData.catcherX = e.touches[0].clientX - rect.left - 20;
+                snowGameData.catcherY = e.touches[0].clientY - rect.top - 20;
+                catcher.style.left = snowGameData.catcherX + 'px';
+                catcher.style.top = snowGameData.catcherY + 'px';
+            }, { passive: false });
+        }
+
+        function startSnowGame() {
+            if (snowGameData.gameActive) return;
+            snowGameData.gameActive = true;
+            snowGameData.paused = false;
+
+            // Start spawning snowflakes
+            snowGameData.spawnInterval = setInterval(() => {
+                if (!snowGameData.paused && snowGameData.gameActive) {
+                    spawnSnowflake();
+                }
+            }, 800);
+
+            // Start timer
+            snowGameData.timerInterval = setInterval(() => {
+                if (!snowGameData.paused && snowGameData.gameActive) {
+                    snowGameData.timeLeft--;
+                    document.getElementById('snowTimer').textContent = snowGameData.timeLeft;
+                    if (snowGameData.timeLeft <= 0) {
+                        endSnowGame();
+                    }
+                }
+            }, 1000);
+        }
+
+        function spawnSnowflake() {
+            const gameArea = document.getElementById('snowGameArea');
+            const snowflake = document.createElement('div');
+            snowflake.className = 'falling-snowflake';
+
+            // Random chance for special snowflake
+            const isSpecial = Math.random() < 0.2;
+            if (isSpecial) {
+                snowflake.classList.add('special');
+                snowflake.innerHTML = '✨';
+                snowflake.dataset.points = 50;
+            } else {
+                snowflake.innerHTML = '❄️';
+                snowflake.dataset.points = 10;
+            }
+
+            // Random position
+            snowflake.style.left = Math.random() * (gameArea.offsetWidth - 30) + 'px';
+            snowflake.style.animationDuration = (3 + Math.random() * 2) + 's';
+
+            // Click/touch handler
+            snowflake.addEventListener('click', () => catchSnowflake(snowflake));
+            snowflake.addEventListener('touchstart', () => catchSnowflake(snowflake));
+
+            gameArea.appendChild(snowflake);
+
+            // Remove after animation
+            setTimeout(() => {
+                if (snowflake.parentNode) {
+                    snowflake.remove();
+                    // Reset combo if missed
+                    if (!snowflake.classList.contains('caught')) {
+                        snowGameData.combo = 0;
+                        document.getElementById('snowCombo').textContent = snowGameData.combo;
+                    }
+                }
+            }, 5000);
+        }
+
+        function catchSnowflake(snowflake) {
+            if (snowflake.classList.contains('caught')) return;
+            snowflake.classList.add('caught');
+
+            const points = parseInt(snowflake.dataset.points);
+            snowGameData.score += points;
+            snowGameData.caught++;
+            snowGameData.combo++;
+
+            if (snowGameData.combo > snowGameData.maxCombo) {
+                snowGameData.maxCombo = snowGameData.combo;
+            }
+
+            // Update display
+            document.getElementById('snowScore').textContent = snowGameData.score;
+            document.getElementById('snowCaught').textContent = snowGameData.caught;
+            document.getElementById('snowCombo').textContent = snowGameData.combo;
+
+            // Animate catch
+            snowflake.style.animation = 'snowCatch 0.3s ease';
+            setTimeout(() => snowflake.remove(), 300);
+
+            // Show combo popup
+            if (snowGameData.combo >= 5 && snowGameData.combo % 5 === 0) {
+                showComboPopup();
+            }
+        }
+
+        function showComboPopup() {
+            const gameArea = document.getElementById('snowGameArea');
+            const popup = document.createElement('div');
+            popup.className = 'combo-display';
+            popup.textContent = `${snowGameData.combo}x COMBO!`;
+            gameArea.appendChild(popup);
+            setTimeout(() => popup.remove(), 1000);
+        }
+
+        function pauseSnowGame() {
+            if (!snowGameData.gameActive) return;
+            snowGameData.paused = !snowGameData.paused;
+            document.getElementById('snowPauseBtn').textContent = snowGameData.paused ? '▶️ Resume' : '⏸️ Pause';
+        }
+
+        function resetSnowGame() {
+            // Stop timers
+            if (snowGameData.timerInterval) clearInterval(snowGameData.timerInterval);
+            if (snowGameData.spawnInterval) clearInterval(snowGameData.spawnInterval);
+
+            // Reset data
+            snowGameData = {
+                score: 0,
+                caught: 0,
+                timeLeft: 60,
+                combo: 0,
+                maxCombo: 0,
+                timerInterval: null,
+                gameActive: false,
+                paused: false,
+                highScore: snowGameData.highScore || 0,
+                snowflakes: [],
+                spawnInterval: null,
+                catcherX: 200,
+                catcherY: 200
+            };
+
+            // Update display
+            document.getElementById('snowScore').textContent = 0;
+            document.getElementById('snowCaught').textContent = 0;
+            document.getElementById('snowTimer').textContent = 60;
+            document.getElementById('snowCombo').textContent = 0;
+            document.getElementById('snowHighScore').textContent = snowGameData.highScore;
+
+            // Clear snowflakes
+            document.querySelectorAll('.falling-snowflake').forEach(s => s.remove());
+
+            // Position catcher
+            const catcher = document.getElementById('snowCatcher');
+            catcher.style.left = '200px';
+            catcher.style.top = '200px';
+        }
+
+        function endSnowGame() {
+            snowGameData.gameActive = false;
+            clearInterval(snowGameData.timerInterval);
+            clearInterval(snowGameData.spawnInterval);
+
+            // Check high score
+            if (snowGameData.score > snowGameData.highScore) {
+                snowGameData.highScore = snowGameData.score;
+                localStorage.setItem('snowGameHighScore', snowGameData.highScore);
+                document.getElementById('snowHighScore').textContent = snowGameData.highScore;
+                showToast(`🎉 NEW HIGH SCORE: ${snowGameData.highScore}! 🎉`);
+            } else {
+                showToast(`❄️ Game Over! Caught ${snowGameData.caught} snowflakes! Score: ${snowGameData.score}`);
             }
         }
 
@@ -3023,6 +3593,10 @@
         window.resetParkGame = resetParkGame;
         window.closeGame = closeGame;
         window.continuePlaying = continuePlaying;
+        window.startSnowflakeGame = startSnowflakeGame;
+        window.startSnowGame = startSnowGame;
+        window.pauseSnowGame = pauseSnowGame;
+        window.resetSnowGame = resetSnowGame;
         window.showPage = showPage;
         window.selectRating = selectRating;
         window.saveSettings = saveSettings;
