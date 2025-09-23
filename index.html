@@ -1529,8 +1529,13 @@
                     <button class="game-close-btn" onclick="closeGame('dragonMaze')">✕</button>
                 </div>
                 <div class="game-instructions" style="padding: 8px; background: #f8f9fa; border-radius: 5px; margin-bottom: 10px;">
-                    <p style="margin: 3px 0; font-size: 0.9em;">🐉 Guide to 👸 | Moves: <span id="mazeMovesCount" style="font-weight: bold;">0</span>/<span id="mazeMoveLimit">100</span> | Level: <span id="mazeLevel">1</span> | Best: <span id="mazeBestMoves">--</span></p>
-                    <p style="margin: 3px 0; font-size: 0.9em; color: #28a745; font-weight: bold;">✓ Complete in <span id="maxMoves">100</span> moves or less!</p>
+                    <div style="margin-bottom: 5px;">
+                        <button class="maze-difficulty-btn" onclick="setMazeDifficulty('easy', this)" style="padding: 5px 10px; margin: 2px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Easy (5x5)</button>
+                        <button class="maze-difficulty-btn" onclick="setMazeDifficulty('medium', this)" style="padding: 5px 10px; margin: 2px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Medium (7x7)</button>
+                        <button class="maze-difficulty-btn" onclick="setMazeDifficulty('hard', this)" style="padding: 5px 10px; margin: 2px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Hard (10x10)</button>
+                    </div>
+                    <p style="margin: 3px 0; font-size: 0.9em;">🐉 Guide to 👸 | Moves: <span id="mazeMovesCount" style="font-weight: bold;">0</span>/<span id="mazeMoveLimit">50</span> | Level: <span id="mazeLevel">1</span> | Best: <span id="mazeBestMoves">--</span></p>
+                    <p style="margin: 3px 0; font-size: 0.9em; color: #28a745; font-weight: bold;">✓ Complete in <span id="maxMoves">50</span> moves or less!</p>
                 </div>
                 <div class="maze-game-area" id="mazeGameArea">
                     <canvas id="mazeCanvas" width="300" height="300"></canvas>
@@ -1661,19 +1666,20 @@
         // Dragon Maze Game Data
         let mazeGameData = {
             walls: { horizontal: [], vertical: [] }, // Store walls between cells
-            mazeSize: 10, // 10x10 grid of all usable cells
+            mazeSize: 5, // Default to easy 5x5
             cellSize: 0,
             dragon: { x: 0, y: 0 },
             princess: { x: 0, y: 0 },
             obstacles: [],
             path: [],
             moves: 0,
-            maxMoves: 100,
+            maxMoves: 50, // Default to easy 50 moves
             level: 1,
             gameActive: false,
             bestMoves: null,
             canvas: null,
-            ctx: null
+            ctx: null,
+            difficulty: 'easy' // Track current difficulty
         };
 
         // Dog facts database
@@ -4045,27 +4051,41 @@
         }
 
         // Dragon Maze Game Functions
-        function startDragonMazeGame() {
-            console.log('Starting Dragon Maze Game...');
+        function setMazeDifficulty(difficulty, button) {
+            const settings = {
+                easy: { size: 5, moves: 50 },
+                medium: { size: 7, moves: 75 },
+                hard: { size: 10, moves: 100 }
+            };
 
-            const gameDiv = document.getElementById('dragonMazeGame');
-            gameDiv.style.display = 'block';
+            mazeGameData.difficulty = difficulty;
+            mazeGameData.mazeSize = settings[difficulty].size;
+            mazeGameData.maxMoves = settings[difficulty].moves;
 
-            // Check for any existing overlays
-            const existingOverlay = document.getElementById('gameOverlay');
-            if (existingOverlay) {
-                console.log('Found existing overlay, hiding it:', existingOverlay);
-                existingOverlay.style.display = 'none';
+            // Update UI
+            document.getElementById('mazeMoveLimit').textContent = mazeGameData.maxMoves;
+            document.getElementById('maxMoves').textContent = mazeGameData.maxMoves;
+
+            // Update button styles
+            document.querySelectorAll('.maze-difficulty-btn').forEach(btn => {
+                btn.style.background = '#667eea';
+            });
+            if (button) {
+                button.style.background = '#28a745';
             }
 
-            // Check all elements with overlay in their ID or class
-            const allOverlays = document.querySelectorAll('[id*="overlay"], [class*="overlay"], .game-overlay');
-            console.log('All overlay elements found:', allOverlays);
-            allOverlays.forEach(el => {
-                console.log('Overlay element:', el, 'Display:', window.getComputedStyle(el).display, 'Opacity:', window.getComputedStyle(el).opacity);
-            });
+            // Reset and regenerate maze with new size
+            if (mazeGameData.canvas) {
+                mazeGameData.cellSize = Math.floor(mazeGameData.canvas.width / mazeGameData.mazeSize);
+                startMazeGame();
+            }
 
-            // No overlay needed for Dragon Maze - game window is self-contained
+            showToast(`🐉 Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`);
+        }
+
+        function startDragonMazeGame() {
+            const gameDiv = document.getElementById('dragonMazeGame');
+            gameDiv.style.display = 'block';
 
             // Initialize canvas with delay to ensure proper rendering
             setTimeout(() => {
@@ -4073,26 +4093,17 @@
                 mazeGameData.ctx = mazeGameData.canvas.getContext('2d');
                 mazeGameData.cellSize = Math.floor(mazeGameData.canvas.width / mazeGameData.mazeSize);
 
-                // Check canvas and game area styles
-                console.log('Canvas element:', mazeGameData.canvas);
-                console.log('Canvas computed style:', window.getComputedStyle(mazeGameData.canvas));
-                const gameArea = document.getElementById('mazeGameArea');
-                console.log('Game area computed style:', window.getComputedStyle(gameArea));
-
-                // Check if mazeOverlay is visible
-                const mazeOverlay = document.getElementById('mazeOverlay');
-                console.log('Maze overlay:', mazeOverlay, 'Display:', window.getComputedStyle(mazeOverlay).display);
-
                 // Clear canvas first with white background
                 mazeGameData.ctx.fillStyle = '#ffffff';
                 mazeGameData.ctx.fillRect(0, 0, mazeGameData.canvas.width, mazeGameData.canvas.height);
 
-                // Load best score
-                mazeGameData.bestMoves = parseInt(localStorage.getItem('mazeBestMoves') || '999');
+                // Load best score for current difficulty
+                const bestScoreKey = `mazeBestMoves_${mazeGameData.difficulty}`;
+                mazeGameData.bestMoves = parseInt(localStorage.getItem(bestScoreKey) || '999');
                 if (mazeGameData.bestMoves === 999) {
-                    document.getElementById('mazeFastestRescue').textContent = '--';
+                    document.getElementById('mazeBestMoves').textContent = '--';
                 } else {
-                    document.getElementById('mazeFastestRescue').textContent = mazeGameData.bestMoves;
+                    document.getElementById('mazeBestMoves').textContent = mazeGameData.bestMoves;
                 }
 
                 startMazeGame();
@@ -4396,11 +4407,11 @@
         function winMaze() {
             mazeGameData.gameActive = false;
 
-            // Check for best score
-            if (mazeGameData.bestMoves === null || mazeGameData.moves < mazeGameData.bestMoves) {
+            // Check for best score per difficulty
+            const bestScoreKey = `mazeBestMoves_${mazeGameData.difficulty}`;
+            if (mazeGameData.bestMoves === null || mazeGameData.bestMoves === 999 || mazeGameData.moves < mazeGameData.bestMoves) {
                 mazeGameData.bestMoves = mazeGameData.moves;
-                localStorage.setItem('mazeBestMoves', mazeGameData.bestMoves);
-                document.getElementById('mazeFastestRescue').textContent = mazeGameData.bestMoves;
+                localStorage.setItem(bestScoreKey, mazeGameData.bestMoves);
                 document.getElementById('mazeBestMoves').textContent = mazeGameData.bestMoves;
             }
 
@@ -4471,6 +4482,7 @@
         window.resetSnowGame = resetSnowGame;
         window.setSnowSpeed = setSnowSpeed;
         window.startDragonMazeGame = startDragonMazeGame;
+        window.setMazeDifficulty = setMazeDifficulty;
         window.startMazeGame = startMazeGame;
         window.moveDragon = moveDragon;
         window.resetMaze = resetMaze;
