@@ -2276,16 +2276,6 @@
 
             // Add keyboard controls
             document.addEventListener('keydown', handleKeyPress);
-
-            // Set default speed and highlight Normal button (with small delay to ensure DOM is ready)
-            setTimeout(() => {
-                const speedBtns = document.querySelectorAll('.speed-btn');
-                speedBtns.forEach(btn => {
-                    if (btn.textContent === 'Normal') {
-                        setGameSpeed(1, btn);
-                    }
-                });
-            }, 100);
         }
 
         // Handle keyboard input
@@ -2612,14 +2602,14 @@
 
             // Reset all speed buttons to default color
             document.querySelectorAll('.speed-btn').forEach(btn => {
-                btn.style.setProperty('background', '#667eea', 'important');
-                btn.style.setProperty('color', 'white', 'important');
+                btn.style.background = '#667eea';
+                btn.style.color = 'white';
             });
 
             // Highlight selected speed button
             if (button) {
-                button.style.setProperty('background', '#28a745', 'important');
-                button.style.setProperty('color', 'white', 'important');
+                button.style.background = '#28a745';
+                button.style.color = 'white';
             }
         }
 
