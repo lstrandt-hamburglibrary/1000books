@@ -2794,8 +2794,11 @@
             }
 
             parkGameData.score += points;
+            console.log('Collected item type:', type, 'Points:', points);
+
             if (type === 'bone') {
                 parkGameData.bonesCollected++;
+                console.log('Bone collected! Total bones:', parkGameData.bonesCollected);
 
                 // Unlock a dog fact every 5 bones
                 if (parkGameData.bonesCollected % 5 === 0) {
@@ -2964,6 +2967,7 @@
             document.getElementById('parkScore').textContent = parkGameData.score;
             document.getElementById('parkTimer').textContent = parkGameData.timeLeft;
             document.getElementById('bonesCollected').textContent = parkGameData.bonesCollected;
+            console.log('Display updated - Bones:', parkGameData.bonesCollected, 'Score:', parkGameData.score);
             updateLivesDisplay();
         }
 
