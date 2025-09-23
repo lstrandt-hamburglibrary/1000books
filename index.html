@@ -1569,7 +1569,11 @@
                         <button class="puzzle-difficulty-btn" onclick="setPuzzleDifficulty('medium', this)" style="padding: 5px 10px; margin: 2px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Medium (4x4)</button>
                         <button class="puzzle-difficulty-btn" onclick="setPuzzleDifficulty('hard', this)" style="padding: 5px 10px; margin: 2px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Hard (5x5)</button>
                     </div>
-                    <p style="margin: 3px 0; font-size: 0.9em;">Moves: <span id="puzzleMovesCount" style="font-weight: bold;">0</span> | Best: <span id="puzzleBestMoves">--</span></p>
+                    <div style="margin-bottom: 5px;">
+                        <button onclick="togglePuzzleMode()" style="padding: 5px 10px; margin: 2px; background: #764ba2; color: white; border: none; border-radius: 5px; font-size: 0.85em;">🎼️/1️⃣ Toggle Mode</button>
+                        <button onclick="changePuzzleImage()" style="padding: 5px 10px; margin: 2px; background: #764ba2; color: white; border: none; border-radius: 5px; font-size: 0.85em;">🌄 Change Picture</button>
+                    </div>
+                    <p style="margin: 3px 0; font-size: 0.9em;">Moves: <span id="puzzleMovesCount" style="font-weight: bold;">0</span> | Best: <span id="puzzleBestMoves">--</span> | Mode: <span id="puzzleMode">Picture</span></p>
                 </div>
                 <div class="puzzle-game-area" id="puzzleGameArea" style="position: relative; height: 320px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 10px; display: flex; align-items: center; justify-content: center;">
                     <div id="puzzleGrid" style="display: grid; gap: 5px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
@@ -1700,7 +1704,9 @@
             isComplete: false,
             difficulty: 'easy',
             bestMoves: null,
-            gameActive: false
+            gameActive: false,
+            mode: 'picture', // 'numbers' or 'picture'
+            currentImage: 0
         };
 
         // Dragon Maze Game Data
@@ -4629,25 +4635,73 @@
 
             puzzleGameData.tiles.forEach((tile, index) => {
                 const tileDiv = document.createElement('div');
-                tileDiv.style.cssText = `
-                    width: ${cellSize}px;
-                    height: ${cellSize}px;
-                    background: ${tile ? getTileColor(tile) : 'transparent'};
-                    border: ${tile ? '2px solid rgba(255,255,255,0.5)' : 'none'};
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: ${Math.max(16, cellSize/3)}px;
-                    font-weight: bold;
-                    color: white;
-                    cursor: ${tile && !puzzleGameData.isComplete ? 'pointer' : 'default'};
-                    transition: all 0.3s;
-                    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                `;
+
+                if (puzzleGameData.mode === 'picture' && tile) {
+                    // Picture mode - show part of image
+                    const correctRow = Math.floor((tile - 1) / size);
+                    const correctCol = (tile - 1) % size;
+                    const bgPosX = -(correctCol * cellSize);
+                    const bgPosY = -(correctRow * cellSize);
+
+                    tileDiv.style.cssText = `
+                        width: ${cellSize}px;
+                        height: ${cellSize}px;
+                        background-image: ${getPuzzleImage()};
+                        background-size: ${cellSize * size}px ${cellSize * size}px;
+                        background-position: ${bgPosX}px ${bgPosY}px;
+                        border: 2px solid rgba(255,255,255,0.8);
+                        border-radius: 4px;
+                        cursor: ${!puzzleGameData.isComplete ? 'pointer' : 'default'};
+                        transition: all 0.3s;
+                        position: relative;
+                        overflow: hidden;
+                    `;
+
+                    // Add subtle number overlay for help
+                    const numberOverlay = document.createElement('div');
+                    numberOverlay.style.cssText = `
+                        position: absolute;
+                        top: 2px;
+                        right: 2px;
+                        background: rgba(0,0,0,0.5);
+                        color: white;
+                        padding: 2px 5px;
+                        border-radius: 3px;
+                        font-size: 12px;
+                        font-weight: bold;
+                    `;
+                    numberOverlay.textContent = tile;
+                    tileDiv.appendChild(numberOverlay);
+                } else if (tile) {
+                    // Numbers mode
+                    tileDiv.style.cssText = `
+                        width: ${cellSize}px;
+                        height: ${cellSize}px;
+                        background: ${getTileColor(tile)};
+                        border: 2px solid rgba(255,255,255,0.5);
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: ${Math.max(16, cellSize/3)}px;
+                        font-weight: bold;
+                        color: white;
+                        cursor: ${!puzzleGameData.isComplete ? 'pointer' : 'default'};
+                        transition: all 0.3s;
+                        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                    `;
+                    tileDiv.textContent = tile;
+                } else {
+                    // Empty tile
+                    tileDiv.style.cssText = `
+                        width: ${cellSize}px;
+                        height: ${cellSize}px;
+                        background: transparent;
+                        border: none;
+                    `;
+                }
 
                 if (tile) {
-                    tileDiv.textContent = tile;
                     tileDiv.onclick = () => handleTileClick(index);
                     tileDiv.onmouseover = () => {
                         if (!puzzleGameData.isComplete) {
@@ -4666,6 +4720,42 @@
         function getTileColor(value) {
             const hue = (value * 25) % 360;
             return `hsl(${hue}, 70%, 60%)`;
+        }
+
+        function getPuzzleImage() {
+            // Collection of kid-friendly images using gradient patterns
+            const images = [
+                // Sunset gradient
+                'linear-gradient(135deg, #ff6b6b 0%, #feca57 25%, #48dbfb 50%, #ff9ff3 75%, #54a0ff 100%)',
+                // Ocean gradient
+                'linear-gradient(135deg, #667eea 0%, #48dbfb 50%, #0abde3 100%)',
+                // Forest gradient
+                'linear-gradient(135deg, #11998e 0%, #38ef7d 50%, #f4d03f 100%)',
+                // Candy gradient
+                'linear-gradient(135deg, #fc466b 0%, #3f5efb 50%, #fc466b 100%)',
+                // Rainbow gradient
+                'linear-gradient(135deg, #ff0000 0%, #ff7f00 20%, #ffff00 40%, #00ff00 60%, #0000ff 80%, #8b00ff 100%)',
+                // Space gradient
+                'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)'
+            ];
+            return images[puzzleGameData.currentImage % images.length];
+        }
+
+        function togglePuzzleMode() {
+            puzzleGameData.mode = puzzleGameData.mode === 'picture' ? 'numbers' : 'picture';
+            document.getElementById('puzzleMode').textContent = puzzleGameData.mode === 'picture' ? 'Picture' : 'Numbers';
+            renderPuzzle();
+            showToast(`🧩 Mode: ${puzzleGameData.mode === 'picture' ? 'Picture 🎼️' : 'Numbers 1️⃣'}`);
+        }
+
+        function changePuzzleImage() {
+            if (puzzleGameData.mode === 'picture') {
+                puzzleGameData.currentImage = (puzzleGameData.currentImage + 1) % 6;
+                renderPuzzle();
+                showToast('🌄 Picture changed!');
+            } else {
+                showToast('Switch to Picture mode first!');
+            }
         }
 
         function handleTileClick(index) {
@@ -4732,6 +4822,8 @@
         window.setPuzzleDifficulty = setPuzzleDifficulty;
         window.startPuzzleGame = startPuzzleGame;
         window.shufflePuzzle = shufflePuzzle;
+        window.togglePuzzleMode = togglePuzzleMode;
+        window.changePuzzleImage = changePuzzleImage;
         window.startMazeGame = startMazeGame;
         window.moveDragon = moveDragon;
         window.resetMaze = resetMaze;
