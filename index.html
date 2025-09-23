@@ -558,12 +558,12 @@
             transform: translate(-50%, -50%);
             background: white;
             border-radius: 20px;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             z-index: 1001;
-            max-width: 500px;
+            max-width: 480px;
             width: 90%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
         }
 
@@ -920,14 +920,14 @@
         /* Dragon Maze Styles */
         .maze-game-area {
             position: relative;
-            height: 400px;
+            height: 320px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             border-radius: 10px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
         #mazeCanvas {
@@ -1528,16 +1528,14 @@
                     <h3>🐉 Dragon Maze Adventure!</h3>
                     <button class="game-close-btn" onclick="closeGame('dragonMaze')">✕</button>
                 </div>
-                <div class="game-instructions">
-                    <p>Guide the dragon to rescue the princess! 👸</p>
-                    <p style="color: #4169E1;">🎯 Use arrow keys or swipe to move</p>
-                    <p style="color: #FFD700;">⚡ Complete in under <span id="maxMoves">50</span> moves!</p>
-                    <p style="color: #dc3545;">🔥 Avoid obstacles and dead ends!</p>
+                <div class="game-instructions" style="padding: 10px;">
+                    <p style="margin: 5px 0;">🐉 Guide dragon to princess 👸 | Use arrow keys/buttons</p>
+                    <p style="margin: 5px 0; color: #FFD700;">⚡ Complete in <span id="maxMoves">100</span> moves or less!</p>
                 </div>
                 <div class="game-stats">
                     <div class="stat-item">
                         <span class="stat-label">Moves:</span>
-                        <span id="mazeMovesCount" style="font-size: 1.2em; font-weight: bold;">0</span>/<span id="mazeMoveLimit">50</span>
+                        <span id="mazeMovesCount" style="font-size: 1.2em; font-weight: bold;">0</span>/<span id="mazeMoveLimit">100</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Level:</span>
@@ -1549,7 +1547,7 @@
                     </div>
                 </div>
                 <div class="maze-game-area" id="mazeGameArea">
-                    <canvas id="mazeCanvas" width="400" height="400"></canvas>
+                    <canvas id="mazeCanvas" width="300" height="300"></canvas>
                     <div id="mazeOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;"></div>
                 </div>
                 <div class="game-controls">
@@ -1684,7 +1682,7 @@
             obstacles: [],
             path: [],
             moves: 0,
-            maxMoves: 50,
+            maxMoves: 100,
             level: 1,
             gameActive: false,
             bestMoves: null,
@@ -4150,22 +4148,8 @@
             mazeGameData.dragon = { x: 0, y: 0 };
             mazeGameData.princess = { x: size - 1, y: size - 1 };
 
-            // Add a few obstacles in random cells (avoiding start and end)
+            // No obstacles - removed for better gameplay
             mazeGameData.obstacles = [];
-            let obstacleCount = Math.min(2 + Math.floor(mazeGameData.level / 4), 3);
-
-            while (obstacleCount > 0) {
-                const x = Math.floor(Math.random() * size);
-                const y = Math.floor(Math.random() * size);
-
-                // Don't place on start, end, or existing obstacles
-                if ((x !== 0 || y !== 0) &&
-                    (x !== size - 1 || y !== size - 1) &&
-                    !mazeGameData.obstacles.find(o => o.x === x && o.y === y)) {
-                    mazeGameData.obstacles.push({ x, y });
-                    obstacleCount--;
-                }
-            }
         }
 
         function startMazeGame() {
@@ -4430,7 +4414,7 @@
 
         function nextMazeLevel() {
             mazeGameData.level++;
-            mazeGameData.maxMoves = Math.max(30, 50 - mazeGameData.level * 2); // Gets harder
+            mazeGameData.maxMoves = Math.max(60, 100 - mazeGameData.level * 5); // Gets harder gradually
             document.getElementById('mazeMoveLimit').textContent = mazeGameData.maxMoves;
             document.getElementById('maxMoves').textContent = mazeGameData.maxMoves;
 
