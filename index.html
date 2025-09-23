@@ -4646,7 +4646,7 @@
                     tileDiv.style.cssText = `
                         width: ${cellSize}px;
                         height: ${cellSize}px;
-                        background-image: ${getPuzzleImage()};
+                        background-image: url('${getPuzzleImage()}');
                         background-size: ${cellSize * size}px ${cellSize * size}px;
                         background-position: ${bgPosX}px ${bgPosY}px;
                         border: 2px solid rgba(255,255,255,0.8);
@@ -4723,22 +4723,25 @@
         }
 
         function getPuzzleImage() {
-            // Collection of kid-friendly images using gradient patterns
-            const images = [
-                // Sunset gradient
-                'linear-gradient(135deg, #ff6b6b 0%, #feca57 25%, #48dbfb 50%, #ff9ff3 75%, #54a0ff 100%)',
-                // Ocean gradient
-                'linear-gradient(135deg, #667eea 0%, #48dbfb 50%, #0abde3 100%)',
-                // Forest gradient
-                'linear-gradient(135deg, #11998e 0%, #38ef7d 50%, #f4d03f 100%)',
-                // Candy gradient
-                'linear-gradient(135deg, #fc466b 0%, #3f5efb 50%, #fc466b 100%)',
-                // Rainbow gradient
-                'linear-gradient(135deg, #ff0000 0%, #ff7f00 20%, #ffff00 40%, #00ff00 60%, #0000ff 80%, #8b00ff 100%)',
-                // Space gradient
-                'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)'
+            // Collection of kid-friendly images from Picsum (free image service)
+            // These are curated IDs that show kid-appropriate content
+            const imageIds = [
+                '237', // Cute puppy
+                '433', // Bear
+                '1074', // Lion
+                '582', // Fox
+                '659', // Nature/forest
+                '1084', // Walrus
+                '783', // Monkey
+                '1003', // Deer
+                '593', // Tiger
+                '837'  // Flowers
             ];
-            return images[puzzleGameData.currentImage % images.length];
+
+            // Use Picsum service for consistent, kid-friendly images
+            // Size 300x300 for good quality
+            const imageId = imageIds[puzzleGameData.currentImage % imageIds.length];
+            return `https://picsum.photos/id/${imageId}/300/300`;
         }
 
         function togglePuzzleMode() {
@@ -4750,7 +4753,7 @@
 
         function changePuzzleImage() {
             if (puzzleGameData.mode === 'picture') {
-                puzzleGameData.currentImage = (puzzleGameData.currentImage + 1) % 6;
+                puzzleGameData.currentImage = (puzzleGameData.currentImage + 1) % 10;
                 renderPuzzle();
                 showToast('🌄 Picture changed!');
             } else {
