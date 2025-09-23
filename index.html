@@ -1273,7 +1273,7 @@
                         <button class="game-btn" onclick="resetParkGame()">🔄 New Game</button>
                     </div>
                     <div class="game-controls" style="margin-top: 10px;">
-                        <label style="margin-right: 10px;">Speed:</label>
+                        <label style="margin-right: 10px;">Speed: <strong id="currentSpeedLabel" style="color: #28a745;">Normal (1x)</strong></label>
                         <button class="game-btn speed-btn" onclick="setGameSpeed(0.5, this)" style="padding: 5px 10px;">Slow</button>
                         <button class="game-btn speed-btn" onclick="setGameSpeed(1, this)" style="padding: 5px 10px;">Normal</button>
                         <button class="game-btn speed-btn" onclick="setGameSpeed(1.5, this)" style="padding: 5px 10px;">Fast</button>
@@ -2508,17 +2508,13 @@
             // Initialize Normal speed button as selected
             document.querySelectorAll('.speed-btn').forEach(btn => {
                 btn.classList.remove('speed-selected');
-                btn.style.background = '';
-                btn.style.border = '';
-                btn.style.transform = '';
-                btn.style.boxShadow = '';
+                // Clear any inline styles except padding
+                const padding = btn.style.padding;
+                btn.removeAttribute('style');
+                btn.style.padding = padding;
 
                 if (btn.textContent === 'Normal') {
                     btn.classList.add('speed-selected');
-                    btn.style.background = '#28a745';
-                    btn.style.border = '2px solid #1e7e34';
-                    btn.style.transform = 'scale(1.1)';
-                    btn.style.boxShadow = '0 4px 8px rgba(40, 167, 69, 0.3)';
                 }
             });
         }
@@ -2869,9 +2865,15 @@
             // Update display to show base speed
             document.getElementById('gameSpeed').textContent = speed + 'x';
 
-            // If game is active, update current speed
+            // If game is active, update current speed and restart spawning with new speed
             if (parkGameData.gameActive) {
                 parkGameData.gameSpeed = speed;
+
+                // Restart item spawning with new speed
+                if (parkGameData.itemSpawnInterval) {
+                    clearInterval(parkGameData.itemSpawnInterval);
+                    startItemSpawning();
+                }
             }
 
             // Show speed change notification
@@ -2881,28 +2883,27 @@
                 1.5: 'Fast'
             };
 
+            // Update the speed label
+            const speedLabel = document.getElementById('currentSpeedLabel');
+            if (speedLabel) {
+                speedLabel.textContent = `${speedNames[speed]} (${speed}x)`;
+                speedLabel.style.color = speed === 0.5 ? '#17a2b8' : speed === 1 ? '#28a745' : '#dc3545';
+            }
+
             showToast(`🎮 Speed changed to ${speedNames[speed]} (${speed}x)`);
 
             // Reset all speed buttons first
             document.querySelectorAll('.speed-btn').forEach(btn => {
                 btn.classList.remove('speed-selected');
-                // Force style reset
-                btn.style.background = '';
-                btn.style.border = '';
-                btn.style.transform = '';
-                btn.style.boxShadow = '';
+                // Clear any inline styles except padding
+                const padding = btn.style.padding;
+                btn.removeAttribute('style');
+                btn.style.padding = padding;
             });
 
-            // Highlight selected speed button with a slight delay to ensure CSS applies
+            // Highlight selected speed button
             if (button) {
-                setTimeout(() => {
-                    button.classList.add('speed-selected');
-                    // Force the styles to apply
-                    button.style.background = '#28a745';
-                    button.style.border = '2px solid #1e7e34';
-                    button.style.transform = 'scale(1.1)';
-                    button.style.boxShadow = '0 4px 8px rgba(40, 167, 69, 0.3)';
-                }, 10);
+                button.classList.add('speed-selected');
             }
         }
 
