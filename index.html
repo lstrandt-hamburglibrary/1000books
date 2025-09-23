@@ -1576,7 +1576,7 @@
                     <p style="margin: 3px 0; font-size: 0.9em;">Moves: <span id="puzzleMovesCount" style="font-weight: bold;">0</span> | Best: <span id="puzzleBestMoves">--</span> | Mode: <span id="puzzleMode">Picture</span></p>
                 </div>
                 <div class="puzzle-game-area" id="puzzleGameArea" style="position: relative; height: 320px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 10px; display: flex; align-items: center; justify-content: center;">
-                    <div id="puzzleGrid" style="display: grid; gap: 5px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
+                    <div id="puzzleGrid" style="display: grid; gap: 1px; background: rgba(0,0,0,0.2); padding: 1px; border-radius: 10px;">
                         <!-- Puzzle tiles will be generated here -->
                     </div>
                 </div>
@@ -4649,8 +4649,8 @@
                         background-image: url('${getPuzzleImage()}');
                         background-size: ${cellSize * size}px ${cellSize * size}px;
                         background-position: ${bgPosX}px ${bgPosY}px;
-                        border: 2px solid rgba(255,255,255,0.8);
-                        border-radius: 4px;
+                        border: 0.5px solid rgba(255,255,255,0.3);
+                        border-radius: 1px;
                         cursor: ${!puzzleGameData.isComplete ? 'pointer' : 'default'};
                         transition: all 0.3s;
                         position: relative;
@@ -4678,8 +4678,8 @@
                         width: ${cellSize}px;
                         height: ${cellSize}px;
                         background: ${getTileColor(tile)};
-                        border: 2px solid rgba(255,255,255,0.5);
-                        border-radius: 8px;
+                        border: 1px solid rgba(255,255,255,0.5);
+                        border-radius: 4px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
