@@ -857,12 +857,45 @@
 
         // Badges
         const badges = [
+            // Getting Started
             { id: 'first-book', name: 'First Book', description: 'Read your first book!', emoji: '📘', condition: (books) => books.length >= 1 },
+            { id: 'first-five', name: 'High Five', description: 'Read 5 books', emoji: '✋', condition: (books) => books.length >= 5 },
+            { id: 'double-digits', name: 'Double Digits', description: 'Read 10 books', emoji: '🔟', condition: (books) => books.length >= 10 },
+
+            // Streaks & Consistency
             { id: 'week-streak', name: 'Week Streak', description: '7 day reading streak', emoji: '🔥', condition: (books) => calculateStreak(books) >= 7 },
+            { id: 'fortnight-streak', name: 'Two Week Wonder', description: '14 day reading streak', emoji: '💫', condition: (books) => calculateStreak(books) >= 14 },
+            { id: 'month-streak', name: 'Monthly Master', description: '30 day reading streak', emoji: '🏅', condition: (books) => calculateStreak(books) >= 30 },
+            { id: 'weekend-warrior', name: 'Weekend Warrior', description: 'Read on 5 consecutive weekends', emoji: '🦸', condition: (books) => checkWeekendStreak(books) >= 5 },
+
+            // Reading Patterns
             { id: 'night-owl', name: 'Night Owl', description: 'Read 10 bedtime stories', emoji: '🦉', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('bedtime')).length >= 10 },
+            { id: 'early-bird', name: 'Early Bird', description: 'Read 10 books before noon (add "morning" to notes)', emoji: '🐦', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('morning')).length >= 10 },
+            { id: 'story-time', name: 'Story Time Pro', description: 'Read at library story time 5 times (add "story time" to notes)', emoji: '🎭', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('story time')).length >= 5 },
+
+            // Favorites & Ratings
             { id: 'favorite-finder', name: 'Favorite Finder', description: 'Mark 5 books as favorites', emoji: '⭐', condition: (books) => books.filter(b => b.isFavorite).length >= 5 },
+            { id: 'super-fan', name: 'Super Fan', description: 'Mark 20 books as favorites', emoji: '🌟', condition: (books) => books.filter(b => b.isFavorite).length >= 20 },
+            { id: 'love-reader', name: 'Book Lover', description: 'Rate 10 books as "Loved it!"', emoji: '💖', condition: (books) => books.filter(b => b.rating === 'love').length >= 10 },
+            { id: 'critic', name: 'Little Critic', description: 'Rate 25 books with any rating', emoji: '🎓', condition: (books) => books.filter(b => b.rating).length >= 25 },
+
+            // Speed & Volume
             { id: 'speed-reader', name: 'Speed Reader', description: 'Read 10 books in one week', emoji: '⚡', condition: (books) => checkWeeklyBooks(books) >= 10 },
-            { id: 'variety-reader', name: 'Variety Reader', description: 'Read books from 10 different authors', emoji: '🌈', condition: (books) => new Set(books.map(b => b.author).filter(a => a)).size >= 10 }
+            { id: 'marathon-reader', name: 'Marathon Reader', description: 'Read 5 books in one day', emoji: '🏃', condition: (books) => checkDailyMax(books) >= 5 },
+            { id: 'century-club', name: 'Century Club', description: 'Read 100 books total', emoji: '💯', condition: (books) => books.length >= 100 },
+
+            // Variety
+            { id: 'variety-reader', name: 'Variety Reader', description: 'Read books from 10 different authors', emoji: '🌈', condition: (books) => new Set(books.map(b => b.author).filter(a => a)).size >= 10 },
+            { id: 'author-fan', name: 'Author Fan', description: 'Read 5 books by the same author', emoji: '✍️', condition: (books) => checkSameAuthor(books) >= 5 },
+            { id: 'series-starter', name: 'Series Starter', description: 'Read 3 books from same series (add series name to notes)', emoji: '📚', condition: (books) => checkSeries(books) >= 3 },
+
+            // Special Achievements
+            { id: 'holiday-reader', name: 'Holiday Reader', description: 'Read holiday books (add "holiday" to notes)', emoji: '🎄', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('holiday')).length >= 5 },
+            { id: 'summer-reader', name: 'Summer Reader', description: 'Read 30 books in June, July, or August', emoji: '☀️', condition: (books) => checkSummerReading(books) >= 30 },
+            { id: 'rainy-day', name: 'Rainy Day Reader', description: 'Read on a rainy day (add "rainy day" to notes)', emoji: '🌧️', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('rainy day')).length >= 3 },
+            { id: 'library-lover', name: 'Library Lover', description: 'Read 20 library books (add "library book" to notes)', emoji: '🏛️', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('library book')).length >= 20 },
+            { id: 'rereader', name: 'Repeat Reader', description: 'Read the same book 3 times', emoji: '🔄', condition: (books) => checkRereads(books) >= 3 },
+            { id: 'note-taker', name: 'Note Taker', description: 'Add notes to 15 books', emoji: '📝', condition: (books) => books.filter(b => b.notes && b.notes.length > 10).length >= 15 }
         ];
 
         // Initialize App
@@ -1128,6 +1161,137 @@
             }
 
             return streak;
+        }
+
+        // Check Weekend Streak
+        function checkWeekendStreak(books) {
+            if (books.length === 0) return 0;
+
+            const weekendDates = books
+                .filter(b => {
+                    const date = new Date(b.readDate);
+                    const day = date.getDay();
+                    return day === 0 || day === 6; // Sunday or Saturday
+                })
+                .map(b => b.readDate);
+
+            if (weekendDates.length === 0) return 0;
+
+            // Group by weekend
+            const weekends = new Set();
+            weekendDates.forEach(dateStr => {
+                const date = new Date(dateStr);
+                const weekStart = new Date(date);
+                if (date.getDay() === 0) { // Sunday
+                    weekStart.setDate(date.getDate() - 1);
+                }
+                while (weekStart.getDay() !== 6) { // Find Saturday
+                    weekStart.setDate(weekStart.getDate() - 1);
+                }
+                weekends.add(weekStart.toISOString().split('T')[0]);
+            });
+
+            // Check for consecutive weekends
+            const sortedWeekends = Array.from(weekends).sort().reverse();
+            let maxStreak = 1;
+            let currentStreak = 1;
+
+            for (let i = 1; i < sortedWeekends.length; i++) {
+                const prevWeekend = new Date(sortedWeekends[i - 1]);
+                const currWeekend = new Date(sortedWeekends[i]);
+                const dayDiff = (prevWeekend - currWeekend) / (1000 * 60 * 60 * 24);
+
+                if (dayDiff === 7) {
+                    currentStreak++;
+                    maxStreak = Math.max(maxStreak, currentStreak);
+                } else {
+                    currentStreak = 1;
+                }
+            }
+
+            return maxStreak;
+        }
+
+        // Check Daily Maximum
+        function checkDailyMax(books) {
+            if (books.length === 0) return 0;
+
+            const booksByDate = {};
+            books.forEach(book => {
+                if (!booksByDate[book.readDate]) {
+                    booksByDate[book.readDate] = 0;
+                }
+                booksByDate[book.readDate]++;
+            });
+
+            return Math.max(...Object.values(booksByDate));
+        }
+
+        // Check Same Author
+        function checkSameAuthor(books) {
+            if (books.length === 0) return 0;
+
+            const authorCounts = {};
+            books.forEach(book => {
+                if (book.author) {
+                    if (!authorCounts[book.author]) {
+                        authorCounts[book.author] = 0;
+                    }
+                    authorCounts[book.author]++;
+                }
+            });
+
+            return Math.max(...Object.values(authorCounts), 0);
+        }
+
+        // Check Series
+        function checkSeries(books) {
+            if (books.length === 0) return 0;
+
+            const seriesBooks = books.filter(b => b.notes &&
+                (b.notes.toLowerCase().includes('series') ||
+                 b.notes.toLowerCase().includes('book 1') ||
+                 b.notes.toLowerCase().includes('book 2') ||
+                 b.notes.toLowerCase().includes('book 3')));
+
+            // Try to identify series by matching titles
+            const titleGroups = {};
+            seriesBooks.forEach(book => {
+                const baseTitle = book.title.replace(/[:#]\s*book\s*\d+/i, '').trim();
+                if (!titleGroups[baseTitle]) {
+                    titleGroups[baseTitle] = 0;
+                }
+                titleGroups[baseTitle]++;
+            });
+
+            return Math.max(...Object.values(titleGroups), seriesBooks.length >= 3 ? 3 : 0);
+        }
+
+        // Check Summer Reading
+        function checkSummerReading(books) {
+            if (books.length === 0) return 0;
+
+            return books.filter(book => {
+                const date = new Date(book.readDate);
+                const month = date.getMonth();
+                return month >= 5 && month <= 7; // June (5), July (6), August (7)
+            }).length;
+        }
+
+        // Check Rereads
+        function checkRereads(books) {
+            if (books.length === 0) return 0;
+
+            const titleCounts = {};
+            books.forEach(book => {
+                const title = book.title.toLowerCase();
+                if (!titleCounts[title]) {
+                    titleCounts[title] = 0;
+                }
+                titleCounts[title]++;
+            });
+
+            return Math.max(...Object.values(titleCounts), 0);
         }
 
         // Display Recent Books
