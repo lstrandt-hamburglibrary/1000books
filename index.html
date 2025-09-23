@@ -967,6 +967,7 @@
             bonePosition: -1,
             revealed: []
         };
+        let testMode = false;
 
         // Book Suggestions Database
         const bookSuggestions = {
@@ -1964,6 +1965,16 @@
 
         // Check Unlocked Games
         function checkUnlockedGames() {
+            // Test mode unlocks all games
+            if (testMode) {
+                return {
+                    findBone: true,
+                    letterMatch: true,
+                    storyBuilder: true,
+                    seasonSort: true
+                };
+            }
+
             if (appData.currentChild === null || !appData.children[appData.currentChild]) {
                 return {
                     findBone: false,
@@ -2098,6 +2109,25 @@
 
         // Initialize app when page loads
         window.addEventListener('DOMContentLoaded', initApp);
+
+        // Developer test mode - Press Ctrl+Shift+G to toggle test mode (G for Games)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+                e.preventDefault(); // Prevent any browser default action
+                testMode = !testMode;
+                if (testMode) {
+                    showToast('🎮 Test Mode ENABLED - All games unlocked!');
+                } else {
+                    showToast('Test Mode disabled');
+                }
+
+                // Refresh games page if currently viewing it
+                const gamesPage = document.getElementById('games');
+                if (gamesPage && gamesPage.classList.contains('active')) {
+                    displayGames();
+                }
+            }
+        });
     </script>
 </body>
 </html>
