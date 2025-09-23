@@ -1411,14 +1411,10 @@
                 </div>
                 <div class="game-instructions">
                     <p>Catch snowflakes with your glove! Just move it under them!</p>
-                    <p style="color: #FFD700;">⭐ Golden snowflakes = bonus points!</p>
+                    <p style="color: #28a745;">🎯 Build combos by catching snowflakes in a row!</p>
                     <p style="color: #dc3545;">Miss 10 snowflakes and you lose!</p>
                 </div>
                 <div class="game-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Score:</span>
-                        <span id="snowScore">0</span>
-                    </div>
                     <div class="stat-item">
                         <span class="stat-label">Caught:</span>
                         <span id="snowCaught">0</span>
@@ -1429,7 +1425,11 @@
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Combo:</span>
-                        <span id="snowCombo">0</span>
+                        <span id="snowCombo" style="font-size: 1.2em; font-weight: bold;">0</span> in a row
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Best Combo:</span>
+                        <span id="snowMaxCombo">0</span>
                     </div>
                 </div>
                 <div class="snow-game-area" id="snowGameArea">
@@ -1451,7 +1451,7 @@
                     <button class="game-btn snow-speed-btn" onclick="setSnowSpeed(1.5, this)" style="padding: 5px 10px;">Fast</button>
                 </div>
                 <div class="high-score">
-                    🏆 High Score: <span id="snowHighScore">0</span>
+                    🏆 Best Combo: <span id="snowBestCombo">0</span> in a row
                 </div>
             </div>
 
@@ -1540,15 +1540,14 @@
         };
 
         let snowGameData = {
-            score: 0,
             caught: 0,
             timeLeft: 60,
             combo: 0,
             maxCombo: 0,
+            bestCombo: 0,
             timerInterval: null,
             gameActive: false,
             paused: false,
-            highScore: 0,
             snowflakes: [],
             spawnInterval: null,
             catcherX: 0,
@@ -3509,6 +3508,10 @@
             const gameDiv = document.getElementById('snowflakeGame');
             gameDiv.style.display = 'block';
 
+            // Load best combo on game start
+            snowGameData.bestCombo = parseInt(localStorage.getItem('snowBestCombo') || '0');
+            document.getElementById('snowBestCombo').textContent = snowGameData.bestCombo;
+
             // Create overlay
             let overlay = document.getElementById('gameOverlay');
             if (!overlay) {
@@ -3578,19 +3581,9 @@
             const snowflake = document.createElement('div');
             snowflake.className = 'falling-snowflake';
 
-            // Random chance for special snowflake (golden)
-            const isSpecial = Math.random() < 0.2;
-            if (isSpecial) {
-                snowflake.classList.add('special');
-                snowflake.innerHTML = '❄️';
-                snowflake.style.color = '#FFD700';
-                snowflake.style.textShadow = '0 0 10px gold';
-                snowflake.dataset.points = 50;
-            } else {
-                snowflake.innerHTML = '❄️';
-                snowflake.style.color = '#87CEEB';
-                snowflake.dataset.points = 10;
-            }
+            // All snowflakes are the same now (no special ones)
+            snowflake.innerHTML = '❄️';
+            snowflake.style.color = '#87CEEB';
 
             // Set initial position and size
             snowflake.style.position = 'absolute';
@@ -3697,17 +3690,23 @@
             if (snowflake.classList.contains('caught')) return;
             snowflake.classList.add('caught');
 
-            const points = parseInt(snowflake.dataset.points);
-            snowGameData.score += points;
             snowGameData.caught++;
             snowGameData.combo++;
 
+            // Track max combo for this game
             if (snowGameData.combo > snowGameData.maxCombo) {
                 snowGameData.maxCombo = snowGameData.combo;
+                document.getElementById('snowMaxCombo').textContent = snowGameData.maxCombo;
+            }
+
+            // Track best combo ever
+            if (snowGameData.combo > snowGameData.bestCombo) {
+                snowGameData.bestCombo = snowGameData.combo;
+                localStorage.setItem('snowBestCombo', snowGameData.bestCombo);
+                document.getElementById('snowBestCombo').textContent = snowGameData.bestCombo;
             }
 
             // Update display
-            document.getElementById('snowScore').textContent = snowGameData.score;
             document.getElementById('snowCaught').textContent = snowGameData.caught;
             document.getElementById('snowCombo').textContent = snowGameData.combo;
 
@@ -3735,8 +3734,16 @@
         function showComboPopup() {
             const gameArea = document.getElementById('snowGameArea');
             const popup = document.createElement('div');
-            popup.className = 'combo-display';
-            popup.textContent = `${snowGameData.combo}x COMBO!`;
+            popup.style.position = 'absolute';
+            popup.style.top = '50%';
+            popup.style.left = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.fontSize = '2em';
+            popup.style.fontWeight = 'bold';
+            popup.style.color = '#28a745';
+            popup.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+            popup.style.zIndex = '100';
+            popup.textContent = `${snowGameData.combo} IN A ROW!`;
             gameArea.appendChild(popup);
             setTimeout(() => popup.remove(), 1000);
         }
@@ -3755,20 +3762,19 @@
             // Clear all snowflakes
             document.querySelectorAll('.falling-snowflake').forEach(s => s.remove());
 
-            // Reset data preserving high score and speed
-            const preservedHighScore = snowGameData.highScore || 0;
+            // Load and preserve best combo
+            const preservedBestCombo = parseInt(localStorage.getItem('snowBestCombo') || '0');
             const preservedBaseSpeed = snowGameData.baseSpeed || 1;
 
             snowGameData = {
-                score: 0,
                 caught: 0,
                 timeLeft: 60,
                 combo: 0,
                 maxCombo: 0,
+                bestCombo: preservedBestCombo,
                 timerInterval: null,
                 gameActive: false,
                 paused: false,
-                highScore: preservedHighScore,
                 snowflakes: [],
                 spawnInterval: null,
                 catcherX: 200,
@@ -3781,11 +3787,11 @@
             };
 
             // Update display
-            document.getElementById('snowScore').textContent = 0;
             document.getElementById('snowCaught').textContent = 0;
             document.getElementById('snowTimer').textContent = 60;
             document.getElementById('snowCombo').textContent = 0;
-            document.getElementById('snowHighScore').textContent = snowGameData.highScore;
+            document.getElementById('snowMaxCombo').textContent = 0;
+            document.getElementById('snowBestCombo').textContent = snowGameData.bestCombo;
             document.getElementById('missedDisplay').textContent = 'Missed: 0/10';
             document.getElementById('snowmanDisplay').innerHTML = '';
 
@@ -3804,24 +3810,18 @@
             document.querySelectorAll('.falling-snowflake').forEach(s => s.remove());
             snowGameData.snowflakes = [];
 
+            // Show appropriate message
             if (won) {
-                // Bonus for winning
-                snowGameData.score += 500;
-                document.getElementById('snowScore').textContent = snowGameData.score;
+                showToast(`⛄ YOU WIN! Built a snowman! Best combo: ${snowGameData.maxCombo} in a row!`);
+            } else if (snowGameData.missedSnowflakes >= snowGameData.maxMissed) {
+                showToast(`❄️ Game Over! Too many missed! Best combo: ${snowGameData.maxCombo} in a row`);
+            } else {
+                showToast(`❄️ Time's up! Caught ${snowGameData.caught} snowflakes! Best combo: ${snowGameData.maxCombo}`);
             }
 
-            // Check high score
-            if (snowGameData.score > snowGameData.highScore) {
-                snowGameData.highScore = snowGameData.score;
-                localStorage.setItem('snowGameHighScore', snowGameData.highScore);
-                document.getElementById('snowHighScore').textContent = snowGameData.highScore;
-                showToast(`🎉 NEW HIGH SCORE: ${snowGameData.highScore}! 🎉`);
-            } else if (won) {
-                showToast(`⛄ YOU WIN! Built a snowman! Score: ${snowGameData.score}`);
-            } else if (snowGameData.missedSnowflakes >= snowGameData.maxMissed) {
-                showToast(`❄️ Game Over! Too many missed! Score: ${snowGameData.score}`);
-            } else {
-                showToast(`❄️ Time's up! Caught ${snowGameData.caught} snowflakes! Score: ${snowGameData.score}`);
+            // Check if new best combo record
+            if (snowGameData.maxCombo > snowGameData.bestCombo) {
+                setTimeout(() => showToast(`🎉 NEW BEST COMBO RECORD: ${snowGameData.maxCombo} IN A ROW! 🎉`), 1500);
             }
         }
 
