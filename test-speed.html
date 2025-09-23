@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speed Button Test</title>
+    <style>
+        .speed-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .speed-btn.speed-selected {
+            background: #28a745 !important;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Speed Button Test</h1>
+    <p>Current Speed: <strong id="currentSpeedLabel">Normal (1x)</strong></p>
+
+    <button class="speed-btn" onclick="setGameSpeed(0.5, this)">Slow</button>
+    <button class="speed-btn speed-selected" onclick="setGameSpeed(1, this)">Normal</button>
+    <button class="speed-btn" onclick="setGameSpeed(1.5, this)">Fast</button>
+
+    <script>
+        function setGameSpeed(speed, button) {
+            console.log('setGameSpeed called with speed:', speed);
+
+            const speedNames = {
+                0.5: 'Slow',
+                1: 'Normal',
+                1.5: 'Fast'
+            };
+
+            // Update label
+            document.getElementById('currentSpeedLabel').textContent = `${speedNames[speed]} (${speed}x)`;
+
+            // Reset all buttons
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.classList.remove('speed-selected');
+            });
+
+            // Highlight selected button
+            if (button) {
+                button.classList.add('speed-selected');
+            }
+
+            alert('Speed changed to: ' + speedNames[speed]);
+        }
+    </script>
+</body>
+</html>

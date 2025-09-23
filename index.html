@@ -2860,6 +2860,7 @@
 
         // Set game speed
         function setGameSpeed(speed, button) {
+            console.log('setGameSpeed called with speed:', speed);
             parkGameData.baseSpeed = speed;
 
             // Update display to show base speed
@@ -2904,6 +2905,7 @@
             // Highlight selected speed button
             if (button) {
                 button.classList.add('speed-selected');
+                console.log('Button highlighted:', button.textContent, 'has class:', button.classList.contains('speed-selected'));
             }
         }
 
@@ -2999,6 +3001,25 @@
 
         // Initialize app when page loads
         window.addEventListener('DOMContentLoaded', initApp);
+
+        // Make all functions globally accessible for onclick handlers
+        window.setGameSpeed = setGameSpeed;
+        window.startParkGame = startParkGame;
+        window.pauseParkGame = pauseParkGame;
+        window.resetParkGame = resetParkGame;
+        window.closeGame = closeGame;
+        window.continuePlaying = continuePlaying;
+        window.showPage = showPage;
+        window.selectRating = selectRating;
+        window.saveSettings = saveSettings;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.clearData = clearData;
+        window.updateNow = updateNow;
+        window.dismissUpdate = dismissUpdate;
+        window.toggleCategory = toggleCategory;
+        window.addSuggestedBook = addSuggestedBook;
+        window.showLockedMessage = showLockedMessage;
 
         // Developer test mode - Press Ctrl+Shift+G to toggle test mode (G for Games)
         document.addEventListener('keydown', function(e) {
