@@ -796,13 +796,16 @@
 
         @keyframes snowmanComplete {
             0% {
-                transform: scale(0.5) rotate(0deg);
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+                opacity: 0;
             }
             50% {
-                transform: scale(1.2) rotate(180deg);
+                transform: translate(-50%, -50%) scale(1.3) rotate(180deg);
+                opacity: 1;
             }
             100% {
-                transform: scale(1) rotate(360deg);
+                transform: translate(-50%, -50%) scale(1) rotate(360deg);
+                opacity: 1;
             }
         }
 
@@ -3679,11 +3682,43 @@
                 snowmanDisplay.innerHTML = '<div style="font-size: 25px; margin: -2px 0 0 0;">⚪</div><div style="font-size: 35px; margin: -3px 0 0 0;">⚪</div><div style="font-size: 45px; margin: -3px 0 0 0;">⚪</div>';
                 showToast(`🎉 Snowman head added! (30/40 snowflakes caught)`);
             } else if (snowGameData.snowmanParts === 4) {
-                // Complete snowman - big and animated
+                // Complete snowman - fill the screen with celebration!
+                const gameArea = document.getElementById('snowGameArea');
+
+                // Create a full-screen snowman celebration
+                const celebration = document.createElement('div');
+                celebration.style.position = 'absolute';
+                celebration.style.top = '50%';
+                celebration.style.left = '50%';
+                celebration.style.transform = 'translate(-50%, -50%)';
+                celebration.style.fontSize = '200px';
+                celebration.style.zIndex = '1000';
+                celebration.style.animation = 'snowmanComplete 1s ease';
+                celebration.innerHTML = '⛄';
+                gameArea.appendChild(celebration);
+
+                // Also update the corner display
                 snowmanDisplay.style.fontSize = '80px';
-                snowmanDisplay.style.animation = 'snowmanComplete 0.5s ease';
                 snowmanDisplay.innerHTML = '⛄';
+
                 showToast('⛄ SNOWMAN COMPLETE! YOU WIN! (40/40 caught)');
+
+                // Add some falling confetti snowflakes for celebration
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.innerHTML = '❄️';
+                        confetti.style.position = 'absolute';
+                        confetti.style.left = Math.random() * gameArea.offsetWidth + 'px';
+                        confetti.style.top = '-50px';
+                        confetti.style.fontSize = '30px';
+                        confetti.style.animation = 'snowfall 3s linear';
+                        confetti.style.zIndex = '999';
+                        gameArea.appendChild(confetti);
+                        setTimeout(() => confetti.remove(), 3000);
+                    }, i * 100);
+                }
+
                 endSnowGame(true);
             }
         }
