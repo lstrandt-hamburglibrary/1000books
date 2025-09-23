@@ -921,7 +921,7 @@
         .maze-game-area {
             position: relative;
             height: 320px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: white;
             border-radius: 10px;
             overflow: hidden;
             display: flex;
@@ -1534,7 +1534,7 @@
                 </div>
                 <div class="maze-game-area" id="mazeGameArea">
                     <canvas id="mazeCanvas" width="300" height="300"></canvas>
-                    <div id="mazeOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;"></div>
+                    <div id="mazeOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;"></div>
                 </div>
                 <div class="game-controls" style="margin: 5px 0;">
                     <button class="game-btn" onclick="startMazeGame()" style="padding: 5px 10px; font-size: 0.9em;">▶️ New</button>
@@ -2318,15 +2318,17 @@
             document.getElementById('thisWeek').textContent = calculateThisWeek(books);
             document.getElementById('favorites').textContent = books.filter(b => b.isFavorite).length;
             // Update streak display with emoji
-            const childId = appData.children[appData.currentChild].id;
-            const streakData = getStreakData(childId);
-            const streakElement = document.getElementById('streak');
-            streakElement.textContent = streakData.currentStreak;
+            if (appData.children[appData.currentChild]) {
+                const childId = appData.children[appData.currentChild].id;
+                const streakData = getStreakData(childId);
+                const streakElement = document.getElementById('streak');
+                streakElement.textContent = streakData.currentStreak;
 
-            // Add visual feedback for streak
-            const streakCard = streakElement.parentElement;
-            const emojiElement = streakCard.querySelector('.stat-emoji');
-            emojiElement.textContent = getStreakEmoji(streakData.currentStreak);
+                // Add visual feedback for streak
+                const streakCard = streakElement.parentElement;
+                const emojiElement = streakCard.querySelector('.stat-emoji');
+                emojiElement.textContent = getStreakEmoji(streakData.currentStreak);
+            }
 
             // Update recent books
             displayRecentBooks(books);
@@ -4044,8 +4046,24 @@
 
         // Dragon Maze Game Functions
         function startDragonMazeGame() {
+            console.log('Starting Dragon Maze Game...');
+
             const gameDiv = document.getElementById('dragonMazeGame');
             gameDiv.style.display = 'block';
+
+            // Check for any existing overlays
+            const existingOverlay = document.getElementById('gameOverlay');
+            if (existingOverlay) {
+                console.log('Found existing overlay, hiding it:', existingOverlay);
+                existingOverlay.style.display = 'none';
+            }
+
+            // Check all elements with overlay in their ID or class
+            const allOverlays = document.querySelectorAll('[id*="overlay"], [class*="overlay"], .game-overlay');
+            console.log('All overlay elements found:', allOverlays);
+            allOverlays.forEach(el => {
+                console.log('Overlay element:', el, 'Display:', window.getComputedStyle(el).display, 'Opacity:', window.getComputedStyle(el).opacity);
+            });
 
             // No overlay needed for Dragon Maze - game window is self-contained
 
@@ -4054,6 +4072,16 @@
                 mazeGameData.canvas = document.getElementById('mazeCanvas');
                 mazeGameData.ctx = mazeGameData.canvas.getContext('2d');
                 mazeGameData.cellSize = Math.floor(mazeGameData.canvas.width / mazeGameData.mazeSize);
+
+                // Check canvas and game area styles
+                console.log('Canvas element:', mazeGameData.canvas);
+                console.log('Canvas computed style:', window.getComputedStyle(mazeGameData.canvas));
+                const gameArea = document.getElementById('mazeGameArea');
+                console.log('Game area computed style:', window.getComputedStyle(gameArea));
+
+                // Check if mazeOverlay is visible
+                const mazeOverlay = document.getElementById('mazeOverlay');
+                console.log('Maze overlay:', mazeOverlay, 'Display:', window.getComputedStyle(mazeOverlay).display);
 
                 // Clear canvas first with white background
                 mazeGameData.ctx.fillStyle = '#ffffff';
