@@ -1101,9 +1101,9 @@
                     </div>
                     <div class="game-controls" style="margin-top: 10px;">
                         <label style="margin-right: 10px;">Speed:</label>
-                        <button class="game-btn" onclick="setGameSpeed(0.5)" style="padding: 5px 10px;">Slow</button>
-                        <button class="game-btn" onclick="setGameSpeed(1)" style="padding: 5px 10px;">Normal</button>
-                        <button class="game-btn" onclick="setGameSpeed(1.5)" style="padding: 5px 10px;">Fast</button>
+                        <button class="game-btn speed-btn" onclick="setGameSpeed(0.5, this)" style="padding: 5px 10px;">Slow</button>
+                        <button class="game-btn speed-btn" onclick="setGameSpeed(1, this)" style="padding: 5px 10px;">Normal</button>
+                        <button class="game-btn speed-btn" onclick="setGameSpeed(1.5, this)" style="padding: 5px 10px;">Fast</button>
                     </div>
                     <div class="high-score">
                         🏆 High Score: <span id="parkHighScore">0</span>
@@ -2430,16 +2430,17 @@
 
             // Move item across screen
             const moveInterval = setInterval(() => {
+                // Check collision even when paused (so kids can still collect during fact display)
+                if (!item.classList.contains('collected')) {
+                    checkSingleItemCollision(item);
+                }
+
+                // Don't move if paused, but still check collisions above
                 if (parkGameData.paused) return;
 
                 const currentRight = parseInt(item.style.right);
                 const newRight = currentRight + (5 * parkGameData.gameSpeed);
                 item.style.right = newRight + 'px';
-
-                // Check collision every frame as item moves
-                if (!item.classList.contains('collected')) {
-                    checkSingleItemCollision(item);
-                }
 
                 // Remove if off screen
                 if (newRight > gameArea.offsetWidth) {
@@ -2558,15 +2559,36 @@
         }
 
         // Set game speed
-        function setGameSpeed(speed) {
+        function setGameSpeed(speed, button) {
             parkGameData.baseSpeed = speed;
 
-            // Update display to show base speed (not including time-based increases)
+            // Update display to show base speed
             document.getElementById('gameSpeed').textContent = speed + 'x';
 
             // If game is active, update current speed
             if (parkGameData.gameActive) {
                 parkGameData.gameSpeed = speed;
+            }
+
+            // Show speed change notification
+            const speedNames = {
+                0.5: 'Slow',
+                1: 'Normal',
+                1.5: 'Fast'
+            };
+
+            showToast(`🎮 Speed changed to ${speedNames[speed]} (${speed}x)`);
+
+            // Reset all speed buttons to default color
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.style.background = '#667eea';
+                btn.style.color = 'white';
+            });
+
+            // Highlight selected speed button
+            if (button) {
+                button.style.background = '#28a745';
+                button.style.color = 'white';
             }
         }
 
