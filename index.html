@@ -625,6 +625,16 @@
             animation: itemFloat 2s infinite;
         }
 
+        .game-item[data-type="obstacle"] {
+            animation: obstacleJump 1s infinite;
+            filter: drop-shadow(0 0 3px rgba(255, 0, 0, 0.5));
+        }
+
+        @keyframes obstacleJump {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(10deg); }
+        }
+
         @keyframes itemFloat {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -1064,7 +1074,8 @@
                         <button class="game-close-btn" onclick="closeGame('dogPark')">✕</button>
                     </div>
                     <div class="game-instructions">
-                        <p>Use ⬆️⬇️ arrow keys to move! Collect bones 🦴 and special items for points!</p>
+                        <p>Use ⬆️⬇️ arrow keys to move! Collect bones 🦴 for points!</p>
+                        <p style="color: #dc3545; font-weight: bold;">⚠️ AVOID THE SQUIRRELS! 🐿️ You have 3 lives!</p>
                     </div>
                     <div class="game-stats">
                         <div class="stat-item">
@@ -1080,8 +1091,8 @@
                             <span id="bonesCollected">0</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Speed:</span>
-                            <span id="gameSpeed">1</span>x
+                            <span class="stat-label">Lives:</span>
+                            <span id="livesLeft">❤️❤️❤️</span>
                         </div>
                     </div>
                     <div class="park-game-area" id="parkGameArea">
@@ -1174,7 +1185,8 @@
             itemSpawnInterval: null,
             gameSpeed: 1,
             baseSpeed: 1,
-            factsUnlocked: []
+            factsUnlocked: [],
+            lives: 3
         };
         let testMode = false;
 
@@ -2339,7 +2351,8 @@
                 itemSpawnInterval: null,
                 gameSpeed: preservedBaseSpeed,
                 baseSpeed: preservedBaseSpeed,
-                factsUnlocked: preservedFacts
+                factsUnlocked: preservedFacts,
+                lives: 3
             };
 
             // Reset display
@@ -2394,7 +2407,9 @@
                     { emoji: '🎾', points: 25, type: 'tennis' },
                     { emoji: '🧸', points: 30, type: 'toy' },
                     { emoji: '🥏', points: 35, type: 'frisbee' },
-                    { emoji: '🏆', points: 50, type: 'trophy' }
+                    { emoji: '🏆', points: 50, type: 'trophy' },
+                    { emoji: '🐿️', points: 0, type: 'obstacle' }, // Squirrel obstacle
+                    { emoji: '🐿️', points: 0, type: 'obstacle' }  // More squirrels for challenge
                 ];
 
                 const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
@@ -2485,6 +2500,12 @@
 
             const points = parseInt(item.dataset.points);
             const type = item.dataset.type;
+
+            // Handle obstacle collision
+            if (type === 'obstacle') {
+                handleObstacleHit(item);
+                return;
+            }
 
             parkGameData.score += points;
             if (type === 'bone') {
@@ -2592,33 +2613,77 @@
             }
         }
 
+        // Handle obstacle hit
+        function handleObstacleHit(item) {
+            parkGameData.lives--;
+
+            // Visual feedback
+            const dog = document.getElementById('dogCharacter');
+            dog.style.color = 'red';
+            setTimeout(() => dog.style.color = '', 500);
+
+            // Show warning
+            showToast(`⚠️ Hit a squirrel! ${parkGameData.lives} ${parkGameData.lives === 1 ? 'life' : 'lives'} left!`);
+
+            // Update lives display
+            updateLivesDisplay();
+
+            // Clear item interval
+            if (item.dataset.moveInterval) {
+                clearInterval(parseInt(item.dataset.moveInterval));
+            }
+            item.remove();
+
+            // Check for game over
+            if (parkGameData.lives <= 0) {
+                endParkGame(true); // true = lost due to obstacles
+            }
+        }
+
+        // Update lives display
+        function updateLivesDisplay() {
+            const livesDisplay = document.getElementById('livesLeft');
+            let hearts = '';
+            for (let i = 0; i < parkGameData.lives; i++) {
+                hearts += '❤️';
+            }
+            for (let i = parkGameData.lives; i < 3; i++) {
+                hearts += '💔';
+            }
+            livesDisplay.textContent = hearts;
+        }
+
         // Update display
         function updateParkDisplay() {
             document.getElementById('parkScore').textContent = parkGameData.score;
             document.getElementById('parkTimer').textContent = parkGameData.timeLeft;
             document.getElementById('bonesCollected').textContent = parkGameData.bonesCollected;
-            document.getElementById('gameSpeed').textContent = parkGameData.gameSpeed + 'x';
+            updateLivesDisplay();
         }
 
         // End park game
-        function endParkGame() {
+        function endParkGame(lostToObstacle = false) {
             parkGameData.gameActive = false;
             clearInterval(parkGameData.timerInterval);
             clearInterval(parkGameData.itemSpawnInterval);
 
             // Clear remaining items
             document.querySelectorAll('.game-item').forEach(item => {
-                clearInterval(item.dataset.moveInterval);
+                if (item.dataset.moveInterval) {
+                    clearInterval(parseInt(item.dataset.moveInterval));
+                }
             });
 
-            // Check high score
-            if (parkGameData.score > parkGameData.highScore) {
+            // Different messages for different endings
+            if (lostToObstacle) {
+                showToast(`💔 Game Over! Too many squirrels! Final Score: ${parkGameData.score}`);
+            } else if (parkGameData.score > parkGameData.highScore) {
                 parkGameData.highScore = parkGameData.score;
                 localStorage.setItem('parkGameHighScore', parkGameData.highScore);
                 document.getElementById('parkHighScore').textContent = parkGameData.highScore;
                 showToast(`🎉 NEW HIGH SCORE: ${parkGameData.highScore}! 🎉`);
             } else {
-                showToast(`Game Over! Score: ${parkGameData.score} | Bones: ${parkGameData.bonesCollected} 🦴`);
+                showToast(`⏰ Time's up! Score: ${parkGameData.score} | Bones: ${parkGameData.bonesCollected} 🦴`);
             }
         }
 
