@@ -1676,8 +1676,8 @@
 
         // Dragon Maze Game Data
         let mazeGameData = {
-            maze: [],
-            mazeSize: 11, // 11x11 grid
+            walls: { horizontal: [], vertical: [] }, // Store walls between cells
+            mazeSize: 10, // 10x10 grid of all usable cells
             cellSize: 0,
             dragon: { x: 0, y: 0 },
             princess: { x: 0, y: 0 },
@@ -1689,8 +1689,7 @@
             gameActive: false,
             bestMoves: null,
             canvas: null,
-            ctx: null,
-            currentMaze: []
+            ctx: null
         };
 
         // Dog facts database
@@ -4085,94 +4084,100 @@
 
         function generateMaze() {
             const size = mazeGameData.mazeSize;
-            const maze = [];
 
-            // Initialize maze with all walls
+            // Initialize all walls as existing (true = wall exists)
+            mazeGameData.walls.horizontal = [];
+            mazeGameData.walls.vertical = [];
+
+            // Create grid of walls - horizontal walls are above each cell, vertical walls are to the left
+            for (let y = 0; y <= size; y++) {
+                mazeGameData.walls.horizontal[y] = new Array(size).fill(true);
+            }
             for (let y = 0; y < size; y++) {
-                maze[y] = [];
-                for (let x = 0; x < size; x++) {
-                    maze[y][x] = 1; // 1 = wall
-                }
+                mazeGameData.walls.vertical[y] = new Array(size + 1).fill(true);
+            }
+
+            // Track visited cells for maze generation
+            const visited = [];
+            for (let y = 0; y < size; y++) {
+                visited[y] = new Array(size).fill(false);
             }
 
             // Recursive backtracking to generate maze
             function carvePassage(x, y) {
-                maze[y][x] = 0; // 0 = path
+                visited[y][x] = true;
 
                 // Create list of directions in random order
                 const directions = [
-                    { dx: 0, dy: -2, dir: 'N' },
-                    { dx: 2, dy: 0, dir: 'E' },
-                    { dx: 0, dy: 2, dir: 'S' },
-                    { dx: -2, dy: 0, dir: 'W' }
+                    { dx: 0, dy: -1, wall: 'top' },
+                    { dx: 1, dy: 0, wall: 'right' },
+                    { dx: 0, dy: 1, wall: 'bottom' },
+                    { dx: -1, dy: 0, wall: 'left' }
                 ].sort(() => Math.random() - 0.5);
 
-                for (let { dx, dy } of directions) {
+                for (let { dx, dy, wall } of directions) {
                     const nx = x + dx;
                     const ny = y + dy;
 
-                    if (nx > 0 && nx < size - 1 && ny > 0 && ny < size - 1 && maze[ny][nx] === 1) {
-                        // Carve path to the new cell
-                        maze[y + dy/2][x + dx/2] = 0;
+                    // Check if neighbor is valid and unvisited
+                    if (nx >= 0 && nx < size && ny >= 0 && ny < size && !visited[ny][nx]) {
+                        // Remove wall between current cell and neighbor
+                        switch (wall) {
+                            case 'top':
+                                mazeGameData.walls.horizontal[y][x] = false;
+                                break;
+                            case 'bottom':
+                                mazeGameData.walls.horizontal[y + 1][x] = false;
+                                break;
+                            case 'left':
+                                mazeGameData.walls.vertical[y][x] = false;
+                                break;
+                            case 'right':
+                                mazeGameData.walls.vertical[y][x + 1] = false;
+                                break;
+                        }
+
+                        // Continue carving from the neighbor
                         carvePassage(nx, ny);
                     }
                 }
             }
 
-            // Start carving from position (1,1)
-            carvePassage(1, 1);
+            // Start carving from position (0,0)
+            carvePassage(0, 0);
 
             // Set start (dragon) and end (princess) positions
-            maze[1][1] = 2; // 2 = dragon start
-            maze[size - 2][size - 2] = 3; // 3 = princess/goal
+            mazeGameData.dragon = { x: 0, y: 0 };
+            mazeGameData.princess = { x: size - 1, y: size - 1 };
 
-            // Add obstacles (fire pits) - but ensure path remains clear
-            // We'll only place obstacles in dead ends or areas with alternate paths
-            let obstacleCount = Math.min(2 + Math.floor(mazeGameData.level / 3), 4);
+            // Add a few obstacles in random cells (avoiding start and end)
             mazeGameData.obstacles = [];
+            let obstacleCount = Math.min(2 + Math.floor(mazeGameData.level / 4), 3);
 
-            // Find safe spots for obstacles (not on critical path)
-            for (let y = 1; y < size - 1; y++) {
-                for (let x = 1; x < size - 1; x++) {
-                    if (obstacleCount <= 0) break;
+            while (obstacleCount > 0) {
+                const x = Math.floor(Math.random() * size);
+                const y = Math.floor(Math.random() * size);
 
-                    // Only place obstacles in open areas with multiple paths
-                    if (maze[y][x] === 0 &&
-                        !(x === 1 && y === 1) &&
-                        !(x === size - 2 && y === size - 2) &&
-                        Math.random() < 0.1) {
-
-                        // Check if there are alternate paths
-                        let pathCount = 0;
-                        if (y > 0 && maze[y-1][x] === 0) pathCount++;
-                        if (y < size-1 && maze[y+1][x] === 0) pathCount++;
-                        if (x > 0 && maze[y][x-1] === 0) pathCount++;
-                        if (x < size-1 && maze[y][x+1] === 0) pathCount++;
-
-                        // Only place if there are at least 3 paths (not a critical corridor)
-                        if (pathCount >= 3) {
-                            maze[y][x] = 4; // 4 = obstacle
-                            mazeGameData.obstacles.push({ x, y });
-                            obstacleCount--;
-                        }
-                    }
+                // Don't place on start, end, or existing obstacles
+                if ((x !== 0 || y !== 0) &&
+                    (x !== size - 1 || y !== size - 1) &&
+                    !mazeGameData.obstacles.find(o => o.x === x && o.y === y)) {
+                    mazeGameData.obstacles.push({ x, y });
+                    obstacleCount--;
                 }
             }
-
-            return maze;
         }
 
         function startMazeGame() {
             // Generate new maze
-            mazeGameData.maze = generateMaze();
-            mazeGameData.currentMaze = JSON.parse(JSON.stringify(mazeGameData.maze));
+            generateMaze();
 
             // Reset game state
-            mazeGameData.dragon = { x: 1, y: 1 };
-            mazeGameData.princess = { x: mazeGameData.mazeSize - 2, y: mazeGameData.mazeSize - 2 };
+            mazeGameData.dragon = { x: 0, y: 0 };
+            mazeGameData.princess = { x: mazeGameData.mazeSize - 1, y: mazeGameData.mazeSize - 1 };
             mazeGameData.moves = 0;
             mazeGameData.gameActive = true;
-            mazeGameData.path = [{ x: 1, y: 1 }];
+            mazeGameData.path = [{ x: 0, y: 0 }];
 
             // Update display
             document.getElementById('mazeMovesCount').textContent = '0';
@@ -4193,68 +4198,54 @@
             // Clear canvas
             ctx.clearRect(0, 0, mazeGameData.canvas.width, mazeGameData.canvas.height);
 
-            // Draw maze with walls as borders
+            // Fill background for all cells
             for (let y = 0; y < size; y++) {
                 for (let x = 0; x < size; x++) {
-                    const cell = mazeGameData.currentMaze[y][x];
                     const xPos = x * cellSize;
                     const yPos = y * cellSize;
 
-                    // Fill background for all cells
-                    if (cell === 4) { // Obstacle (fire)
+                    // Check if this cell has an obstacle
+                    const hasObstacle = mazeGameData.obstacles.find(o => o.x === x && o.y === y);
+
+                    if (hasObstacle) {
                         ctx.fillStyle = '#ffe0e0';
-                    } else if (cell === 0 || cell === 2 || cell === 3) { // Path
+                    } else {
                         ctx.fillStyle = '#f8f8f8';
-                    } else { // Wall
-                        ctx.fillStyle = '#2c3e50';
                     }
                     ctx.fillRect(xPos, yPos, cellSize, cellSize);
 
-                    // Draw borders between walls and paths
-                    ctx.strokeStyle = '#2c3e50';
-                    ctx.lineWidth = 2;
-
-                    // Check neighbors and draw walls
-                    if (cell === 0 || cell === 2 || cell === 3 || cell === 4) {
-                        // Top wall
-                        if (y === 0 || mazeGameData.currentMaze[y-1][x] === 1) {
-                            ctx.beginPath();
-                            ctx.moveTo(xPos, yPos);
-                            ctx.lineTo(xPos + cellSize, yPos);
-                            ctx.stroke();
-                        }
-                        // Bottom wall
-                        if (y === size-1 || mazeGameData.currentMaze[y+1][x] === 1) {
-                            ctx.beginPath();
-                            ctx.moveTo(xPos, yPos + cellSize);
-                            ctx.lineTo(xPos + cellSize, yPos + cellSize);
-                            ctx.stroke();
-                        }
-                        // Left wall
-                        if (x === 0 || mazeGameData.currentMaze[y][x-1] === 1) {
-                            ctx.beginPath();
-                            ctx.moveTo(xPos, yPos);
-                            ctx.lineTo(xPos, yPos + cellSize);
-                            ctx.stroke();
-                        }
-                        // Right wall
-                        if (x === size-1 || mazeGameData.currentMaze[y][x+1] === 1) {
-                            ctx.beginPath();
-                            ctx.moveTo(xPos + cellSize, yPos);
-                            ctx.lineTo(xPos + cellSize, yPos + cellSize);
-                            ctx.stroke();
-                        }
-                    }
-
-                    // Draw special elements
-                    if (x === mazeGameData.princess.x && y === mazeGameData.princess.y) {
-                        ctx.font = `${cellSize * 0.7}px Arial`;
-                        ctx.fillText('👸', xPos + 2, yPos + cellSize - 5);
-                    }
-
-                    if (cell === 4) {
+                    // Draw obstacles
+                    if (hasObstacle) {
                         ctx.font = `${cellSize * 0.6}px Arial`;
-                        ctx.fillText('🔥', xPos + 3, yPos + cellSize - 7);
+                        ctx.fillText('🔥', xPos + cellSize * 0.2, yPos + cellSize * 0.7);
+                    }
+                }
+            }
+
+            // Draw walls
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 3;
+
+            // Draw horizontal walls
+            for (let y = 0; y <= size; y++) {
+                for (let x = 0; x < size; x++) {
+                    if (mazeGameData.walls.horizontal[y][x]) {
+                        ctx.beginPath();
+                        ctx.moveTo(x * cellSize, y * cellSize);
+                        ctx.lineTo((x + 1) * cellSize, y * cellSize);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw vertical walls
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x <= size; x++) {
+                    if (mazeGameData.walls.vertical[y][x]) {
+                        ctx.beginPath();
+                        ctx.moveTo(x * cellSize, y * cellSize);
+                        ctx.lineTo(x * cellSize, (y + 1) * cellSize);
+                        ctx.stroke();
                     }
                 }
             }
@@ -4276,37 +4267,61 @@
             }
             ctx.stroke();
 
+            // Draw princess
+            const princessX = mazeGameData.princess.x * cellSize;
+            const princessY = mazeGameData.princess.y * cellSize;
+            ctx.font = `${cellSize * 0.7}px Arial`;
+            ctx.fillText('👸', princessX + cellSize * 0.15, princessY + cellSize * 0.75);
+
             // Draw dragon
             const dragonX = mazeGameData.dragon.x * cellSize;
             const dragonY = mazeGameData.dragon.y * cellSize;
             ctx.font = `${cellSize * 0.8}px Arial`;
-            ctx.fillText('🐉', dragonX, dragonY + cellSize - 3);
+            ctx.fillText('🐉', dragonX + cellSize * 0.1, dragonY + cellSize * 0.8);
         }
 
         function moveDragon(direction) {
             if (!mazeGameData.gameActive) return;
 
             const dragon = mazeGameData.dragon;
-            let newX = dragon.x;
-            let newY = dragon.y;
+            let canMove = false;
 
+            // Check if movement is blocked by a wall
             switch (direction) {
-                case 'up': newY--; break;
-                case 'down': newY++; break;
-                case 'left': newX--; break;
-                case 'right': newX++; break;
+                case 'up':
+                    if (dragon.y > 0 && !mazeGameData.walls.horizontal[dragon.y][dragon.x]) {
+                        canMove = true;
+                        dragon.y--;
+                    }
+                    break;
+                case 'down':
+                    if (dragon.y < mazeGameData.mazeSize - 1 && !mazeGameData.walls.horizontal[dragon.y + 1][dragon.x]) {
+                        canMove = true;
+                        dragon.y++;
+                    }
+                    break;
+                case 'left':
+                    if (dragon.x > 0 && !mazeGameData.walls.vertical[dragon.y][dragon.x]) {
+                        canMove = true;
+                        dragon.x--;
+                    }
+                    break;
+                case 'right':
+                    if (dragon.x < mazeGameData.mazeSize - 1 && !mazeGameData.walls.vertical[dragon.y][dragon.x + 1]) {
+                        canMove = true;
+                        dragon.x++;
+                    }
+                    break;
             }
 
-            // Check bounds and walls
-            if (newX < 0 || newX >= mazeGameData.mazeSize ||
-                newY < 0 || newY >= mazeGameData.mazeSize ||
-                mazeGameData.currentMaze[newY][newX] === 1) {
-                // Hit wall - play bump sound/animation
+            if (!canMove) {
+                // Hit wall - could add bump animation
                 return;
             }
 
             // Check for obstacles
-            if (mazeGameData.currentMaze[newY][newX] === 4) {
+            const hasObstacle = mazeGameData.obstacles.find(o => o.x === dragon.x && o.y === dragon.y);
+            if (hasObstacle) {
                 showToast('🔥 Ouch! Fire blocks your path!');
                 mazeGameData.moves += 2; // Penalty for hitting obstacle
                 document.getElementById('mazeMovesCount').textContent = mazeGameData.moves;
@@ -4315,16 +4330,14 @@
             }
 
             // Valid move
-            mazeGameData.dragon.x = newX;
-            mazeGameData.dragon.y = newY;
             mazeGameData.moves++;
-            mazeGameData.path.push({ x: newX, y: newY });
+            mazeGameData.path.push({ x: dragon.x, y: dragon.y });
 
             // Update display
             document.getElementById('mazeMovesCount').textContent = mazeGameData.moves;
 
             // Check for win
-            if (newX === mazeGameData.princess.x && newY === mazeGameData.princess.y) {
+            if (dragon.x === mazeGameData.princess.x && dragon.y === mazeGameData.princess.y) {
                 winMaze();
                 return;
             }
@@ -4405,11 +4418,10 @@
             const overlay = document.getElementById('mazeOverlay');
             overlay.style.display = 'none';
 
-            // Reset to saved maze
-            mazeGameData.currentMaze = JSON.parse(JSON.stringify(mazeGameData.maze));
-            mazeGameData.dragon = { x: 1, y: 1 };
+            // Reset to start position
+            mazeGameData.dragon = { x: 0, y: 0 };
             mazeGameData.moves = 0;
-            mazeGameData.path = [{ x: 1, y: 1 }];
+            mazeGameData.path = [{ x: 0, y: 0 }];
             mazeGameData.gameActive = true;
 
             document.getElementById('mazeMovesCount').textContent = '0';
