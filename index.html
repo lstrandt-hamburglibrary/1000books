@@ -1492,8 +1492,10 @@
             currentChild: null,
             books: [],
             settings: {
-                dailyGoal: 3
-            }
+                dailyGoal: 3,
+                streakNotifications: true
+            },
+            streaks: {}  // Will store streak data per child
         };
 
         let selectedRating = '';
@@ -2077,6 +2079,83 @@
             }
         }
 
+        // Streak Management Functions
+        function getStreakData(childId) {
+            if (!appData.streaks[childId]) {
+                appData.streaks[childId] = {
+                    currentStreak: 0,
+                    longestStreak: 0,
+                    lastReadDate: null,
+                    freezeUsed: false
+                };
+            }
+            return appData.streaks[childId];
+        }
+
+        function updateStreak(childId) {
+            const streak = getStreakData(childId);
+            const today = new Date().toDateString();
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+            if (streak.lastReadDate === today) {
+                // Already read today, no change
+                return streak.currentStreak;
+            }
+
+            if (streak.lastReadDate === yesterday) {
+                // Continuing streak
+                streak.currentStreak++;
+                streak.lastReadDate = today;
+            } else if (!streak.lastReadDate || getDaysBetween(new Date(streak.lastReadDate), new Date()) > 2) {
+                // Starting new streak or broke streak
+                streak.currentStreak = 1;
+                streak.lastReadDate = today;
+                streak.freezeUsed = false;
+            } else if (getDaysBetween(new Date(streak.lastReadDate), new Date()) === 2 && !streak.freezeUsed) {
+                // Use one-time freeze (missed one day)
+                streak.freezeUsed = true;
+                streak.lastReadDate = today;
+                showToast('🧊 Streak freeze used! Your streak continues!');
+            } else {
+                // Broke streak
+                streak.currentStreak = 1;
+                streak.lastReadDate = today;
+                streak.freezeUsed = false;
+            }
+
+            // Update longest streak
+            if (streak.currentStreak > streak.longestStreak) {
+                streak.longestStreak = streak.currentStreak;
+
+                // Celebrate milestones
+                if (appData.settings.streakNotifications) {
+                    if (streak.currentStreak === 7) {
+                        showToast('🔥 Amazing! 7 day streak!');
+                    } else if (streak.currentStreak === 30) {
+                        showToast('🔥🔥 Incredible! 30 day streak!');
+                    } else if (streak.currentStreak === 100) {
+                        showToast('🔥🔥🔥 LEGENDARY! 100 day streak!');
+                    }
+                }
+            }
+
+            saveData();
+            return streak.currentStreak;
+        }
+
+        function getDaysBetween(date1, date2) {
+            const oneDay = 24 * 60 * 60 * 1000;
+            return Math.round(Math.abs((date2 - date1) / oneDay));
+        }
+
+        function getStreakEmoji(days) {
+            if (days === 0) return '💤';
+            if (days < 3) return '🔥';
+            if (days < 7) return '🔥🔥';
+            if (days < 30) return '🔥🔥🔥';
+            return '🔥🔥🔥🔥';
+        }
+
         // Update Dashboard
         function updateDashboard() {
             if (appData.currentChild === null || !appData.children[appData.currentChild]) {
@@ -2098,7 +2177,16 @@
             document.getElementById('daysActive').textContent = calculateDaysActive(books);
             document.getElementById('thisWeek').textContent = calculateThisWeek(books);
             document.getElementById('favorites').textContent = books.filter(b => b.isFavorite).length;
-            document.getElementById('streak').textContent = calculateStreak(books);
+            // Update streak display with emoji
+            const childId = appData.children[appData.currentChild].id;
+            const streakData = getStreakData(childId);
+            const streakElement = document.getElementById('streak');
+            streakElement.textContent = streakData.currentStreak;
+
+            // Add visual feedback for streak
+            const streakCard = streakElement.parentElement;
+            const emojiElement = streakCard.querySelector('.stat-emoji');
+            emojiElement.textContent = getStreakEmoji(streakData.currentStreak);
 
             // Update recent books
             displayRecentBooks(books);
@@ -2365,6 +2453,10 @@
 
             appData.children[appData.currentChild].books.push(book);
             saveData();
+
+            // Update streak
+            const childId = appData.children[appData.currentChild].id;
+            updateStreak(childId);
 
             // Check for new badges
             checkBadges();
@@ -2694,6 +2786,10 @@
             appData.children[appData.currentChild].books.push(newBook);
             saveData();
 
+            // Update streak
+            const childId = appData.children[appData.currentChild].id;
+            updateStreak(childId);
+
             // Update button to show it's been added
             const button = document.getElementById(`suggest-${categoryKey}-${bookIndex}`);
             button.textContent = '✓ Added';
@@ -2802,6 +2898,7 @@
             if (testMode) {
                 return {
                     dogPark: true,
+                    snowflake: true,
                     letterMatch: true,
                     storyBuilder: true,
                     seasonSort: true
