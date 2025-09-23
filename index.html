@@ -1398,8 +1398,9 @@
                     <button class="game-close-btn" onclick="closeGame('snowflake')">✕</button>
                 </div>
                 <div class="game-instructions">
-                    <p>Catch the falling snowflakes! ❄️ Move your mouse or touch the screen!</p>
-                    <p style="color: #17a2b8;">🎯 Special snowflakes give bonus points!</p>
+                    <p>Catch snowflakes with your glove! Just move it under them!</p>
+                    <p style="color: #FFD700;">⭐ Golden snowflakes = bonus points!</p>
+                    <p style="color: #dc3545;">Miss 10 snowflakes and you lose!</p>
                 </div>
                 <div class="game-stats">
                     <div class="stat-item">
@@ -1423,11 +1424,19 @@
                     <div class="snow-background"></div>
                     <div class="snow-catcher" id="snowCatcher">🧤</div>
                     <div class="falling-items" id="fallingItems"></div>
+                    <div id="snowmanDisplay" style="position: absolute; bottom: 10px; right: 10px; font-size: 50px;"></div>
+                    <div id="missedDisplay" style="position: absolute; top: 10px; right: 10px; color: #dc3545; font-weight: bold;">Missed: 0/10</div>
                 </div>
                 <div class="game-controls">
                     <button class="game-btn" onclick="startSnowGame()">▶️ Start</button>
                     <button class="game-btn" onclick="pauseSnowGame()" id="snowPauseBtn">⏸️ Pause</button>
                     <button class="game-btn" onclick="resetSnowGame()">🔄 New Game</button>
+                </div>
+                <div class="game-controls" style="margin-top: 10px;">
+                    <label style="margin-right: 10px;">Speed: <strong id="currentSnowSpeed" style="color: #17a2b8;">Normal (1x)</strong></label>
+                    <button class="game-btn snow-speed-btn" onclick="setSnowSpeed(0.5, this)" style="padding: 5px 10px;">Slow</button>
+                    <button class="game-btn snow-speed-btn" onclick="setSnowSpeed(1, this)" style="padding: 5px 10px;">Normal</button>
+                    <button class="game-btn snow-speed-btn" onclick="setSnowSpeed(1.5, this)" style="padding: 5px 10px;">Fast</button>
                 </div>
                 <div class="high-score">
                     🏆 High Score: <span id="snowHighScore">0</span>
@@ -1531,7 +1540,12 @@
             snowflakes: [],
             spawnInterval: null,
             catcherX: 0,
-            catcherY: 0
+            catcherY: 0,
+            snowmanParts: 0,
+            missedSnowflakes: 0,
+            maxMissed: 10,
+            gameSpeed: 1,
+            baseSpeed: 1
         };
 
         let testMode = false;
@@ -3528,12 +3542,12 @@
             snowGameData.gameActive = true;
             snowGameData.paused = false;
 
-            // Start spawning snowflakes
+            // Start spawning snowflakes with speed adjustment
             snowGameData.spawnInterval = setInterval(() => {
                 if (!snowGameData.paused && snowGameData.gameActive) {
                     spawnSnowflake();
                 }
-            }, 800);
+            }, 800 / snowGameData.gameSpeed);
 
             // Start timer
             snowGameData.timerInterval = setInterval(() => {
@@ -3552,38 +3566,114 @@
             const snowflake = document.createElement('div');
             snowflake.className = 'falling-snowflake';
 
-            // Random chance for special snowflake
+            // Random chance for special snowflake (golden)
             const isSpecial = Math.random() < 0.2;
             if (isSpecial) {
                 snowflake.classList.add('special');
-                snowflake.innerHTML = '✨';
+                snowflake.innerHTML = '❄️';
+                snowflake.style.color = '#FFD700';
+                snowflake.style.textShadow = '0 0 10px gold';
                 snowflake.dataset.points = 50;
             } else {
                 snowflake.innerHTML = '❄️';
+                snowflake.style.color = '#87CEEB';
                 snowflake.dataset.points = 10;
             }
 
-            // Random position
+            // Set initial position and size
+            snowflake.style.position = 'absolute';
             snowflake.style.left = Math.random() * (gameArea.offsetWidth - 30) + 'px';
-            snowflake.style.animationDuration = (3 + Math.random() * 2) + 's';
-
-            // Click/touch handler
-            snowflake.addEventListener('click', () => catchSnowflake(snowflake));
-            snowflake.addEventListener('touchstart', () => catchSnowflake(snowflake));
+            snowflake.style.top = '-50px';
+            snowflake.style.fontSize = '30px';
+            snowflake.style.zIndex = '10';
 
             gameArea.appendChild(snowflake);
 
-            // Remove after animation
-            setTimeout(() => {
-                if (snowflake.parentNode) {
-                    snowflake.remove();
-                    // Reset combo if missed
+            // Store reference
+            snowGameData.snowflakes.push(snowflake);
+
+            // Animate falling with collision detection
+            const fallInterval = setInterval(() => {
+                if (snowGameData.paused || !snowGameData.gameActive) return;
+                if (snowflake.classList.contains('caught')) {
+                    clearInterval(fallInterval);
+                    return;
+                }
+
+                const currentTop = parseFloat(snowflake.style.top);
+                const newTop = currentTop + (3 * snowGameData.gameSpeed);
+                snowflake.style.top = newTop + 'px';
+
+                // Check collision with glove
+                checkSnowflakeCollision(snowflake);
+
+                // Check if missed
+                if (newTop > gameArea.offsetHeight) {
+                    clearInterval(fallInterval);
                     if (!snowflake.classList.contains('caught')) {
-                        snowGameData.combo = 0;
-                        document.getElementById('snowCombo').textContent = snowGameData.combo;
+                        handleMissedSnowflake();
+                        snowflake.remove();
+                        // Remove from array
+                        const index = snowGameData.snowflakes.indexOf(snowflake);
+                        if (index > -1) snowGameData.snowflakes.splice(index, 1);
                     }
                 }
-            }, 5000);
+            }, 30);
+        }
+
+        function checkSnowflakeCollision(snowflake) {
+            if (snowflake.classList.contains('caught')) return;
+
+            const catcher = document.getElementById('snowCatcher');
+            const catcherRect = catcher.getBoundingClientRect();
+            const snowRect = snowflake.getBoundingClientRect();
+            const gameAreaRect = document.getElementById('snowGameArea').getBoundingClientRect();
+
+            // Check collision
+            if (catcherRect.left < snowRect.right &&
+                catcherRect.right > snowRect.left &&
+                catcherRect.top < snowRect.bottom &&
+                catcherRect.bottom > snowRect.top) {
+                catchSnowflake(snowflake);
+            }
+        }
+
+        function handleMissedSnowflake() {
+            snowGameData.missedSnowflakes++;
+            snowGameData.combo = 0;
+            document.getElementById('snowCombo').textContent = snowGameData.combo;
+            document.getElementById('missedDisplay').textContent = `Missed: ${snowGameData.missedSnowflakes}/${snowGameData.maxMissed}`;
+
+            // Flash red warning
+            const display = document.getElementById('missedDisplay');
+            display.style.fontSize = '20px';
+            setTimeout(() => display.style.fontSize = '14px', 200);
+
+            if (snowGameData.missedSnowflakes >= snowGameData.maxMissed) {
+                endSnowGame(false);
+            }
+        }
+
+        function buildSnowmanPart() {
+            snowGameData.snowmanParts++;
+            const snowmanDisplay = document.getElementById('snowmanDisplay');
+
+            // Build snowman progressively
+            const snowmanStages = [
+                '⚪',           // Base
+                '⚪<br>⚪',        // Body
+                '⚪<br>⚪<br>⚪',     // Full body
+                '⛄'            // Complete snowman
+            ];
+
+            if (snowGameData.snowmanParts <= 3) {
+                snowmanDisplay.innerHTML = snowmanStages[snowGameData.snowmanParts - 1];
+                showToast(`🎉 Snowman part ${snowGameData.snowmanParts}/3 built!`);
+            } else if (snowGameData.snowmanParts === 4) {
+                snowmanDisplay.innerHTML = snowmanStages[3];
+                showToast('⛄ SNOWMAN COMPLETE! YOU WIN!');
+                endSnowGame(true);
+            }
         }
 
         function catchSnowflake(snowflake) {
@@ -3604,9 +3694,20 @@
             document.getElementById('snowCaught').textContent = snowGameData.caught;
             document.getElementById('snowCombo').textContent = snowGameData.combo;
 
+            // Check for snowman building (every 10 snowflakes)
+            if (snowGameData.caught % 10 === 0) {
+                buildSnowmanPart();
+            }
+
             // Animate catch
-            snowflake.style.animation = 'snowCatch 0.3s ease';
-            setTimeout(() => snowflake.remove(), 300);
+            snowflake.style.opacity = '0';
+            snowflake.style.transform = 'scale(1.5)';
+            setTimeout(() => {
+                snowflake.remove();
+                // Remove from array
+                const index = snowGameData.snowflakes.indexOf(snowflake);
+                if (index > -1) snowGameData.snowflakes.splice(index, 1);
+            }, 300);
 
             // Show combo popup
             if (snowGameData.combo >= 5 && snowGameData.combo % 5 === 0) {
@@ -3634,7 +3735,13 @@
             if (snowGameData.timerInterval) clearInterval(snowGameData.timerInterval);
             if (snowGameData.spawnInterval) clearInterval(snowGameData.spawnInterval);
 
-            // Reset data
+            // Clear all snowflakes
+            document.querySelectorAll('.falling-snowflake').forEach(s => s.remove());
+
+            // Reset data preserving high score and speed
+            const preservedHighScore = snowGameData.highScore || 0;
+            const preservedBaseSpeed = snowGameData.baseSpeed || 1;
+
             snowGameData = {
                 score: 0,
                 caught: 0,
@@ -3644,11 +3751,16 @@
                 timerInterval: null,
                 gameActive: false,
                 paused: false,
-                highScore: snowGameData.highScore || 0,
+                highScore: preservedHighScore,
                 snowflakes: [],
                 spawnInterval: null,
                 catcherX: 200,
-                catcherY: 200
+                catcherY: 200,
+                snowmanParts: 0,
+                missedSnowflakes: 0,
+                maxMissed: 10,
+                gameSpeed: preservedBaseSpeed,
+                baseSpeed: preservedBaseSpeed
             };
 
             // Update display
@@ -3657,9 +3769,8 @@
             document.getElementById('snowTimer').textContent = 60;
             document.getElementById('snowCombo').textContent = 0;
             document.getElementById('snowHighScore').textContent = snowGameData.highScore;
-
-            // Clear snowflakes
-            document.querySelectorAll('.falling-snowflake').forEach(s => s.remove());
+            document.getElementById('missedDisplay').textContent = 'Missed: 0/10';
+            document.getElementById('snowmanDisplay').innerHTML = '';
 
             // Position catcher
             const catcher = document.getElementById('snowCatcher');
@@ -3667,10 +3778,20 @@
             catcher.style.top = '200px';
         }
 
-        function endSnowGame() {
+        function endSnowGame(won = false) {
             snowGameData.gameActive = false;
             clearInterval(snowGameData.timerInterval);
             clearInterval(snowGameData.spawnInterval);
+
+            // Clear all falling snowflakes
+            document.querySelectorAll('.falling-snowflake').forEach(s => s.remove());
+            snowGameData.snowflakes = [];
+
+            if (won) {
+                // Bonus for winning
+                snowGameData.score += 500;
+                document.getElementById('snowScore').textContent = snowGameData.score;
+            }
 
             // Check high score
             if (snowGameData.score > snowGameData.highScore) {
@@ -3678,9 +3799,54 @@
                 localStorage.setItem('snowGameHighScore', snowGameData.highScore);
                 document.getElementById('snowHighScore').textContent = snowGameData.highScore;
                 showToast(`🎉 NEW HIGH SCORE: ${snowGameData.highScore}! 🎉`);
+            } else if (won) {
+                showToast(`⛄ YOU WIN! Built a snowman! Score: ${snowGameData.score}`);
+            } else if (snowGameData.missedSnowflakes >= snowGameData.maxMissed) {
+                showToast(`❄️ Game Over! Too many missed! Score: ${snowGameData.score}`);
             } else {
-                showToast(`❄️ Game Over! Caught ${snowGameData.caught} snowflakes! Score: ${snowGameData.score}`);
+                showToast(`❄️ Time's up! Caught ${snowGameData.caught} snowflakes! Score: ${snowGameData.score}`);
             }
+        }
+
+        // Set snow game speed
+        function setSnowSpeed(speed, button) {
+            snowGameData.baseSpeed = speed;
+
+            if (snowGameData.gameActive) {
+                snowGameData.gameSpeed = speed;
+
+                // Restart spawning with new speed
+                if (snowGameData.spawnInterval) {
+                    clearInterval(snowGameData.spawnInterval);
+                    snowGameData.spawnInterval = setInterval(() => {
+                        if (!snowGameData.paused && snowGameData.gameActive) {
+                            spawnSnowflake();
+                        }
+                    }, 800 / snowGameData.gameSpeed);
+                }
+            }
+
+            // Update display
+            const speedNames = {
+                0.5: 'Slow',
+                1: 'Normal',
+                1.5: 'Fast'
+            };
+
+            document.getElementById('currentSnowSpeed').textContent = `${speedNames[speed]} (${speed}x)`;
+
+            // Update button styles
+            document.querySelectorAll('.snow-speed-btn').forEach(btn => {
+                btn.style.background = '';
+                btn.style.fontWeight = '';
+            });
+
+            if (button) {
+                button.style.background = '#28a745';
+                button.style.fontWeight = 'bold';
+            }
+
+            showToast(`❄️ Speed: ${speedNames[speed]}`);
         }
 
         // Make all functions globally accessible for onclick handlers IMMEDIATELY
@@ -3694,6 +3860,7 @@
         window.startSnowGame = startSnowGame;
         window.pauseSnowGame = pauseSnowGame;
         window.resetSnowGame = resetSnowGame;
+        window.setSnowSpeed = setSnowSpeed;
         window.showPage = showPage;
         window.selectRating = selectRating;
         window.saveSettings = saveSettings;
