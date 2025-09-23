@@ -905,6 +905,56 @@
             display: none;
         }
 
+        /* Dragon Maze Styles */
+        .maze-game-area {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        #mazeCanvas {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .maze-arrow-btn {
+            display: inline-block;
+            padding: 15px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .maze-arrow-btn:hover {
+            transform: scale(1.05);
+            background: #764ba2;
+        }
+
+        .maze-arrow-btn:active {
+            transform: scale(0.95);
+        }
+
+        .game-controls:has(.maze-arrow-btn) {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 200px;
+            margin: 10px auto;
+        }
+
         /* Suggestions Styles */
         .suggestion-lists {
             margin-top: 20px;
@@ -1460,6 +1510,52 @@
                 </div>
             </div>
 
+            <!-- Dragon Maze Game -->
+            <div id="dragonMazeGame" class="mini-game" style="display: none;">
+                <div class="game-header">
+                    <h3>🐉 Dragon Maze Adventure!</h3>
+                    <button class="game-close-btn" onclick="closeGame('dragonMaze')">✕</button>
+                </div>
+                <div class="game-instructions">
+                    <p>Guide the dragon to rescue the princess! 👸</p>
+                    <p style="color: #4169E1;">🎯 Use arrow keys or swipe to move</p>
+                    <p style="color: #FFD700;">⚡ Complete in under <span id="maxMoves">50</span> moves!</p>
+                    <p style="color: #dc3545;">🔥 Avoid obstacles and dead ends!</p>
+                </div>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Moves:</span>
+                        <span id="mazeMovesCount" style="font-size: 1.2em; font-weight: bold;">0</span>/<span id="mazeMoveLimit">50</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Level:</span>
+                        <span id="mazeLevel">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Best:</span>
+                        <span id="mazeBestMoves">--</span> moves
+                    </div>
+                </div>
+                <div class="maze-game-area" id="mazeGameArea">
+                    <canvas id="mazeCanvas" width="400" height="400"></canvas>
+                    <div id="mazeOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;"></div>
+                </div>
+                <div class="game-controls">
+                    <button class="game-btn" onclick="startMazeGame()">▶️ New Maze</button>
+                    <button class="game-btn" onclick="resetMaze()">🔄 Restart</button>
+                    <button class="game-btn" onclick="showMazeHint()">💡 Hint (-5 moves)</button>
+                </div>
+                <div class="game-controls" style="margin-top: 10px;">
+                    <button class="maze-arrow-btn" onclick="moveDragon('up')" style="grid-column: 2;">⬆️</button>
+                    <button class="maze-arrow-btn" onclick="moveDragon('left')" style="grid-column: 1;">⬅️</button>
+                    <button class="maze-arrow-btn" onclick="moveDragon('down')" style="grid-column: 2;">⬇️</button>
+                    <button class="maze-arrow-btn" onclick="moveDragon('right')" style="grid-column: 3;">➡️</button>
+                </div>
+                <div class="high-score">
+                    🏆 Fastest Rescue: <span id="mazeFastestRescue">--</span> moves
+                </div>
+            </div>
+
             <!-- Settings Page -->
             <div id="settings" class="page">
                 <h2>Settings</h2>
@@ -1565,6 +1661,25 @@
         };
 
         let testMode = false;
+
+        // Dragon Maze Game Data
+        let mazeGameData = {
+            maze: [],
+            mazeSize: 11, // 11x11 grid
+            cellSize: 0,
+            dragon: { x: 0, y: 0 },
+            princess: { x: 0, y: 0 },
+            obstacles: [],
+            path: [],
+            moves: 0,
+            maxMoves: 50,
+            level: 1,
+            gameActive: false,
+            bestMoves: null,
+            canvas: null,
+            ctx: null,
+            currentMaze: []
+        };
 
         // Dog facts database
         const dogFacts = [
@@ -2892,6 +3007,14 @@
                     action: () => startSnowflakeGame()
                 },
                 {
+                    id: 'dragonMaze',
+                    name: 'Dragon Maze',
+                    icon: '🐉',
+                    requirement: 'Read all 10 Adventure Stories',
+                    unlocked: unlockedGames.dragonMaze,
+                    action: () => startDragonMazeGame()
+                },
+                {
                     id: 'seasonSort',
                     name: 'Season Sorter',
                     icon: '🍂',
@@ -2916,6 +3039,7 @@
             window.gameActions = {
                 dogPark: () => startDogParkGame(),
                 snowflake: () => startSnowflakeGame(),
+                dragonMaze: () => startDragonMazeGame(),
                 letterMatch: () => showToast('Letter Match game coming soon!'),
                 storyBuilder: () => showToast('Story Builder game coming soon!'),
                 seasonSort: () => showToast('Season Sorter game coming soon!')
@@ -2929,6 +3053,7 @@
                 return {
                     dogPark: true,
                     snowflake: true,
+                    dragonMaze: true,
                     letterMatch: true,
                     storyBuilder: true,
                     seasonSort: true
@@ -2938,6 +3063,8 @@
             if (appData.currentChild === null || !appData.children[appData.currentChild]) {
                 return {
                     dogPark: false,
+                    snowflake: false,
+                    dragonMaze: false,
                     letterMatch: false,
                     storyBuilder: false,
                     seasonSort: false
@@ -2963,6 +3090,7 @@
                 dogPark: hasReadAllFromCategory('dogs'),
                 letterMatch: hasReadAllFromCategory('learning'),
                 storyBuilder: hasReadAllFromCategory('adventure'),
+                dragonMaze: hasReadAllFromCategory('adventure'),
                 snowflake: hasReadAllFromCategory('winter'),
                 seasonSort: hasReadAllFromCategory('fall')
             };
@@ -3500,6 +3628,14 @@
                 if (snowGameData.spawnInterval) clearInterval(snowGameData.spawnInterval);
 
                 document.getElementById('snowflakeGame').style.display = 'none';
+            } else if (gameId === 'dragonMaze') {
+                // Stop game
+                mazeGameData.gameActive = false;
+
+                // Remove keyboard listener
+                document.removeEventListener('keydown', handleMazeKeyPress);
+
+                document.getElementById('dragonMazeGame').style.display = 'none';
             }
 
             const overlay = document.getElementById('gameOverlay');
@@ -3903,6 +4039,348 @@
             showToast(`❄️ Speed: ${speedNames[speed]}`);
         }
 
+        // Dragon Maze Game Functions
+        function startDragonMazeGame() {
+            const gameDiv = document.getElementById('dragonMazeGame');
+            gameDiv.style.display = 'block';
+
+            // Create overlay
+            let overlay = document.getElementById('gameOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'gameOverlay';
+                overlay.className = 'game-overlay';
+                document.body.appendChild(overlay);
+            }
+            overlay.style.display = 'block';
+
+            // Initialize canvas
+            mazeGameData.canvas = document.getElementById('mazeCanvas');
+            mazeGameData.ctx = mazeGameData.canvas.getContext('2d');
+            mazeGameData.cellSize = Math.floor(mazeGameData.canvas.width / mazeGameData.mazeSize);
+
+            // Load best score
+            mazeGameData.bestMoves = parseInt(localStorage.getItem('mazeBestMoves') || '999');
+            if (mazeGameData.bestMoves === 999) {
+                document.getElementById('mazeFastestRescue').textContent = '--';
+            } else {
+                document.getElementById('mazeFastestRescue').textContent = mazeGameData.bestMoves;
+            }
+
+            startMazeGame();
+        }
+
+        function generateMaze() {
+            const size = mazeGameData.mazeSize;
+            const maze = [];
+
+            // Initialize maze with all walls
+            for (let y = 0; y < size; y++) {
+                maze[y] = [];
+                for (let x = 0; x < size; x++) {
+                    maze[y][x] = 1; // 1 = wall
+                }
+            }
+
+            // Recursive backtracking to generate maze
+            function carvePassage(x, y) {
+                maze[y][x] = 0; // 0 = path
+
+                // Create list of directions in random order
+                const directions = [
+                    { dx: 0, dy: -2, dir: 'N' },
+                    { dx: 2, dy: 0, dir: 'E' },
+                    { dx: 0, dy: 2, dir: 'S' },
+                    { dx: -2, dy: 0, dir: 'W' }
+                ].sort(() => Math.random() - 0.5);
+
+                for (let { dx, dy } of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+
+                    if (nx > 0 && nx < size - 1 && ny > 0 && ny < size - 1 && maze[ny][nx] === 1) {
+                        // Carve path to the new cell
+                        maze[y + dy/2][x + dx/2] = 0;
+                        carvePassage(nx, ny);
+                    }
+                }
+            }
+
+            // Start carving from position (1,1)
+            carvePassage(1, 1);
+
+            // Set start (dragon) and end (princess) positions
+            maze[1][1] = 2; // 2 = dragon start
+            maze[size - 2][size - 2] = 3; // 3 = princess/goal
+
+            // Add some obstacles (fire pits)
+            let obstacleCount = 3 + Math.floor(mazeGameData.level / 2);
+            mazeGameData.obstacles = [];
+            while (obstacleCount > 0) {
+                const x = Math.floor(Math.random() * (size - 2)) + 1;
+                const y = Math.floor(Math.random() * (size - 2)) + 1;
+                if (maze[y][x] === 0 && !(x === 1 && y === 1) && !(x === size - 2 && y === size - 2)) {
+                    maze[y][x] = 4; // 4 = obstacle
+                    mazeGameData.obstacles.push({ x, y });
+                    obstacleCount--;
+                }
+            }
+
+            return maze;
+        }
+
+        function startMazeGame() {
+            // Generate new maze
+            mazeGameData.maze = generateMaze();
+            mazeGameData.currentMaze = JSON.parse(JSON.stringify(mazeGameData.maze));
+
+            // Reset game state
+            mazeGameData.dragon = { x: 1, y: 1 };
+            mazeGameData.princess = { x: mazeGameData.mazeSize - 2, y: mazeGameData.mazeSize - 2 };
+            mazeGameData.moves = 0;
+            mazeGameData.gameActive = true;
+            mazeGameData.path = [{ x: 1, y: 1 }];
+
+            // Update display
+            document.getElementById('mazeMovesCount').textContent = '0';
+            document.getElementById('mazeLevel').textContent = mazeGameData.level;
+
+            // Draw maze
+            drawMaze();
+
+            // Set up keyboard controls
+            document.addEventListener('keydown', handleMazeKeyPress);
+        }
+
+        function drawMaze() {
+            const ctx = mazeGameData.ctx;
+            const cellSize = mazeGameData.cellSize;
+            const size = mazeGameData.mazeSize;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, mazeGameData.canvas.width, mazeGameData.canvas.height);
+
+            // Draw maze cells
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const cell = mazeGameData.currentMaze[y][x];
+                    const xPos = x * cellSize;
+                    const yPos = y * cellSize;
+
+                    switch (cell) {
+                        case 0: // Path
+                            ctx.fillStyle = '#f0f0f0';
+                            break;
+                        case 1: // Wall
+                            ctx.fillStyle = '#333';
+                            break;
+                        case 4: // Obstacle (fire)
+                            ctx.fillStyle = '#ffcccc';
+                            break;
+                        default:
+                            ctx.fillStyle = '#f0f0f0';
+                    }
+
+                    ctx.fillRect(xPos, yPos, cellSize, cellSize);
+                    ctx.strokeStyle = '#ccc';
+                    ctx.strokeRect(xPos, yPos, cellSize, cellSize);
+
+                    // Draw special elements
+                    if (x === mazeGameData.princess.x && y === mazeGameData.princess.y) {
+                        ctx.font = `${cellSize * 0.7}px Arial`;
+                        ctx.fillText('👸', xPos + 2, yPos + cellSize - 5);
+                    }
+
+                    if (cell === 4) {
+                        ctx.font = `${cellSize * 0.6}px Arial`;
+                        ctx.fillText('🔥', xPos + 3, yPos + cellSize - 7);
+                    }
+                }
+            }
+
+            // Draw path trail
+            ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
+            ctx.lineWidth = cellSize / 4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            for (let i = 0; i < mazeGameData.path.length; i++) {
+                const p = mazeGameData.path[i];
+                const xPos = p.x * cellSize + cellSize / 2;
+                const yPos = p.y * cellSize + cellSize / 2;
+                if (i === 0) {
+                    ctx.moveTo(xPos, yPos);
+                } else {
+                    ctx.lineTo(xPos, yPos);
+                }
+            }
+            ctx.stroke();
+
+            // Draw dragon
+            const dragonX = mazeGameData.dragon.x * cellSize;
+            const dragonY = mazeGameData.dragon.y * cellSize;
+            ctx.font = `${cellSize * 0.8}px Arial`;
+            ctx.fillText('🐉', dragonX, dragonY + cellSize - 3);
+        }
+
+        function moveDragon(direction) {
+            if (!mazeGameData.gameActive) return;
+
+            const dragon = mazeGameData.dragon;
+            let newX = dragon.x;
+            let newY = dragon.y;
+
+            switch (direction) {
+                case 'up': newY--; break;
+                case 'down': newY++; break;
+                case 'left': newX--; break;
+                case 'right': newX++; break;
+            }
+
+            // Check bounds and walls
+            if (newX < 0 || newX >= mazeGameData.mazeSize ||
+                newY < 0 || newY >= mazeGameData.mazeSize ||
+                mazeGameData.currentMaze[newY][newX] === 1) {
+                // Hit wall - play bump sound/animation
+                return;
+            }
+
+            // Check for obstacles
+            if (mazeGameData.currentMaze[newY][newX] === 4) {
+                showToast('🔥 Ouch! Fire blocks your path!');
+                mazeGameData.moves += 2; // Penalty for hitting obstacle
+                document.getElementById('mazeMovesCount').textContent = mazeGameData.moves;
+                checkMazeLose();
+                return;
+            }
+
+            // Valid move
+            mazeGameData.dragon.x = newX;
+            mazeGameData.dragon.y = newY;
+            mazeGameData.moves++;
+            mazeGameData.path.push({ x: newX, y: newY });
+
+            // Update display
+            document.getElementById('mazeMovesCount').textContent = mazeGameData.moves;
+
+            // Check for win
+            if (newX === mazeGameData.princess.x && newY === mazeGameData.princess.y) {
+                winMaze();
+                return;
+            }
+
+            // Check for lose
+            checkMazeLose();
+
+            // Redraw
+            drawMaze();
+        }
+
+        function handleMazeKeyPress(e) {
+            if (!mazeGameData.gameActive) return;
+
+            switch(e.key) {
+                case 'ArrowUp':
+                    e.preventDefault();
+                    moveDragon('up');
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    moveDragon('down');
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    moveDragon('left');
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    moveDragon('right');
+                    break;
+            }
+        }
+
+        function checkMazeLose() {
+            if (mazeGameData.moves >= mazeGameData.maxMoves) {
+                mazeGameData.gameActive = false;
+                const overlay = document.getElementById('mazeOverlay');
+                overlay.style.display = 'flex';
+                overlay.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px;">😢</div>
+                        <div>Too many moves!</div>
+                        <div style="font-size: 16px; margin-top: 10px;">The princess is still waiting...</div>
+                        <button class="game-btn" onclick="resetMaze()" style="margin-top: 15px;">Try Again</button>
+                    </div>
+                `;
+                showToast('💔 Game Over! Too many moves!');
+            }
+        }
+
+        function winMaze() {
+            mazeGameData.gameActive = false;
+
+            // Check for best score
+            if (mazeGameData.bestMoves === null || mazeGameData.moves < mazeGameData.bestMoves) {
+                mazeGameData.bestMoves = mazeGameData.moves;
+                localStorage.setItem('mazeBestMoves', mazeGameData.bestMoves);
+                document.getElementById('mazeFastestRescue').textContent = mazeGameData.bestMoves;
+                document.getElementById('mazeBestMoves').textContent = mazeGameData.bestMoves;
+            }
+
+            const overlay = document.getElementById('mazeOverlay');
+            overlay.style.display = 'flex';
+            overlay.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 48px;">🎉</div>
+                    <div>Princess Rescued!</div>
+                    <div style="font-size: 16px; margin-top: 10px;">Completed in ${mazeGameData.moves} moves!</div>
+                    <button class="game-btn" onclick="nextMazeLevel()" style="margin-top: 15px;">Next Level</button>
+                </div>
+            `;
+
+            showToast(`👸 Princess rescued in ${mazeGameData.moves} moves!`);
+        }
+
+        function resetMaze() {
+            const overlay = document.getElementById('mazeOverlay');
+            overlay.style.display = 'none';
+
+            // Reset to saved maze
+            mazeGameData.currentMaze = JSON.parse(JSON.stringify(mazeGameData.maze));
+            mazeGameData.dragon = { x: 1, y: 1 };
+            mazeGameData.moves = 0;
+            mazeGameData.path = [{ x: 1, y: 1 }];
+            mazeGameData.gameActive = true;
+
+            document.getElementById('mazeMovesCount').textContent = '0';
+            drawMaze();
+        }
+
+        function nextMazeLevel() {
+            mazeGameData.level++;
+            mazeGameData.maxMoves = Math.max(30, 50 - mazeGameData.level * 2); // Gets harder
+            document.getElementById('mazeMoveLimit').textContent = mazeGameData.maxMoves;
+            document.getElementById('maxMoves').textContent = mazeGameData.maxMoves;
+
+            const overlay = document.getElementById('mazeOverlay');
+            overlay.style.display = 'none';
+
+            startMazeGame();
+        }
+
+        function showMazeHint() {
+            if (!mazeGameData.gameActive) return;
+
+            // Penalty for using hint
+            mazeGameData.moves += 5;
+            document.getElementById('mazeMovesCount').textContent = mazeGameData.moves;
+
+            // Show shortest path briefly
+            // This would require implementing a pathfinding algorithm
+            showToast('💡 Hint used! +5 moves penalty');
+
+            checkMazeLose();
+        }
+
         // Make all functions globally accessible for onclick handlers IMMEDIATELY
         window.setGameSpeed = setGameSpeed;
         window.startParkGame = startParkGame;
@@ -3915,6 +4393,12 @@
         window.pauseSnowGame = pauseSnowGame;
         window.resetSnowGame = resetSnowGame;
         window.setSnowSpeed = setSnowSpeed;
+        window.startDragonMazeGame = startDragonMazeGame;
+        window.startMazeGame = startMazeGame;
+        window.moveDragon = moveDragon;
+        window.resetMaze = resetMaze;
+        window.nextMazeLevel = nextMazeLevel;
+        window.showMazeHint = showMazeHint;
         window.showPage = showPage;
         window.selectRating = selectRating;
         window.saveSettings = saveSettings;
