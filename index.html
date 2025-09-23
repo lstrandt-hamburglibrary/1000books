@@ -3617,12 +3617,24 @@
                 document.removeEventListener('keydown', handleKeyPress);
 
                 document.getElementById('dogParkGame').style.display = 'none';
+
+                // Hide overlay for dogPark
+                const overlay = document.getElementById('gameOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
             } else if (gameId === 'snowflake') {
                 // Stop timers
                 if (snowGameData.timerInterval) clearInterval(snowGameData.timerInterval);
                 if (snowGameData.spawnInterval) clearInterval(snowGameData.spawnInterval);
 
                 document.getElementById('snowflakeGame').style.display = 'none';
+
+                // Hide overlay for snowflake
+                const overlay = document.getElementById('gameOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
             } else if (gameId === 'dragonMaze') {
                 // Stop game
                 mazeGameData.gameActive = false;
@@ -3631,11 +3643,7 @@
                 document.removeEventListener('keydown', handleMazeKeyPress);
 
                 document.getElementById('dragonMazeGame').style.display = 'none';
-            }
-
-            const overlay = document.getElementById('gameOverlay');
-            if (overlay) {
-                overlay.style.display = 'none';
+                // No overlay to hide for Dragon Maze
             }
         }
 
@@ -4039,16 +4047,7 @@
             const gameDiv = document.getElementById('dragonMazeGame');
             gameDiv.style.display = 'block';
 
-            // Create overlay for background dimming
-            let overlay = document.getElementById('gameOverlay');
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'gameOverlay';
-                overlay.className = 'game-overlay';
-                overlay.onclick = () => closeGame('dragonMaze');
-                document.body.appendChild(overlay);
-            }
-            overlay.style.display = 'block';
+            // No overlay needed for Dragon Maze - game window is self-contained
 
             // Initialize canvas with delay to ensure proper rendering
             setTimeout(() => {
