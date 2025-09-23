@@ -1557,6 +1557,35 @@
                 </div>
             </div>
 
+            <!-- Sliding Puzzle Game -->
+            <div id="slidingPuzzleGame" class="mini-game" style="display: none;">
+                <div class="game-header">
+                    <h3>🧩 Sliding Puzzle!</h3>
+                    <button class="game-close-btn" onclick="closeGame('slidingPuzzle')">✕</button>
+                </div>
+                <div class="game-instructions" style="padding: 8px; background: #f8f9fa; border-radius: 5px; margin-bottom: 10px;">
+                    <div style="margin-bottom: 5px;">
+                        <button class="puzzle-difficulty-btn" onclick="setPuzzleDifficulty('easy', this)" style="padding: 5px 10px; margin: 2px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Easy (3x3)</button>
+                        <button class="puzzle-difficulty-btn" onclick="setPuzzleDifficulty('medium', this)" style="padding: 5px 10px; margin: 2px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Medium (4x4)</button>
+                        <button class="puzzle-difficulty-btn" onclick="setPuzzleDifficulty('hard', this)" style="padding: 5px 10px; margin: 2px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 0.85em;">Hard (5x5)</button>
+                    </div>
+                    <p style="margin: 3px 0; font-size: 0.9em;">Moves: <span id="puzzleMovesCount" style="font-weight: bold;">0</span> | Best: <span id="puzzleBestMoves">--</span></p>
+                </div>
+                <div class="puzzle-game-area" id="puzzleGameArea" style="position: relative; height: 320px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 10px; display: flex; align-items: center; justify-content: center;">
+                    <div id="puzzleGrid" style="display: grid; gap: 5px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
+                        <!-- Puzzle tiles will be generated here -->
+                    </div>
+                </div>
+                <div class="game-controls" style="margin: 10px 0; text-align: center;">
+                    <button class="game-btn" onclick="startPuzzleGame()" style="padding: 8px 15px; font-size: 0.9em; background: #28a745; color: white; border: none; border-radius: 5px; margin: 0 5px;">🎮 New Game</button>
+                    <button class="game-btn" onclick="shufflePuzzle()" style="padding: 8px 15px; font-size: 0.9em; background: #17a2b8; color: white; border: none; border-radius: 5px; margin: 0 5px;">🔄 Shuffle</button>
+                </div>
+                <div id="puzzleComplete" style="display: none; text-align: center; padding: 10px; background: #28a745; color: white; border-radius: 8px; margin-top: 10px;">
+                    <h4>🎉 Congratulations! 🎉</h4>
+                    <p>Solved in <span id="puzzleFinalMoves">0</span> moves!</p>
+                </div>
+            </div>
+
             <!-- Settings Page -->
             <div id="settings" class="page">
                 <h2>Settings</h2>
@@ -1662,6 +1691,17 @@
         };
 
         let testMode = false;
+
+        // Sliding Puzzle Game Data
+        let puzzleGameData = {
+            gridSize: 3,
+            tiles: [],
+            moves: 0,
+            isComplete: false,
+            difficulty: 'easy',
+            bestMoves: null,
+            gameActive: false
+        };
 
         // Dragon Maze Game Data
         let mazeGameData = {
@@ -3018,6 +3058,14 @@
                     action: () => startDragonMazeGame()
                 },
                 {
+                    id: 'slidingPuzzle',
+                    name: 'Sliding Puzzle',
+                    icon: '🧩',
+                    requirement: 'Read 50 books total',
+                    unlocked: unlockedGames.slidingPuzzle,
+                    action: () => startSlidingPuzzleGame()
+                },
+                {
                     id: 'seasonSort',
                     name: 'Season Sorter',
                     icon: '🍂',
@@ -3043,6 +3091,7 @@
                 dogPark: () => startDogParkGame(),
                 snowflake: () => startSnowflakeGame(),
                 dragonMaze: () => startDragonMazeGame(),
+                slidingPuzzle: () => startSlidingPuzzleGame(),
                 letterMatch: () => showToast('Letter Match game coming soon!'),
                 storyBuilder: () => showToast('Story Builder game coming soon!'),
                 seasonSort: () => showToast('Season Sorter game coming soon!')
@@ -3057,6 +3106,7 @@
                     dogPark: true,
                     snowflake: true,
                     dragonMaze: true,
+                    slidingPuzzle: true,
                     letterMatch: true,
                     storyBuilder: true,
                     seasonSort: true
@@ -3068,6 +3118,7 @@
                     dogPark: false,
                     snowflake: false,
                     dragonMaze: false,
+                    slidingPuzzle: false,
                     letterMatch: false,
                     storyBuilder: false,
                     seasonSort: false
@@ -3089,10 +3140,13 @@
                 return readCount >= 10;
             };
 
+            const totalBooks = books.length;
+
             return {
                 dogPark: hasReadAllFromCategory('dogs'),
                 letterMatch: hasReadAllFromCategory('learning'),
                 storyBuilder: hasReadAllFromCategory('adventure'),
+                slidingPuzzle: totalBooks >= 50,
                 dragonMaze: hasReadAllFromCategory('adventure'),
                 snowflake: hasReadAllFromCategory('winter'),
                 seasonSort: hasReadAllFromCategory('fall')
@@ -3652,6 +3706,9 @@
 
                 document.getElementById('dragonMazeGame').style.display = 'none';
                 // No overlay to hide for Dragon Maze
+            } else if (game === 'slidingPuzzle') {
+                document.getElementById('slidingPuzzleGame').style.display = 'none';
+                puzzleGameData.gameActive = false;
             }
         }
 
@@ -4469,6 +4526,194 @@
             checkMazeLose();
         }
 
+        // Sliding Puzzle Game Functions
+        function setPuzzleDifficulty(difficulty, button) {
+            const settings = {
+                easy: { size: 3 },
+                medium: { size: 4 },
+                hard: { size: 5 }
+            };
+
+            puzzleGameData.difficulty = difficulty;
+            puzzleGameData.gridSize = settings[difficulty].size;
+
+            // Update UI buttons
+            const buttons = document.querySelectorAll('.puzzle-difficulty-btn');
+            buttons.forEach(btn => {
+                btn.style.background = '#667eea';
+            });
+            if (button) {
+                button.style.background = '#28a745';
+            }
+
+            showToast(`🧩 Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`);
+            startPuzzleGame();
+        }
+
+        function startSlidingPuzzleGame() {
+            const gameDiv = document.getElementById('slidingPuzzleGame');
+            gameDiv.style.display = 'block';
+
+            // Load best score for current difficulty
+            const bestScoreKey = `puzzleBestMoves_${puzzleGameData.difficulty}`;
+            puzzleGameData.bestMoves = parseInt(localStorage.getItem(bestScoreKey) || '999');
+            if (puzzleGameData.bestMoves === 999) {
+                document.getElementById('puzzleBestMoves').textContent = '--';
+            } else {
+                document.getElementById('puzzleBestMoves').textContent = puzzleGameData.bestMoves;
+            }
+
+            startPuzzleGame();
+        }
+
+        function initializePuzzle(size) {
+            const totalTiles = size * size;
+            const tiles = [];
+            for (let i = 1; i < totalTiles; i++) {
+                tiles.push(i);
+            }
+            tiles.push(null); // Empty tile
+            return tiles;
+        }
+
+        function shufflePuzzle() {
+            const size = puzzleGameData.gridSize;
+            const tiles = initializePuzzle(size);
+            let emptyIndex = tiles.length - 1;
+
+            // Perform valid moves to shuffle
+            const moveCount = size === 3 ? 50 : size === 4 ? 80 : 120;
+            for (let i = 0; i < moveCount; i++) {
+                const validMoves = getValidPuzzleMoves(emptyIndex, size);
+                if (validMoves.length > 0) {
+                    const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+                    [tiles[emptyIndex], tiles[randomMove]] = [tiles[randomMove], tiles[emptyIndex]];
+                    emptyIndex = randomMove;
+                }
+            }
+
+            puzzleGameData.tiles = tiles;
+            puzzleGameData.moves = 0;
+            puzzleGameData.isComplete = false;
+            document.getElementById('puzzleMovesCount').textContent = '0';
+            document.getElementById('puzzleComplete').style.display = 'none';
+            renderPuzzle();
+        }
+
+        function getValidPuzzleMoves(emptyIndex, size) {
+            const moves = [];
+            const row = Math.floor(emptyIndex / size);
+            const col = emptyIndex % size;
+
+            if (row > 0) moves.push(emptyIndex - size); // Up
+            if (row < size - 1) moves.push(emptyIndex + size); // Down
+            if (col > 0) moves.push(emptyIndex - 1); // Left
+            if (col < size - 1) moves.push(emptyIndex + 1); // Right
+
+            return moves;
+        }
+
+        function startPuzzleGame() {
+            shufflePuzzle();
+            puzzleGameData.gameActive = true;
+        }
+
+        function renderPuzzle() {
+            const grid = document.getElementById('puzzleGrid');
+            const size = puzzleGameData.gridSize;
+            const cellSize = Math.min(60, 280 / size);
+
+            grid.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
+            grid.style.gridTemplateRows = `repeat(${size}, ${cellSize}px)`;
+            grid.innerHTML = '';
+
+            puzzleGameData.tiles.forEach((tile, index) => {
+                const tileDiv = document.createElement('div');
+                tileDiv.style.cssText = `
+                    width: ${cellSize}px;
+                    height: ${cellSize}px;
+                    background: ${tile ? getTileColor(tile) : 'transparent'};
+                    border: ${tile ? '2px solid rgba(255,255,255,0.5)' : 'none'};
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: ${Math.max(16, cellSize/3)}px;
+                    font-weight: bold;
+                    color: white;
+                    cursor: ${tile && !puzzleGameData.isComplete ? 'pointer' : 'default'};
+                    transition: all 0.3s;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                `;
+
+                if (tile) {
+                    tileDiv.textContent = tile;
+                    tileDiv.onclick = () => handleTileClick(index);
+                    tileDiv.onmouseover = () => {
+                        if (!puzzleGameData.isComplete) {
+                            tileDiv.style.transform = 'scale(1.05)';
+                        }
+                    };
+                    tileDiv.onmouseout = () => {
+                        tileDiv.style.transform = 'scale(1)';
+                    };
+                }
+
+                grid.appendChild(tileDiv);
+            });
+        }
+
+        function getTileColor(value) {
+            const hue = (value * 25) % 360;
+            return `hsl(${hue}, 70%, 60%)`;
+        }
+
+        function handleTileClick(index) {
+            if (puzzleGameData.isComplete || !puzzleGameData.gameActive) return;
+
+            const emptyIndex = puzzleGameData.tiles.indexOf(null);
+            const validMoves = getValidPuzzleMoves(emptyIndex, puzzleGameData.gridSize);
+
+            if (validMoves.includes(index)) {
+                // Swap tiles
+                [puzzleGameData.tiles[emptyIndex], puzzleGameData.tiles[index]] =
+                [puzzleGameData.tiles[index], puzzleGameData.tiles[emptyIndex]];
+
+                puzzleGameData.moves++;
+                document.getElementById('puzzleMovesCount').textContent = puzzleGameData.moves;
+
+                renderPuzzle();
+                checkPuzzleCompletion();
+            }
+        }
+
+        function checkPuzzleCompletion() {
+            const tiles = puzzleGameData.tiles;
+            const solved = tiles.every((tile, index) => {
+                if (index === tiles.length - 1) return tile === null;
+                return tile === index + 1;
+            });
+
+            if (solved) {
+                puzzleGameData.isComplete = true;
+                puzzleGameData.gameActive = false;
+
+                // Update best score
+                const bestScoreKey = `puzzleBestMoves_${puzzleGameData.difficulty}`;
+                if (!puzzleGameData.bestMoves || puzzleGameData.moves < puzzleGameData.bestMoves) {
+                    puzzleGameData.bestMoves = puzzleGameData.moves;
+                    localStorage.setItem(bestScoreKey, puzzleGameData.moves.toString());
+                    document.getElementById('puzzleBestMoves').textContent = puzzleGameData.bestMoves;
+                }
+
+                // Show completion message
+                document.getElementById('puzzleFinalMoves').textContent = puzzleGameData.moves;
+                document.getElementById('puzzleComplete').style.display = 'block';
+
+                showToast(`🎉 Puzzle solved in ${puzzleGameData.moves} moves!`);
+            }
+        }
+
         // Make all functions globally accessible for onclick handlers IMMEDIATELY
         window.setGameSpeed = setGameSpeed;
         window.startParkGame = startParkGame;
@@ -4483,6 +4728,10 @@
         window.setSnowSpeed = setSnowSpeed;
         window.startDragonMazeGame = startDragonMazeGame;
         window.setMazeDifficulty = setMazeDifficulty;
+        window.startSlidingPuzzleGame = startSlidingPuzzleGame;
+        window.setPuzzleDifficulty = setPuzzleDifficulty;
+        window.startPuzzleGame = startPuzzleGame;
+        window.shufflePuzzle = shufflePuzzle;
         window.startMazeGame = startMazeGame;
         window.moveDragon = moveDragon;
         window.resetMaze = resetMaze;
