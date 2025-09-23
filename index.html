@@ -349,14 +349,24 @@
         }
 
         /* Speed button highlighting */
+        .speed-btn {
+            background: #667eea;
+            color: white;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
         .speed-btn.speed-selected {
             background: #28a745 !important;
             color: white !important;
+            border: 2px solid #1e7e34 !important;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
         }
 
-        .speed-btn:not(.speed-selected) {
-            background: #667eea !important;
-            color: white !important;
+        .speed-btn:hover:not(.speed-selected) {
+            background: #5a5fcc;
+            transform: scale(1.05);
         }
 
         /* Update Banner */
@@ -894,16 +904,157 @@
             cursor: default;
         }
 
-        /* Responsive */
+        /* Enhanced Mobile & Touch Styles */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .app-container {
+                border-radius: 10px;
+            }
+            .app-header {
+                padding: 15px;
+            }
+            .app-header h1 {
+                font-size: 1.5rem;
+            }
+            .content {
+                padding: 15px;
+            }
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
-
             .nav-tabs {
                 flex-wrap: nowrap;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            .nav-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .nav-tab {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            .quick-add-buttons {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .quick-add-btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            .books-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .book-card {
+                padding: 12px;
+            }
+            .badge-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .milestone-card {
+                padding: 12px;
+            }
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .game-card {
+                padding: 15px;
+            }
+            /* Touch-friendly buttons */
+            button, .btn, .quick-add-btn, .nav-tab {
+                -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+                touch-action: manipulation;
+                user-select: none;
+            }
+            /* Improve input fields for mobile */
+            input, select, textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 12px;
+            }
+            /* Modal adjustments for mobile */
+            .modal-content {
+                margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            /* Dog Park Game mobile adjustments */
+            .mini-game {
+                width: 95%;
+                left: 2.5%;
+                right: 2.5%;
+                top: 10px;
+                transform: none;
+                max-height: calc(100vh - 20px);
+                overflow-y: auto;
+            }
+            .park-game-area {
+                height: 250px;
+            }
+            .game-controls {
+                flex-wrap: wrap;
+            }
+            .game-btn {
+                min-width: 80px;
+                padding: 12px;
+            }
+            /* Touch swipe controls for game */
+            .park-game-area {
+                touch-action: none;
+            }
+        }
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .app-header h1 {
+                font-size: 1.2rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .badge-container {
+                grid-template-columns: 1fr;
+            }
+            .nav-tab {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+        /* Improved touch interactions */
+        @media (hover: none) and (pointer: coarse) {
+            .book-card:active,
+            .quick-add-btn:active,
+            .nav-tab:active,
+            .game-card:active {
+                transform: scale(0.98);
+                transition: transform 0.1s;
+            }
+            /* Larger touch targets */
+            .book-actions button {
+                padding: 10px 15px;
+                margin: 2px;
+            }
+            /* Better scrolling */
+            .books-list,
+            .badge-container,
+            .milestones-list {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        /* Landscape mobile adjustments */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .app-container {
+                max-height: 100vh;
+                overflow-y: auto;
+            }
+            .park-game-area {
+                height: 200px;
             }
         }
     </style>
@@ -1155,9 +1306,24 @@
                     </select>
                 </div>
                 <button class="submit-btn" onclick="saveSettings()">Save Settings</button>
-                <div style="margin-top: 20px;">
-                    <button class="submit-btn" style="background: #28a745;" onclick="exportData()">Export Data 📥</button>
-                    <button class="submit-btn" style="background: #dc3545;" onclick="clearData()">Clear All Data 🗑️</button>
+
+                <!-- Data Management Section -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e9ecef;">
+                    <h3 style="margin-bottom: 15px;">Data Management</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="submit-btn" style="background: #28a745;" onclick="exportData()">📥 Export Backup</button>
+                        <button class="submit-btn" style="background: #17a2b8;" onclick="document.getElementById('importFile').click()">📤 Import Backup</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    </div>
+                    <button class="submit-btn" style="background: #dc3545; margin-top: 20px; width: 100%;" onclick="clearData()">🗑️ Clear All Data</button>
+                    <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                        <small style="color: #6c757d;">
+                            <strong>Backup Tips:</strong><br>
+                            • Export regularly to save your progress<br>
+                            • Import to restore from a previous backup<br>
+                            • Backups include all children, books, and settings
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2005,7 +2171,55 @@
             linkElement.setAttribute('download', exportName);
             linkElement.click();
 
-            showToast('Data exported successfully!');
+            showToast('Data exported successfully! 💾');
+        }
+
+        // Import Data
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+
+                    // Validate the imported data structure
+                    if (!importedData.children || !Array.isArray(importedData.children)) {
+                        throw new Error('Invalid backup file format');
+                    }
+
+                    // Confirm before importing
+                    const bookCount = importedData.children.reduce((total, child) => total + (child.books?.length || 0), 0);
+                    const childCount = importedData.children.length;
+
+                    if (confirm(`Import backup with ${childCount} child profile(s) and ${bookCount} total book(s)? This will replace all current data.`)) {
+                        // Import the data
+                        appData = importedData;
+
+                        // Ensure required fields exist
+                        if (!appData.settings) {
+                            appData.settings = { dailyGoal: 3 };
+                        }
+                        if (!appData.currentChild && appData.children.length > 0) {
+                            appData.currentChild = appData.children[0].id;
+                        }
+
+                        // Save and refresh
+                        saveData();
+                        initApp();
+                        showToast('Data imported successfully! 📤');
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showToast('Failed to import data. Please check the file format.', 'error');
+                }
+
+                // Reset the file input
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
         }
 
         // Clear Data
@@ -2288,14 +2502,63 @@
             // Add keyboard controls
             document.addEventListener('keydown', handleKeyPress);
 
+            // Add touch controls for mobile
+            setupTouchControls();
+
             // Initialize Normal speed button as selected
             document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.classList.remove('speed-selected');
+                btn.style.background = '';
+                btn.style.border = '';
+                btn.style.transform = '';
+                btn.style.boxShadow = '';
+
                 if (btn.textContent === 'Normal') {
                     btn.classList.add('speed-selected');
-                } else {
-                    btn.classList.remove('speed-selected');
+                    btn.style.background = '#28a745';
+                    btn.style.border = '2px solid #1e7e34';
+                    btn.style.transform = 'scale(1.1)';
+                    btn.style.boxShadow = '0 4px 8px rgba(40, 167, 69, 0.3)';
                 }
             });
+        }
+
+        // Setup touch controls for mobile
+        function setupTouchControls() {
+            const gameArea = document.getElementById('parkGameArea');
+            if (!gameArea) return;
+
+            let touchStartY = 0;
+            let dogStartY = 0;
+
+            gameArea.addEventListener('touchstart', (e) => {
+                if (!parkGameData.gameActive || parkGameData.paused) return;
+                e.preventDefault();
+                touchStartY = e.touches[0].clientY;
+                const dog = document.getElementById('dogCharacter');
+                dogStartY = parseInt(dog.style.top) || 300;
+            }, { passive: false });
+
+            gameArea.addEventListener('touchmove', (e) => {
+                if (!parkGameData.gameActive || parkGameData.paused) return;
+                e.preventDefault();
+
+                const dog = document.getElementById('dogCharacter');
+                const gameArea = document.getElementById('parkGameArea');
+                const areaHeight = gameArea.offsetHeight;
+
+                const touchY = e.touches[0].clientY;
+                const deltaY = touchY - touchStartY;
+                let newTop = dogStartY + deltaY;
+
+                // Keep dog within bounds
+                newTop = Math.max(30, Math.min(areaHeight - 60, newTop));
+                dog.style.top = newTop + 'px';
+                parkGameData.dogPosition.y = newTop;
+
+                // Check for collisions
+                checkCollisions();
+            }, { passive: false });
         }
 
         // Handle keyboard input
@@ -2620,14 +2883,26 @@
 
             showToast(`🎮 Speed changed to ${speedNames[speed]} (${speed}x)`);
 
-            // Reset all speed buttons and highlight selected one
+            // Reset all speed buttons first
             document.querySelectorAll('.speed-btn').forEach(btn => {
                 btn.classList.remove('speed-selected');
+                // Force style reset
+                btn.style.background = '';
+                btn.style.border = '';
+                btn.style.transform = '';
+                btn.style.boxShadow = '';
             });
 
-            // Highlight selected speed button
+            // Highlight selected speed button with a slight delay to ensure CSS applies
             if (button) {
-                button.classList.add('speed-selected');
+                setTimeout(() => {
+                    button.classList.add('speed-selected');
+                    // Force the styles to apply
+                    button.style.background = '#28a745';
+                    button.style.border = '2px solid #1e7e34';
+                    button.style.transform = 'scale(1.1)';
+                    button.style.boxShadow = '0 4px 8px rgba(40, 167, 69, 0.3)';
+                }, 10);
             }
         }
 
