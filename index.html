@@ -3676,12 +3676,12 @@
                 snowmanDisplay.innerHTML = '<div style="font-size: 45px; margin: 0;">⚪</div>';
                 showToast(`🎉 Snowman base built! (1/4)`);
             } else if (snowGameData.snowmanParts === 2) {
-                // Body - medium on top of large
-                snowmanDisplay.innerHTML = '<div style="font-size: 35px; margin: -8px 0 0 0;">⚪</div><div style="font-size: 45px; margin: -8px 0 0 0;">⚪</div>';
+                // Body - medium on top of large (less overlap)
+                snowmanDisplay.innerHTML = '<div style="font-size: 35px; margin: -3px 0 0 0;">⚪</div><div style="font-size: 45px; margin: -3px 0 0 0;">⚪</div>';
                 showToast(`🎉 Snowman body built! (2/4)`);
             } else if (snowGameData.snowmanParts === 3) {
-                // Head - small on top of medium on top of large
-                snowmanDisplay.innerHTML = '<div style="font-size: 25px; margin: -5px 0 0 0;">⚪</div><div style="font-size: 35px; margin: -7px 0 0 0;">⚪</div><div style="font-size: 45px; margin: -8px 0 0 0;">⚪</div>';
+                // Head - small on top of medium on top of large (less overlap)
+                snowmanDisplay.innerHTML = '<div style="font-size: 25px; margin: -2px 0 0 0;">⚪</div><div style="font-size: 35px; margin: -3px 0 0 0;">⚪</div><div style="font-size: 45px; margin: -3px 0 0 0;">⚪</div>';
                 showToast(`🎉 Snowman head added! (3/4)`);
             } else if (snowGameData.snowmanParts === 4) {
                 // Complete snowman - big and animated
