@@ -1274,9 +1274,9 @@
                     </div>
                     <div class="game-controls" style="margin-top: 10px;">
                         <label style="margin-right: 10px;">Speed: <strong id="currentSpeedLabel" style="color: #28a745;">Normal (1x)</strong></label>
-                        <button class="game-btn speed-btn" onclick="setGameSpeed(0.5, this)" style="padding: 5px 10px;">Slow</button>
-                        <button class="game-btn speed-btn" onclick="setGameSpeed(1, this)" style="padding: 5px 10px;">Normal</button>
-                        <button class="game-btn speed-btn" onclick="setGameSpeed(1.5, this)" style="padding: 5px 10px;">Fast</button>
+                        <button class="game-btn speed-btn" style="padding: 5px 10px;">Slow</button>
+                        <button class="game-btn speed-btn" style="padding: 5px 10px;">Normal</button>
+                        <button class="game-btn speed-btn" style="padding: 5px 10px;">Fast</button>
                     </div>
                     <div class="high-score">
                         🏆 High Score: <span id="parkHighScore">0</span>
@@ -2505,8 +2505,12 @@
             // Add touch controls for mobile
             setupTouchControls();
 
-            // Initialize Normal speed button as selected
-            document.querySelectorAll('.speed-btn').forEach(btn => {
+            // Initialize Normal speed button as selected and add event listeners
+            const speedButtons = document.querySelectorAll('.speed-btn');
+            console.log('Found speed buttons:', speedButtons.length);
+
+            speedButtons.forEach(btn => {
+                console.log('Setting up button:', btn.textContent);
                 btn.classList.remove('speed-selected');
                 // Clear any inline styles except padding
                 const padding = btn.style.padding;
@@ -2516,6 +2520,20 @@
                 if (btn.textContent === 'Normal') {
                     btn.classList.add('speed-selected');
                 }
+
+                // Remove any existing onclick
+                btn.onclick = null;
+
+                // Add click event listener to each button
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Speed button clicked:', this.textContent);
+                    const speed = this.textContent === 'Slow' ? 0.5 :
+                                 this.textContent === 'Normal' ? 1 : 1.5;
+                    console.log('Calling setGameSpeed with speed:', speed);
+                    setGameSpeed(speed, this);
+                });
             });
         }
 
@@ -2860,7 +2878,13 @@
 
         // Set game speed
         function setGameSpeed(speed, button) {
-            console.log('setGameSpeed called with speed:', speed);
+            console.log('setGameSpeed called with speed:', speed, 'button:', button);
+
+            if (!parkGameData) {
+                console.error('parkGameData is not defined!');
+                return;
+            }
+
             parkGameData.baseSpeed = speed;
 
             // Update display to show base speed
@@ -2999,10 +3023,7 @@
             }
         }
 
-        // Initialize app when page loads
-        window.addEventListener('DOMContentLoaded', initApp);
-
-        // Make all functions globally accessible for onclick handlers
+        // Make all functions globally accessible for onclick handlers IMMEDIATELY
         window.setGameSpeed = setGameSpeed;
         window.startParkGame = startParkGame;
         window.pauseParkGame = pauseParkGame;
@@ -3020,6 +3041,9 @@
         window.toggleCategory = toggleCategory;
         window.addSuggestedBook = addSuggestedBook;
         window.showLockedMessage = showLockedMessage;
+
+        // Initialize app when page loads
+        window.addEventListener('DOMContentLoaded', initApp);
 
         // Developer test mode - Press Ctrl+Shift+G to toggle test mode (G for Games)
         document.addEventListener('keydown', function(e) {
