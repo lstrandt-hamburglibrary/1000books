@@ -2310,6 +2310,10 @@
             if (parkGameData.timerInterval) clearInterval(parkGameData.timerInterval);
             if (parkGameData.itemSpawnInterval) clearInterval(parkGameData.itemSpawnInterval);
 
+            // Preserve certain values
+            const preservedHighScore = parkGameData.highScore || 0;
+            const preservedFacts = parkGameData.factsUnlocked || [];
+
             // Reset game data
             parkGameData = {
                 score: 0,
@@ -2318,19 +2322,24 @@
                 timerInterval: null,
                 gameActive: false,
                 paused: false,
-                highScore: parkGameData.highScore,
+                highScore: preservedHighScore,
                 dogPosition: { x: 50, y: 200 },
                 items: [],
                 itemSpawnInterval: null,
                 gameSpeed: 1,
-                factsUnlocked: parkGameData.factsUnlocked
+                factsUnlocked: preservedFacts
             };
 
             // Reset display
             updateParkDisplay();
 
-            // Clear items
-            document.getElementById('gameItems').innerHTML = '';
+            // Clear all existing items and their intervals
+            document.querySelectorAll('.game-item').forEach(item => {
+                if (item.dataset.moveInterval) {
+                    clearInterval(parseInt(item.dataset.moveInterval));
+                }
+                item.remove();
+            });
 
             // Position dog
             const dog = document.getElementById('dogCharacter');
@@ -2393,7 +2402,15 @@
         // Spawn a single item
         function spawnItem(itemData) {
             const gameArea = document.getElementById('parkGameArea');
-            const itemsContainer = document.getElementById('gameItems');
+            let itemsContainer = document.getElementById('gameItems');
+
+            // Create items container if it doesn't exist
+            if (!itemsContainer) {
+                itemsContainer = document.createElement('div');
+                itemsContainer.id = 'gameItems';
+                itemsContainer.className = 'game-items';
+                gameArea.appendChild(itemsContainer);
+            }
 
             const item = document.createElement('div');
             item.className = 'game-item';
@@ -2428,7 +2445,7 @@
                 }
             }, 30);
 
-            item.dataset.moveInterval = moveInterval;
+            item.dataset.moveInterval = moveInterval.toString();
         }
 
         // Check collisions (for all items when dog moves)
