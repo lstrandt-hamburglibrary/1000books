@@ -2602,14 +2602,12 @@
 
             // Reset all speed buttons to default color
             document.querySelectorAll('.speed-btn').forEach(btn => {
-                btn.style.background = '#667eea';
-                btn.style.color = 'white';
+                btn.setAttribute('style', 'padding: 5px 10px; background: #667eea !important; color: white !important;');
             });
 
             // Highlight selected speed button
             if (button) {
-                button.style.background = '#28a745';
-                button.style.color = 'white';
+                button.setAttribute('style', 'padding: 5px 10px; background: #28a745 !important; color: white !important;');
             }
         }
 
