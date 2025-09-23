@@ -1092,11 +1092,18 @@
                     <div class="dog-fact-display" id="dogFactDisplay" style="display: none;">
                         <h4>🐾 Fun Dog Fact!</h4>
                         <p id="dogFactText"></p>
+                        <button class="game-btn" onclick="continuePlaying()" style="margin-top: 10px;">Continue Playing ▶️</button>
                     </div>
                     <div class="game-controls">
                         <button class="game-btn" onclick="startParkGame()">▶️ Start</button>
                         <button class="game-btn" onclick="pauseParkGame()" id="pauseBtn">⏸️ Pause</button>
                         <button class="game-btn" onclick="resetParkGame()">🔄 New Game</button>
+                    </div>
+                    <div class="game-controls" style="margin-top: 10px;">
+                        <label style="margin-right: 10px;">Speed:</label>
+                        <button class="game-btn" onclick="setGameSpeed(0.5)" style="padding: 5px 10px;">Slow</button>
+                        <button class="game-btn" onclick="setGameSpeed(1)" style="padding: 5px 10px;">Normal</button>
+                        <button class="game-btn" onclick="setGameSpeed(1.5)" style="padding: 5px 10px;">Fast</button>
                     </div>
                     <div class="high-score">
                         🏆 High Score: <span id="parkHighScore">0</span>
@@ -1160,11 +1167,13 @@
             timerInterval: null,
             gameActive: false,
             paused: false,
+            factPaused: false,
             highScore: 0,
             dogPosition: { x: 50, y: 300 },
             items: [],
             itemSpawnInterval: null,
             gameSpeed: 1,
+            baseSpeed: 1,
             factsUnlocked: []
         };
         let testMode = false;
@@ -2313,6 +2322,7 @@
             // Preserve certain values
             const preservedHighScore = parkGameData.highScore || 0;
             const preservedFacts = parkGameData.factsUnlocked || [];
+            const preservedBaseSpeed = parkGameData.baseSpeed || 1;
 
             // Reset game data
             parkGameData = {
@@ -2322,11 +2332,13 @@
                 timerInterval: null,
                 gameActive: false,
                 paused: false,
+                factPaused: false,
                 highScore: preservedHighScore,
                 dogPosition: { x: 50, y: 200 },
                 items: [],
                 itemSpawnInterval: null,
-                gameSpeed: 1,
+                gameSpeed: preservedBaseSpeed,
+                baseSpeed: preservedBaseSpeed,
                 factsUnlocked: preservedFacts
             };
 
@@ -2362,15 +2374,6 @@
 
                 if (parkGameData.timeLeft <= 10) {
                     timerElement.classList.add('timer-warning');
-                }
-
-                // Increase difficulty over time
-                if (parkGameData.timeLeft === 40) {
-                    parkGameData.gameSpeed = 1.5;
-                    document.getElementById('gameSpeed').textContent = '1.5';
-                } else if (parkGameData.timeLeft === 20) {
-                    parkGameData.gameSpeed = 2;
-                    document.getElementById('gameSpeed').textContent = '2';
                 }
 
                 if (parkGameData.timeLeft <= 0) {
@@ -2515,6 +2518,12 @@
 
         // Show dog fact
         function showDogFact() {
+            // Pause the game
+            if (parkGameData.gameActive && !parkGameData.paused) {
+                parkGameData.paused = true;
+                parkGameData.factPaused = true; // Track that fact caused the pause
+            }
+
             const factDisplay = document.getElementById('dogFactDisplay');
             const factText = document.getElementById('dogFactText');
 
@@ -2528,9 +2537,36 @@
                 factText.textContent = dogFacts[factIndex];
                 factDisplay.style.display = 'block';
 
-                setTimeout(() => {
-                    factDisplay.style.display = 'none';
-                }, 5000);
+                // Don't auto-hide - wait for user to click continue
+            } else if (dogFacts.length > 0) {
+                // If all facts shown, recycle them
+                const randomFact = dogFacts[Math.floor(Math.random() * dogFacts.length)];
+                factText.textContent = randomFact;
+                factDisplay.style.display = 'block';
+            }
+        }
+
+        // Continue playing after reading fact
+        function continuePlaying() {
+            document.getElementById('dogFactDisplay').style.display = 'none';
+
+            // Resume game if it was paused by fact
+            if (parkGameData.factPaused) {
+                parkGameData.paused = false;
+                parkGameData.factPaused = false;
+            }
+        }
+
+        // Set game speed
+        function setGameSpeed(speed) {
+            parkGameData.baseSpeed = speed;
+
+            // Update display to show base speed (not including time-based increases)
+            document.getElementById('gameSpeed').textContent = speed + 'x';
+
+            // If game is active, update current speed
+            if (parkGameData.gameActive) {
+                parkGameData.gameSpeed = speed;
             }
         }
 
