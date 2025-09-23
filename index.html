@@ -2276,6 +2276,12 @@
 
             // Add keyboard controls
             document.addEventListener('keydown', handleKeyPress);
+
+            // Set default speed and highlight Normal button
+            const normalBtn = document.querySelector('.speed-btn[onclick*="setGameSpeed(1"]');
+            if (normalBtn) {
+                setGameSpeed(1, normalBtn);
+            }
         }
 
         // Handle keyboard input
