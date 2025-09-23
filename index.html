@@ -526,16 +526,63 @@
             color: #495057;
         }
 
-        .bone-game-board {
+        .game-level-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .level-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .level-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .level-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .game-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .bone-game-board {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
         }
 
         .hiding-spot {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 70px;
             border-radius: 10px;
             cursor: pointer;
             display: flex;
@@ -543,40 +590,103 @@
             justify-content: center;
             font-size: 2rem;
             transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .hiding-spot:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
         .hiding-spot.revealed {
-            background: #e9ecef;
+            background: #dee2e6;
             cursor: not-allowed;
+            transform: rotateY(180deg);
         }
 
         .hiding-spot.found {
-            background: #28a745;
-            animation: bounce 0.5s;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            animation: boneBounce 1s;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+        .hiding-spot.hint {
+            animation: pulse 1s infinite;
         }
 
-        .game-reset-btn {
-            background: #667eea;
-            color: white;
-            border: none;
+        @keyframes boneBounce {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.3) rotate(-10deg); }
+            50% { transform: scale(1.5) rotate(10deg); }
+            75% { transform: scale(1.3) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .game-btn {
+            flex: 1;
             padding: 10px 20px;
+            border: none;
             border-radius: 20px;
             cursor: pointer;
-            width: 100%;
             font-size: 1rem;
+            transition: all 0.3s;
         }
 
-        .game-reset-btn:hover {
+        .hint-btn {
+            background: #ffc107;
+            color: white;
+        }
+
+        .hint-btn:hover:not(:disabled) {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+
+        .hint-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .reset-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .reset-btn:hover {
             background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .high-score {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #495057;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .timer-warning {
+            animation: timerPulse 1s infinite;
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .game-overlay {
@@ -898,17 +1008,43 @@
                 <!-- Find the Bone Game -->
                 <div id="findBoneGame" class="mini-game" style="display: none;">
                     <div class="game-header">
-                        <h3>🐕 Find the Bone!</h3>
+                        <h3>🐕 Clifford's Bone Hunt!</h3>
                         <button class="game-close-btn" onclick="closeGame('findBone')">✕</button>
                     </div>
-                    <div class="game-instructions">
-                        <p>Help Clifford find his hidden bone! Click on the hiding spots.</p>
+                    <div class="game-level-selector">
+                        <button class="level-btn" onclick="setGameLevel(1)" id="level1Btn">Easy (4x4)</button>
+                        <button class="level-btn" onclick="setGameLevel(2)" id="level2Btn">Medium (5x5)</button>
+                        <button class="level-btn" onclick="setGameLevel(3)" id="level3Btn">Hard (6x6)</button>
                     </div>
-                    <div class="game-score">
-                        Score: <span id="boneGameScore">0</span> | Attempts: <span id="boneGameAttempts">0</span>
+                    <div class="game-instructions">
+                        <p id="gameInstructions">Find all 3 bones before time runs out! Watch for hints!</p>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Score:</span>
+                            <span id="boneGameScore">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Time:</span>
+                            <span id="gameTimer">30</span>s
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Bones:</span>
+                            <span id="bonesFound">0</span>/3
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Level:</span>
+                            <span id="currentLevel">1</span>
+                        </div>
                     </div>
                     <div class="bone-game-board" id="boneGameBoard"></div>
-                    <button class="game-reset-btn" onclick="resetBoneGame()">Play Again</button>
+                    <div class="game-controls">
+                        <button class="game-btn hint-btn" onclick="useHint()" id="hintBtn">💡 Hint (3)</button>
+                        <button class="game-btn reset-btn" onclick="resetBoneGame()">🔄 New Game</button>
+                    </div>
+                    <div class="high-score">
+                        🏆 High Score: <span id="highScore">0</span>
+                    </div>
                 </div>
             </div>
 
@@ -962,10 +1098,19 @@
         let selectedRating = '';
         let currentGame = null;
         let boneGameData = {
+            level: 1,
+            gridSize: 4,
             score: 0,
+            totalScore: 0,
             attempts: 0,
-            bonePosition: -1,
-            revealed: []
+            bonePositions: [],
+            bonesFound: 0,
+            revealed: [],
+            hints: 3,
+            timeLeft: 30,
+            timerInterval: null,
+            gameActive: false,
+            highScore: 0
         };
         let testMode = false;
 
@@ -2017,6 +2162,10 @@
             const gameDiv = document.getElementById('findBoneGame');
             gameDiv.style.display = 'block';
 
+            // Load high score
+            boneGameData.highScore = parseInt(localStorage.getItem('boneGameHighScore') || '0');
+            document.getElementById('highScore').textContent = boneGameData.highScore;
+
             // Create overlay
             let overlay = document.getElementById('gameOverlay');
             if (!overlay) {
@@ -2028,35 +2177,97 @@
             }
             overlay.style.display = 'block';
 
+            setGameLevel(1);
+        }
+
+        // Set Game Level
+        function setGameLevel(level) {
+            boneGameData.level = level;
+
+            // Update level buttons
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`level${level}Btn`).classList.add('active');
+
+            // Set grid size based on level
+            boneGameData.gridSize = level === 1 ? 4 : level === 2 ? 5 : 6;
+
             resetBoneGame();
         }
 
         // Reset Bone Game
         function resetBoneGame() {
-            boneGameData = {
-                score: 0,
-                attempts: 0,
-                bonePosition: Math.floor(Math.random() * 16),
-                revealed: []
-            };
+            // Stop any running timer
+            if (boneGameData.timerInterval) {
+                clearInterval(boneGameData.timerInterval);
+            }
 
+            // Reset game data
+            const totalSpots = boneGameData.gridSize * boneGameData.gridSize;
+            const boneCount = 3; // Always find 3 bones
+
+            boneGameData.score = 0;
+            boneGameData.totalScore = 0;
+            boneGameData.attempts = 0;
+            boneGameData.bonesFound = 0;
+            boneGameData.revealed = [];
+            boneGameData.hints = 3;
+            boneGameData.timeLeft = boneGameData.level === 1 ? 45 : boneGameData.level === 2 ? 35 : 30;
+            boneGameData.gameActive = true;
+
+            // Generate random bone positions
+            boneGameData.bonePositions = [];
+            while (boneGameData.bonePositions.length < boneCount) {
+                const pos = Math.floor(Math.random() * totalSpots);
+                if (!boneGameData.bonePositions.includes(pos)) {
+                    boneGameData.bonePositions.push(pos);
+                }
+            }
+
+            // Create game board
             const board = document.getElementById('boneGameBoard');
             board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${boneGameData.gridSize}, 1fr)`;
 
-            for (let i = 0; i < 16; i++) {
+            const icons = ['🌳', '🌲', '🌴', '🌵', '🎄', '🌿'];
+            for (let i = 0; i < totalSpots; i++) {
                 const spot = document.createElement('div');
                 spot.className = 'hiding-spot';
                 spot.innerHTML = '❓';
+                spot.dataset.index = i;
                 spot.onclick = () => checkSpot(i);
                 board.appendChild(spot);
             }
 
-            updateBoneGameScore();
+            updateGameDisplay();
+            startTimer();
+        }
+
+        // Start Timer
+        function startTimer() {
+            boneGameData.timerInterval = setInterval(() => {
+                boneGameData.timeLeft--;
+
+                const timerElement = document.getElementById('gameTimer');
+                timerElement.textContent = boneGameData.timeLeft;
+
+                // Warning when time is running out
+                if (boneGameData.timeLeft <= 10) {
+                    timerElement.classList.add('timer-warning');
+                } else {
+                    timerElement.classList.remove('timer-warning');
+                }
+
+                // Game over when time runs out
+                if (boneGameData.timeLeft <= 0) {
+                    clearInterval(boneGameData.timerInterval);
+                    endGame(false);
+                }
+            }, 1000);
         }
 
         // Check Spot in Bone Game
         function checkSpot(index) {
-            if (boneGameData.revealed.includes(index)) return;
+            if (!boneGameData.gameActive || boneGameData.revealed.includes(index)) return;
 
             boneGameData.attempts++;
             boneGameData.revealed.push(index);
@@ -2064,41 +2275,119 @@
             const spots = document.querySelectorAll('.hiding-spot');
             const spot = spots[index];
 
-            if (index === boneGameData.bonePosition) {
-                // Found the bone!
+            if (boneGameData.bonePositions.includes(index)) {
+                // Found a bone!
                 spot.innerHTML = '🦴';
                 spot.classList.add('found');
-                boneGameData.score += Math.max(100 - (boneGameData.attempts - 1) * 10, 10);
+                boneGameData.bonesFound++;
 
-                // Disable all spots
-                spots.forEach(s => {
-                    s.onclick = null;
-                    if (!s.classList.contains('found')) {
-                        s.classList.add('revealed');
-                    }
-                });
+                // Calculate score based on speed and accuracy
+                const baseScore = 100;
+                const timeBonus = Math.floor(boneGameData.timeLeft * 2);
+                const accuracyBonus = Math.max(0, 50 - (boneGameData.attempts - boneGameData.bonesFound) * 10);
+                const levelMultiplier = boneGameData.level;
 
-                setTimeout(() => {
-                    showToast(`You found the bone! Score: ${boneGameData.score} 🎉`);
-                }, 500);
+                const points = (baseScore + timeBonus + accuracyBonus) * levelMultiplier;
+                boneGameData.score += points;
+                boneGameData.totalScore += points;
+
+                // Show score popup
+                const scorePopup = document.createElement('div');
+                scorePopup.className = 'score-popup';
+                scorePopup.textContent = `+${points}`;
+                scorePopup.style.position = 'absolute';
+                spot.appendChild(scorePopup);
+
+                setTimeout(() => scorePopup.remove(), 1000);
+
+                // Check if all bones found
+                if (boneGameData.bonesFound === 3) {
+                    endGame(true);
+                }
             } else {
-                // Not here
-                spot.innerHTML = '🌳';
+                // Not here - show random nature emoji
+                const emojis = ['🌳', '🌲', '🌴', '🌵', '🎄', '🌿', '🪨', '🍄'];
+                spot.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
                 spot.classList.add('revealed');
             }
 
-            updateBoneGameScore();
+            updateGameDisplay();
         }
 
-        // Update Bone Game Score
-        function updateBoneGameScore() {
-            document.getElementById('boneGameScore').textContent = boneGameData.score;
-            document.getElementById('boneGameAttempts').textContent = boneGameData.attempts;
+        // Use Hint
+        function useHint() {
+            if (!boneGameData.gameActive || boneGameData.hints <= 0) return;
+
+            boneGameData.hints--;
+
+            // Find an unrevealed bone
+            const unrevealedBones = boneGameData.bonePositions.filter(pos => !boneGameData.revealed.includes(pos));
+
+            if (unrevealedBones.length > 0) {
+                const hintPosition = unrevealedBones[Math.floor(Math.random() * unrevealedBones.length)];
+                const spots = document.querySelectorAll('.hiding-spot');
+                const hintSpot = spots[hintPosition];
+
+                // Add pulsing animation
+                hintSpot.classList.add('hint');
+                setTimeout(() => hintSpot.classList.remove('hint'), 2000);
+            }
+
+            updateGameDisplay();
+        }
+
+        // End Game
+        function endGame(won) {
+            boneGameData.gameActive = false;
+            clearInterval(boneGameData.timerInterval);
+
+            // Calculate final score
+            if (won) {
+                const timeBonus = boneGameData.timeLeft * 10 * boneGameData.level;
+                boneGameData.totalScore += timeBonus;
+
+                // Check for high score
+                if (boneGameData.totalScore > boneGameData.highScore) {
+                    boneGameData.highScore = boneGameData.totalScore;
+                    localStorage.setItem('boneGameHighScore', boneGameData.highScore);
+                    document.getElementById('highScore').textContent = boneGameData.highScore;
+                    showToast(`🎉 NEW HIGH SCORE: ${boneGameData.highScore}! 🎉`);
+                } else {
+                    showToast(`🎉 You found all bones! Score: ${boneGameData.totalScore}`);
+                }
+            } else {
+                showToast(`⏰ Time's up! Score: ${boneGameData.totalScore}`);
+            }
+
+            // Reveal all remaining bones
+            const spots = document.querySelectorAll('.hiding-spot');
+            boneGameData.bonePositions.forEach(pos => {
+                if (!boneGameData.revealed.includes(pos)) {
+                    spots[pos].innerHTML = '🦴';
+                    spots[pos].style.opacity = '0.5';
+                }
+            });
+        }
+
+        // Update Game Display
+        function updateGameDisplay() {
+            document.getElementById('boneGameScore').textContent = boneGameData.totalScore;
+            document.getElementById('gameTimer').textContent = boneGameData.timeLeft;
+            document.getElementById('bonesFound').textContent = boneGameData.bonesFound;
+            document.getElementById('currentLevel').textContent = boneGameData.level;
+
+            const hintBtn = document.getElementById('hintBtn');
+            hintBtn.textContent = `💡 Hint (${boneGameData.hints})`;
+            hintBtn.disabled = boneGameData.hints <= 0;
         }
 
         // Close Game
         function closeGame(gameId) {
             if (gameId === 'findBone') {
+                // Stop timer if running
+                if (boneGameData.timerInterval) {
+                    clearInterval(boneGameData.timerInterval);
+                }
                 document.getElementById('findBoneGame').style.display = 'none';
             }
             const overlay = document.getElementById('gameOverlay');
