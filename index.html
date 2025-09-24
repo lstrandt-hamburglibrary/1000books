@@ -3070,6 +3070,12 @@
                 return;
             }
 
+            // Immediately update button to show it's been read
+            const button = document.getElementById(`suggest-${categoryKey}-${bookIndex}`);
+            button.textContent = '✓ Read';
+            button.classList.add('added');
+            button.disabled = true;
+
             const book = bookSuggestions[categoryKey].books[bookIndex];
             const today = new Date().toISOString().split('T')[0];
 
@@ -3098,12 +3104,6 @@
                 showToast(`🏆 New subject badge earned for ${bookSuggestions[categoryKey].name}!`);
                 localStorage.setItem(`subjectBadgeCount_${appData.currentChild}`, earnedBadges.length.toString());
             }
-
-            // Update button to show it's been read
-            const button = document.getElementById(`suggest-${categoryKey}-${bookIndex}`);
-            button.textContent = '✓ Read';
-            button.classList.add('added');
-            button.disabled = true;
 
             // Check for new badges
             checkBadges();
