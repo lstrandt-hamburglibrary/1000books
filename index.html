@@ -2757,21 +2757,23 @@
                 a.title.toLowerCase().localeCompare(b.title.toLowerCase())
             );
 
-            // Display like suggestion books - full width cards
+            // Display full width - one book per row
             container.innerHTML = `
-                <div style="display: grid; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%;">
                     ${sortedBooks.map((book, index) => `
                         <div style="
                             background: white;
-                            padding: 15px;
+                            padding: 15px 20px;
                             border-radius: 10px;
                             display: flex;
                             justify-content: space-between;
                             align-items: center;
                             transition: all 0.3s;
+                            width: 100%;
+                            box-sizing: border-box;
                         " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)'"
                            onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
-                            <div style="flex: 1;">
+                            <div style="flex: 1; min-width: 0;">
                                 <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">
                                     ${book.title} ${book.isFavorite ? '⭐' : ''}
                                 </div>
@@ -2787,6 +2789,8 @@
                                 padding: 8px 15px;
                                 border-radius: 20px;
                                 font-size: 0.9rem;
+                                white-space: nowrap;
+                                margin-left: 15px;
                             ">
                                 ✓ Read ${new Date(book.readDate).toLocaleDateString()}
                             </div>
@@ -2817,21 +2821,23 @@
                 return;
             }
 
-            // Display filtered results in same style
+            // Display filtered results - full width
             container.innerHTML = `
-                <div style="display: grid; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%;">
                     ${sortedFiltered.map((book, index) => `
                         <div style="
                             background: white;
-                            padding: 15px;
+                            padding: 15px 20px;
                             border-radius: 10px;
                             display: flex;
                             justify-content: space-between;
                             align-items: center;
                             transition: all 0.3s;
+                            width: 100%;
+                            box-sizing: border-box;
                         " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)'"
                            onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
-                            <div style="flex: 1;">
+                            <div style="flex: 1; min-width: 0;">
                                 <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">
                                     ${book.title} ${book.isFavorite ? '⭐' : ''}
                                 </div>
@@ -2847,6 +2853,8 @@
                                 padding: 8px 15px;
                                 border-radius: 20px;
                                 font-size: 0.9rem;
+                                white-space: nowrap;
+                                margin-left: 15px;
                             ">
                                 ✓ Read ${new Date(book.readDate).toLocaleDateString()}
                             </div>
