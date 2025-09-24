@@ -2757,44 +2757,38 @@
                 a.title.toLowerCase().localeCompare(b.title.toLowerCase())
             );
 
-            // Display as a simple list
-            container.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 8px; max-width: 900px; margin: 0 auto;">
-                    ${sortedBooks.map((book, index) => `
-                        <div style="
-                            display: flex;
-                            align-items: center;
-                            padding: 10px 12px;
-                            background: white;
-                            border-radius: 8px;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                            transition: transform 0.2s;
-                        " onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
-                            <div style="
-                                flex: 0 0 35px;
-                                text-align: center;
-                                color: #adb5bd;
-                                font-size: 0.85em;
-                            ">${index + 1}</div>
-                            <div style="
-                                flex: 1;
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                overflow: hidden;
-                            ">
-                                <span style="font-weight: bold; color: #495057;">
-                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
-                                </span>
-                                ${book.author ? `<span style="color: #6c757d; font-size: 0.9em;">by ${book.author}</span>` : ''}
-                            </div>
-                            <div style="color: #adb5bd; font-size: 0.85em; flex: 0 0 85px; text-align: right;">
-                                ${new Date(book.readDate).toLocaleDateString()}
-                            </div>
-                        </div>
-                    `).join('')}
+            // Display as a simple full-width list
+            container.innerHTML = sortedBooks.map((book, index) => `
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    padding: 10px 20px;
+                    background: white;
+                    border-bottom: 1px solid #e9ecef;
+                    transition: background 0.2s;
+                " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                    <div style="
+                        flex: 0 0 50px;
+                        color: #adb5bd;
+                        font-size: 0.85em;
+                    ">${index + 1}.</div>
+                    <div style="
+                        flex: 1;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    ">
+                        <span style="font-weight: 600; color: #495057;">
+                            ${book.title}
+                        </span>
+                        ${book.isFavorite ? '⭐' : ''}
+                        ${book.author ? ` <span style="color: #6c757d;">by ${book.author}</span>` : ''}
+                    </div>
+                    <div style="color: #adb5bd; font-size: 0.85em; padding-left: 20px;">
+                        ${new Date(book.readDate).toLocaleDateString()}
+                    </div>
                 </div>
-            `;
+            `).join('');
         }
 
         // Search Books
@@ -2819,43 +2813,37 @@
             }
 
             // Display filtered results in same simple list style
-            container.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 8px; max-width: 900px; margin: 0 auto;">
-                    ${sortedFiltered.map((book, index) => `
-                        <div style="
-                            display: flex;
-                            align-items: center;
-                            padding: 10px 12px;
-                            background: white;
-                            border-radius: 8px;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                            transition: transform 0.2s;
-                        " onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
-                            <div style="
-                                flex: 0 0 35px;
-                                text-align: center;
-                                color: #adb5bd;
-                                font-size: 0.85em;
-                            ">${index + 1}</div>
-                            <div style="
-                                flex: 1;
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                overflow: hidden;
-                            ">
-                                <span style="font-weight: bold; color: #495057;">
-                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
-                                </span>
-                                ${book.author ? `<span style="color: #6c757d; font-size: 0.9em;">by ${book.author}</span>` : ''}
-                            </div>
-                            <div style="color: #adb5bd; font-size: 0.85em; flex: 0 0 85px; text-align: right;">
-                                ${new Date(book.readDate).toLocaleDateString()}
-                            </div>
-                        </div>
-                    `).join('')}
+            container.innerHTML = sortedFiltered.map((book, index) => `
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    padding: 10px 20px;
+                    background: white;
+                    border-bottom: 1px solid #e9ecef;
+                    transition: background 0.2s;
+                " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                    <div style="
+                        flex: 0 0 50px;
+                        color: #adb5bd;
+                        font-size: 0.85em;
+                    ">${index + 1}.</div>
+                    <div style="
+                        flex: 1;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    ">
+                        <span style="font-weight: 600; color: #495057;">
+                            ${book.title}
+                        </span>
+                        ${book.isFavorite ? '⭐' : ''}
+                        ${book.author ? ` <span style="color: #6c757d;">by ${book.author}</span>` : ''}
+                    </div>
+                    <div style="color: #adb5bd; font-size: 0.85em; padding-left: 20px;">
+                        ${new Date(book.readDate).toLocaleDateString()}
+                    </div>
                 </div>
-            `;
+            `).join('');
         }
 
         // Initialize Badges
