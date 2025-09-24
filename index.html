@@ -2740,7 +2740,7 @@
         // Display Library
         function displayLibrary() {
             if (appData.currentChild === null || !appData.children[appData.currentChild]) {
-                document.getElementById('libraryGrid').innerHTML = '<p style="color: #6c757d; text-align: center; grid-column: 1/-1;">Please select a child first.</p>';
+                document.getElementById('libraryGrid').innerHTML = '<p style="color: #6c757d; text-align: center;">Please select a child first.</p>';
                 return;
             }
 
@@ -2748,19 +2748,47 @@
             const container = document.getElementById('libraryGrid');
 
             if (books.length === 0) {
-                container.innerHTML = '<p style="color: #6c757d; text-align: center; grid-column: 1/-1;">Your library is empty. Start adding books!</p>';
+                container.innerHTML = '<p style="color: #6c757d; text-align: center;">Your library is empty. Start adding books!</p>';
                 return;
             }
 
-            container.innerHTML = books.map(book => `
-                <div class="book-card">
-                    <div class="book-title">${book.title} ${book.isFavorite ? '⭐' : ''}</div>
-                    ${book.author ? `<div class="book-author">by ${book.author}</div>` : ''}
-                    <div class="book-date">Read on ${new Date(book.readDate).toLocaleDateString()}</div>
-                    <div class="book-rating">${book.rating === 'love' ? '😍 Loved it!' : book.rating === 'like' ? '😊 Liked it' : book.rating === 'okay' ? '😐 It was okay' : ''}</div>
-                    ${book.notes ? `<div style="margin-top: 10px; font-size: 0.9rem; color: #6c757d;">${book.notes}</div>` : ''}
+            // Sort books alphabetically by title
+            const sortedBooks = [...books].sort((a, b) =>
+                a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+            );
+
+            // Display as a simple list
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 10px; max-width: 800px; margin: 0 auto;">
+                    ${sortedBooks.map((book, index) => `
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            padding: 12px;
+                            background: white;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div style="
+                                flex: 0 0 40px;
+                                text-align: center;
+                                color: #adb5bd;
+                                font-size: 0.9em;
+                            ">${index + 1}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: #495057;">
+                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
+                                </div>
+                                ${book.author ? `<div style="color: #6c757d; font-size: 0.9em;">by ${book.author}</div>` : ''}
+                            </div>
+                            <div style="text-align: right; color: #adb5bd; font-size: 0.85em;">
+                                ${new Date(book.readDate).toLocaleDateString()}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
 
         // Search Books
@@ -2770,22 +2798,52 @@
 
             const filtered = books.filter(book =>
                 book.title.toLowerCase().includes(query) ||
-                book.author.toLowerCase().includes(query)
+                (book.author && book.author.toLowerCase().includes(query))
+            );
+
+            // Sort filtered results alphabetically
+            const sortedFiltered = filtered.sort((a, b) =>
+                a.title.toLowerCase().localeCompare(b.title.toLowerCase())
             );
 
             const container = document.getElementById('libraryGrid');
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="color: #6c757d; text-align: center; grid-column: 1/-1;">No books found.</p>';
+            if (sortedFiltered.length === 0) {
+                container.innerHTML = '<p style="color: #6c757d; text-align: center;">No books found.</p>';
                 return;
             }
 
-            container.innerHTML = filtered.map(book => `
-                <div class="book-card">
-                    <div class="book-title">${book.title} ${book.isFavorite ? '⭐' : ''}</div>
-                    ${book.author ? `<div class="book-author">by ${book.author}</div>` : ''}
-                    <div class="book-date">Read on ${new Date(book.readDate).toLocaleDateString()}</div>
+            // Display filtered results in same simple list style
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 10px; max-width: 800px; margin: 0 auto;">
+                    ${sortedFiltered.map((book, index) => `
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            padding: 12px;
+                            background: white;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div style="
+                                flex: 0 0 40px;
+                                text-align: center;
+                                color: #adb5bd;
+                                font-size: 0.9em;
+                            ">${index + 1}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: #495057;">
+                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
+                                </div>
+                                ${book.author ? `<div style="color: #6c757d; font-size: 0.9em;">by ${book.author}</div>` : ''}
+                            </div>
+                            <div style="text-align: right; color: #adb5bd; font-size: 0.85em;">
+                                ${new Date(book.readDate).toLocaleDateString()}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
 
         // Initialize Badges
