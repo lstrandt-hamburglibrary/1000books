@@ -1013,16 +1013,15 @@
 
         .suggestion-category-content {
             padding: 0 20px 20px 20px;
-            max-height: 1000px;
+            max-height: none;
             opacity: 1;
-            transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+            transition: opacity 0.3s ease, padding 0.3s ease;
         }
 
         .suggestion-category.collapsed .suggestion-category-content {
-            max-height: 0;
+            display: none;
             opacity: 0;
             padding: 0 20px;
-            overflow: hidden;
         }
 
         .suggestion-books {
@@ -3395,7 +3394,7 @@
                 categoryDiv.innerHTML = `
                     <div class="suggestion-category-header">
                         <h3>
-                            ${category.emoji} ${category.name}
+                            ${category.emoji} ${category.name} <span style="font-size: 0.8em; color: #6c757d;">(${category.books.length} books)</span>
                             ${hasBadge ? `
                                 <span style="
                                     display: inline-block;
@@ -5463,6 +5462,47 @@
                 const gamesPage = document.getElementById('games');
                 if (gamesPage && gamesPage.classList.contains('active')) {
                     displayGames();
+                }
+            }
+        });
+
+        // Mobile test mode activation - tap the Games tab title 5 times quickly
+        let tapCount = 0;
+        let tapTimer = null;
+
+        // Listen for taps on the Games page title
+        document.addEventListener('click', function(e) {
+            // Check if clicking on Games tab content title or the Games nav button
+            const isGamesTitle = e.target.tagName === 'H2' && e.target.textContent.includes('🎮 Games');
+            const isGamesNavButton = e.target.classList.contains('nav-button') && e.target.textContent.includes('Games');
+
+            if (isGamesTitle || isGamesNavButton) {
+                tapCount++;
+
+                // Clear previous timer
+                if (tapTimer) clearTimeout(tapTimer);
+
+                // Reset count after 2 seconds
+                tapTimer = setTimeout(() => {
+                    tapCount = 0;
+                }, 2000);
+
+                // Activate test mode after 5 taps
+                if (tapCount >= 5) {
+                    testMode = !testMode;
+                    tapCount = 0;
+
+                    if (testMode) {
+                        showToast('🎮 Test Mode ENABLED - All games unlocked!');
+                    } else {
+                        showToast('Test Mode disabled');
+                    }
+
+                    // Refresh games page if currently viewing it
+                    const gamesPage = document.getElementById('games');
+                    if (gamesPage && gamesPage.classList.contains('active')) {
+                        displayGames();
+                    }
                 }
             }
         });
