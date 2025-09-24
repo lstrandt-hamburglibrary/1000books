@@ -3,12 +3,12 @@ const VERSION = '1.0.1';
 const CACHE_NAME = `bookworm-v${VERSION}`;
 
 const urlsToCache = [
-  '/',
-  '/1000-books-app.html',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg'
+  './',
+  './index.html',
+  './js/bookSuggestions.js',
+  './manifest.json',
+  './icon-192.svg',
+  './icon-512.svg'
 ];
 
 // Install service worker
