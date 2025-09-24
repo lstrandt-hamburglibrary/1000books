@@ -2953,6 +2953,14 @@
                 badgesByCategory[badge.category] = badge.count;
             });
 
+            // Get current child's books to check what's been read
+            const childBooks = appData.currentChild !== null && appData.children[appData.currentChild]
+                ? appData.children[appData.currentChild].books || []
+                : [];
+
+            // Create a set of book titles that have been read (for faster lookup)
+            const readBookTitles = new Set(childBooks.map(book => book.title.toLowerCase()));
+
             let categoryIndex = 0;
             for (const [key, category] of Object.entries(bookSuggestions)) {
                 if (filter !== 'all' && filter !== key) continue;
@@ -2984,19 +2992,25 @@
                     </div>
                     <div class="suggestion-category-content">
                         <div class="suggestion-books">
-                            ${category.books.map((book, index) => `
-                                <div class="suggestion-book">
-                                    <div class="suggestion-book-info">
-                                        <div class="suggestion-book-title">${book.title}</div>
-                                        <div class="suggestion-book-author">by ${book.author}</div>
-                                        <div class="suggestion-book-age">Ages ${book.age}</div>
+                            ${category.books.map((book, index) => {
+                                const isRead = readBookTitles.has(book.title.toLowerCase());
+                                return `
+                                    <div class="suggestion-book">
+                                        <div class="suggestion-book-info">
+                                            <div class="suggestion-book-title">${book.title}</div>
+                                            <div class="suggestion-book-author">by ${book.author}</div>
+                                            <div class="suggestion-book-age">Ages ${book.age}</div>
+                                        </div>
+                                        <button class="add-suggestion-btn ${isRead ? 'added' : ''}"
+                                                id="suggest-${key}-${index}"
+                                                data-category="${key}"
+                                                data-index="${index}"
+                                                ${isRead ? 'disabled' : ''}>
+                                            ${isRead ? '✓ Read' : 'Add Book'}
+                                        </button>
                                     </div>
-                                    <button class="add-suggestion-btn" id="suggest-${key}-${index}"
-                                            data-category="${key}" data-index="${index}">
-                                        Add Book
-                                    </button>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
@@ -3085,9 +3099,9 @@
                 localStorage.setItem(`subjectBadgeCount_${appData.currentChild}`, earnedBadges.length.toString());
             }
 
-            // Update button to show it's been added
+            // Update button to show it's been read
             const button = document.getElementById(`suggest-${categoryKey}-${bookIndex}`);
-            button.textContent = '✓ Added';
+            button.textContent = '✓ Read';
             button.classList.add('added');
             button.disabled = true;
 
