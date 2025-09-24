@@ -2705,6 +2705,16 @@
                 if (booksInCategory === 3) {
                     // Just earned a badge for this category!
                     showToast(`🏆 Subject badge earned for ${bookSuggestions[book.category].name}! You've read 3 books in this category!`);
+
+                    // Update badge displays if on games or suggestions page
+                    const activePage = document.querySelector('.page.active');
+                    if (activePage) {
+                        if (activePage.id === 'games') {
+                            displaySubjectBadges();
+                        } else if (activePage.id === 'suggestions') {
+                            displaySuggestions();
+                        }
+                    }
                 }
             }
 
@@ -3119,6 +3129,16 @@
             if (booksInCategory === 3) {
                 // Just earned a badge for this category!
                 showToast(`🏆 Subject badge earned for ${bookSuggestions[categoryKey].name}! You've read 3 books in this category!`);
+
+                // Update badge displays if on games or suggestions page
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    if (activePage.id === 'games') {
+                        displaySubjectBadges();
+                    } else if (activePage.id === 'suggestions') {
+                        displaySuggestions();
+                    }
+                }
             }
 
             // Check for new badges
