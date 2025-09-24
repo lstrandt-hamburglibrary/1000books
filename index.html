@@ -2696,12 +2696,16 @@
             // Check for new badges
             checkBadges();
 
-            // Check for subject badges
-            const earnedBadges = checkSubjectBadges();
-            const previousBadgeCount = parseInt(localStorage.getItem(`subjectBadgeCount_${appData.currentChild}`) || '0');
-            if (earnedBadges.length > previousBadgeCount) {
-                showToast(`🏆 New subject badge earned! Check the games page!`);
-                localStorage.setItem(`subjectBadgeCount_${appData.currentChild}`, earnedBadges.length.toString());
+            // Check if this category just earned a badge (3 books)
+            if (book.category && bookSuggestions[book.category]) {
+                const booksInCategory = appData.children[appData.currentChild].books.filter(
+                    b => b.category === book.category
+                ).length;
+
+                if (booksInCategory === 3) {
+                    // Just earned a badge for this category!
+                    showToast(`🏆 Subject badge earned for ${bookSuggestions[book.category].name}! You've read 3 books in this category!`);
+                }
             }
 
             // Reset form
@@ -3107,12 +3111,14 @@
             const childId = appData.children[appData.currentChild].id;
             updateStreak(childId);
 
-            // Check for subject badges
-            const earnedBadges = checkSubjectBadges();
-            const previousBadgeCount = parseInt(localStorage.getItem(`subjectBadgeCount_${appData.currentChild}`) || '0');
-            if (earnedBadges.length > previousBadgeCount) {
-                showToast(`🏆 New subject badge earned for ${bookSuggestions[categoryKey].name}!`);
-                localStorage.setItem(`subjectBadgeCount_${appData.currentChild}`, earnedBadges.length.toString());
+            // Check if this category just earned a badge (3 books)
+            const booksInCategory = appData.children[appData.currentChild].books.filter(
+                b => b.category === categoryKey
+            ).length;
+
+            if (booksInCategory === 3) {
+                // Just earned a badge for this category!
+                showToast(`🏆 Subject badge earned for ${bookSuggestions[categoryKey].name}! You've read 3 books in this category!`);
             }
 
             // Check for new badges
