@@ -2945,6 +2945,13 @@
 
             container.innerHTML = '';
 
+            // Get current badges to check which categories have been earned
+            const earnedBadges = checkSubjectBadges();
+            const badgesByCategory = {};
+            earnedBadges.forEach(badge => {
+                badgesByCategory[badge.category] = badge.count;
+            });
+
             let categoryIndex = 0;
             for (const [key, category] of Object.entries(bookSuggestions)) {
                 if (filter !== 'all' && filter !== key) continue;
@@ -2952,9 +2959,26 @@
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'suggestion-category collapsed';
                 categoryDiv.id = `category-${key}`;
+                const hasBadge = badgesByCategory[key] !== undefined;
+                const bookCount = badgesByCategory[key] || 0;
+
                 categoryDiv.innerHTML = `
                     <div class="suggestion-category-header" onclick="toggleCategory('${key}')">
-                        <h3>${category.emoji} ${category.name}</h3>
+                        <h3>
+                            ${category.emoji} ${category.name}
+                            ${hasBadge ? `
+                                <span style="
+                                    display: inline-block;
+                                    margin-left: 10px;
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white;
+                                    padding: 2px 8px;
+                                    border-radius: 12px;
+                                    font-size: 0.8em;
+                                    font-weight: normal;
+                                ">🏆 Badge Earned! (${bookCount} books)</span>
+                            ` : ''}
+                        </h3>
                         <span class="expand-icon">▼</span>
                     </div>
                     <div class="suggestion-category-content">
