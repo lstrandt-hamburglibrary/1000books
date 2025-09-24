@@ -2756,45 +2756,48 @@
                 a.title.toLowerCase().localeCompare(b.title.toLowerCase())
             );
 
-            // Display full width - one book per row
+            // Display as a compact table-like list
             container.innerHTML = `
-                <div style="display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%;">
-                    ${sortedBooks.map((book, index) => `
-                        <div style="
-                            background: white;
-                            padding: 15px 20px;
-                            border-radius: 10px;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            transition: all 0.3s;
-                            width: 100%;
-                            box-sizing: border-box;
-                        " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)'"
-                           onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">
-                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
-                                </div>
-                                ${book.author ? `<div style="color: #6c757d; font-size: 0.9rem;">by ${book.author}</div>` : ''}
-                                ${book.category && bookSuggestions[book.category] ?
-                                    `<div style="color: #adb5bd; font-size: 0.85rem; margin-top: 3px;">
-                                        ${bookSuggestions[book.category].emoji} ${bookSuggestions[book.category].name}
-                                    </div>` : ''}
-                            </div>
+                <div style="width: 100%; background: white; border-radius: 10px; overflow: hidden;">
+                    <div style="display: table; width: 100%; border-collapse: collapse;">
+                        ${sortedBooks.map((book, index) => `
                             <div style="
-                                background: #28a745;
-                                color: white;
-                                padding: 8px 15px;
-                                border-radius: 20px;
-                                font-size: 0.9rem;
-                                white-space: nowrap;
-                                margin-left: 15px;
-                            ">
-                                ✓ Read ${new Date(book.readDate).toLocaleDateString()}
+                                display: table-row;
+                                transition: background 0.2s;
+                            " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                                <div style="
+                                    display: table-cell;
+                                    padding: 12px 15px;
+                                    border-bottom: 1px solid #e9ecef;
+                                    width: 40px;
+                                    color: #adb5bd;
+                                    font-size: 0.85em;
+                                    vertical-align: middle;
+                                ">${index + 1}</div>
+                                <div style="
+                                    display: table-cell;
+                                    padding: 12px 15px;
+                                    border-bottom: 1px solid #e9ecef;
+                                    vertical-align: middle;
+                                ">
+                                    <span style="font-weight: 600; color: #495057;">
+                                        ${book.title} ${book.isFavorite ? '⭐' : ''}
+                                    </span>
+                                    ${book.author ? ` <span style="color: #6c757d; font-size: 0.9em;">— ${book.author}</span>` : ''}
+                                </div>
+                                <div style="
+                                    display: table-cell;
+                                    padding: 12px 15px;
+                                    border-bottom: 1px solid #e9ecef;
+                                    color: #adb5bd;
+                                    font-size: 0.85em;
+                                    text-align: right;
+                                    width: 100px;
+                                    vertical-align: middle;
+                                ">${new Date(book.readDate).toLocaleDateString()}</div>
                             </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
                 </div>
             `;
         }
@@ -2820,45 +2823,39 @@
                 return;
             }
 
-            // Display filtered results - full width
+            // Display filtered results - compact table format
             container.innerHTML = `
-                <div style="display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%;">
-                    ${sortedFiltered.map((book, index) => `
-                        <div style="
-                            background: white;
-                            padding: 15px 20px;
-                            border-radius: 10px;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            transition: all 0.3s;
-                            width: 100%;
-                            box-sizing: border-box;
-                        " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)'"
-                           onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">
-                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
-                                </div>
-                                ${book.author ? `<div style="color: #6c757d; font-size: 0.9rem;">by ${book.author}</div>` : ''}
-                                ${book.category && bookSuggestions[book.category] ?
-                                    `<div style="color: #adb5bd; font-size: 0.85rem; margin-top: 3px;">
-                                        ${bookSuggestions[book.category].emoji} ${bookSuggestions[book.category].name}
-                                    </div>` : ''}
-                            </div>
-                            <div style="
-                                background: #28a745;
-                                color: white;
-                                padding: 8px 15px;
-                                border-radius: 20px;
-                                font-size: 0.9rem;
-                                white-space: nowrap;
-                                margin-left: 15px;
-                            ">
-                                ✓ Read ${new Date(book.readDate).toLocaleDateString()}
-                            </div>
+                <div style="width: 100%; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="display: table; width: 100%; border-collapse: collapse;">
+                        <div style="display: table-row; background: #f8f9fa; font-weight: bold;">
+                            <div style="display: table-cell; padding: 12px 15px; border-bottom: 2px solid #dee2e6; width: 50px;">#</div>
+                            <div style="display: table-cell; padding: 12px 15px; border-bottom: 2px solid #dee2e6;">Book Details</div>
+                            <div style="display: table-cell; padding: 12px 15px; border-bottom: 2px solid #dee2e6; width: 140px;">Category</div>
+                            <div style="display: table-cell; padding: 12px 15px; border-bottom: 2px solid #dee2e6; width: 120px;">Date Read</div>
                         </div>
-                    `).join('')}
+                        ${sortedFiltered.map((book, index) => `
+                            <div style="display: table-row; transition: background 0.2s;"
+                                 onmouseover="this.style.background='#f8f9fa'"
+                                 onmouseout="this.style.background='white'">
+                                <div style="display: table-cell; padding: 12px 15px; border-bottom: 1px solid #e9ecef; color: #6c757d; vertical-align: top;">
+                                    ${index + 1}
+                                </div>
+                                <div style="display: table-cell; padding: 12px 15px; border-bottom: 1px solid #e9ecef; vertical-align: top;">
+                                    <div style="font-weight: 500; color: #2c3e50;">
+                                        ${book.title} ${book.isFavorite ? '⭐' : ''}
+                                    </div>
+                                    ${book.author ? `<div style="color: #6c757d; font-size: 14px; margin-top: 2px;">by ${book.author}</div>` : ''}
+                                </div>
+                                <div style="display: table-cell; padding: 12px 15px; border-bottom: 1px solid #e9ecef; color: #6c757d; font-size: 14px; vertical-align: top;">
+                                    ${book.category && bookSuggestions[book.category] ?
+                                        `${bookSuggestions[book.category].emoji} ${bookSuggestions[book.category].name}` : '-'}
+                                </div>
+                                <div style="display: table-cell; padding: 12px 15px; border-bottom: 1px solid #e9ecef; color: #6c757d; font-size: 14px; vertical-align: top;">
+                                    ${new Date(book.readDate).toLocaleDateString()}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
             `;
         }
