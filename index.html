@@ -2308,6 +2308,11 @@
 
         // Streak Management Functions
         function getStreakData(childId) {
+            // Initialize streaks object if it doesn't exist
+            if (!appData.streaks) {
+                appData.streaks = {};
+            }
+
             if (!appData.streaks[childId]) {
                 appData.streaks[childId] = {
                     currentStreak: 0,
@@ -3032,7 +3037,7 @@
             if (container) {
                 container.addEventListener('click', function(e) {
                     // Handle add book button clicks
-                    if (e.target.classList.contains('add-suggestion-btn')) {
+                    if (e.target.classList.contains('add-suggestion-btn') && !e.target.disabled) {
                         e.preventDefault();
                         const categoryKey = e.target.dataset.category;
                         const bookIndex = parseInt(e.target.dataset.index);
@@ -3040,6 +3045,7 @@
                     }
                     // Handle category header clicks
                     else if (e.target.closest('.suggestion-category-header')) {
+                        e.preventDefault();
                         const header = e.target.closest('.suggestion-category-header');
                         const categoryDiv = header.parentElement;
                         const key = categoryDiv.id.replace('category-', '');
@@ -3072,9 +3078,11 @@
 
             // Immediately update button to show it's been read
             const button = document.getElementById(`suggest-${categoryKey}-${bookIndex}`);
-            button.textContent = '✓ Read';
-            button.classList.add('added');
-            button.disabled = true;
+            if (button) {
+                button.textContent = '✓ Read';
+                button.classList.add('added');
+                button.disabled = true;
+            }
 
             const book = bookSuggestions[categoryKey].books[bookIndex];
             const today = new Date().toISOString().split('T')[0];
