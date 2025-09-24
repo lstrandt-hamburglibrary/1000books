@@ -1343,6 +1343,12 @@
                         <input type="date" id="readDate" required>
                     </div>
                     <div class="form-group">
+                        <label for="bookCategory">Category (optional)</label>
+                        <select id="bookCategory">
+                            <option value="">Select a category...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>How did you like it?</label>
                         <div class="rating-buttons">
                             <button type="button" class="rating-btn" onclick="selectRating(this, 'love')">😍 Loved it!</button>
@@ -1411,6 +1417,16 @@
                 <div class="games-intro">
                     <p>Complete reading challenges to unlock fun games!</p>
                 </div>
+
+                <!-- Subject Badges Section -->
+                <div id="subjectBadgesSection" style="margin: 30px 0;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📚 Subject Badges</h3>
+                    <p style="color: #6c757d; margin-bottom: 20px;">Read 3 or more books from any category to earn a subject badge!</p>
+                    <div id="subjectBadgesGrid" class="badges-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                        <!-- Subject badges will be displayed here -->
+                    </div>
+                </div>
+
                 <div class="games-grid" id="gamesGrid"></div>
 
                 <!-- Dog Park Dash Game -->
@@ -2120,6 +2136,24 @@
             initializeMilestones();
             checkForUpdates();
             registerServiceWorker();
+            populateCategoryDropdown();
+        }
+
+        // Populate Category Dropdown
+        function populateCategoryDropdown() {
+            const categorySelect = document.getElementById('bookCategory');
+            if (categorySelect) {
+                // Clear existing options except the first one
+                categorySelect.innerHTML = '<option value="">Select a category...</option>';
+
+                // Add all categories from bookSuggestions
+                Object.entries(bookSuggestions).forEach(([key, category]) => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = `${category.emoji} ${category.name}`;
+                    categorySelect.appendChild(option);
+                });
+            }
         }
 
         // Register Service Worker
@@ -2642,7 +2676,8 @@
                 readDate: document.getElementById('readDate').value,
                 rating: selectedRating,
                 notes: document.getElementById('notes').value,
-                isFavorite: document.getElementById('isFavorite').checked
+                isFavorite: document.getElementById('isFavorite').checked,
+                category: document.getElementById('bookCategory')?.value || null
             };
 
             appData.children[appData.currentChild].books.push(book);
@@ -2654,6 +2689,14 @@
 
             // Check for new badges
             checkBadges();
+
+            // Check for subject badges
+            const earnedBadges = checkSubjectBadges();
+            const previousBadgeCount = parseInt(localStorage.getItem(`subjectBadgeCount_${appData.currentChild}`) || '0');
+            if (earnedBadges.length > previousBadgeCount) {
+                showToast(`🏆 New subject badge earned! Check the games page!`);
+                localStorage.setItem(`subjectBadgeCount_${appData.currentChild}`, earnedBadges.length.toString());
+            }
 
             // Reset form
             document.getElementById('addBookForm').reset();
@@ -2974,7 +3017,8 @@
                 readDate: today,
                 rating: '',
                 notes: `Suggested for ages ${book.age}`,
-                isFavorite: false
+                isFavorite: false,
+                category: categoryKey
             };
 
             appData.children[appData.currentChild].books.push(newBook);
@@ -2983,6 +3027,14 @@
             // Update streak
             const childId = appData.children[appData.currentChild].id;
             updateStreak(childId);
+
+            // Check for subject badges
+            const earnedBadges = checkSubjectBadges();
+            const previousBadgeCount = parseInt(localStorage.getItem(`subjectBadgeCount_${appData.currentChild}`) || '0');
+            if (earnedBadges.length > previousBadgeCount) {
+                showToast(`🏆 New subject badge earned for ${bookSuggestions[categoryKey].name}!`);
+                localStorage.setItem(`subjectBadgeCount_${appData.currentChild}`, earnedBadges.length.toString());
+            }
 
             // Update button to show it's been added
             const button = document.getElementById(`suggest-${categoryKey}-${bookIndex}`);
@@ -3019,6 +3071,9 @@
         function displayGames() {
             const container = document.getElementById('gamesGrid');
 
+            // Display subject badges
+            displaySubjectBadges();
+
             // Check if games should be unlocked
             const unlockedGames = checkUnlockedGames();
 
@@ -3027,7 +3082,7 @@
                     id: 'dogPark',
                     name: 'Dog Park Dash',
                     icon: '🦴',
-                    requirement: 'Read all 10 Dog Stories',
+                    requirement: 'Read 10 books',
                     unlocked: unlockedGames.dogPark,
                     action: () => startDogParkGame()
                 },
@@ -3035,7 +3090,7 @@
                     id: 'letterMatch',
                     name: 'Letter Match',
                     icon: '🔤',
-                    requirement: 'Read all 10 Early Learning books',
+                    requirement: 'Read 25 books',
                     unlocked: unlockedGames.letterMatch,
                     action: () => showToast('Letter Match game coming soon!')
                 },
@@ -3043,15 +3098,23 @@
                     id: 'storyTime',
                     name: 'Story Builder',
                     icon: '📝',
-                    requirement: 'Read all 10 Adventure Stories',
+                    requirement: 'Read 40 books',
                     unlocked: unlockedGames.storyBuilder,
                     action: () => showToast('Story Builder game coming soon!')
+                },
+                {
+                    id: 'slidingPuzzle',
+                    name: 'Sliding Puzzle',
+                    icon: '🧩',
+                    requirement: 'Read 50 books',
+                    unlocked: unlockedGames.slidingPuzzle,
+                    action: () => startSlidingPuzzleGame()
                 },
                 {
                     id: 'snowflake',
                     name: 'Snowflake Catcher',
                     icon: '❄️',
-                    requirement: 'Read all 10 Winter Stories',
+                    requirement: 'Read 75 books',
                     unlocked: unlockedGames.snowflake,
                     action: () => startSnowflakeGame()
                 },
@@ -3059,23 +3122,15 @@
                     id: 'dragonMaze',
                     name: 'Dragon Maze',
                     icon: '🐉',
-                    requirement: 'Read all 10 Adventure Stories',
+                    requirement: 'Read 100 books',
                     unlocked: unlockedGames.dragonMaze,
                     action: () => startDragonMazeGame()
-                },
-                {
-                    id: 'slidingPuzzle',
-                    name: 'Sliding Puzzle',
-                    icon: '🧩',
-                    requirement: 'Read 50 books total',
-                    unlocked: unlockedGames.slidingPuzzle,
-                    action: () => startSlidingPuzzleGame()
                 },
                 {
                     id: 'seasonSort',
                     name: 'Season Sorter',
                     icon: '🍂',
-                    requirement: 'Read all 10 Fall Stories',
+                    requirement: 'Read 150 books',
                     unlocked: unlockedGames.seasonSort,
                     action: () => showToast('Season Sorter game coming soon!')
                 }
@@ -3132,31 +3187,80 @@
             }
 
             const books = appData.children[appData.currentChild].books || [];
-
-            // Check if user has read all books from each suggestion category
-            const readTitles = new Set(books.map(b => b.title.toLowerCase()));
-
-            const hasReadAllFromCategory = (category) => {
-                let readCount = 0;
-                bookSuggestions[category].books.forEach(book => {
-                    if (readTitles.has(book.title.toLowerCase())) {
-                        readCount++;
-                    }
-                });
-                return readCount >= 10;
-            };
-
             const totalBooks = books.length;
 
+            // Games unlock based on total books read
             return {
-                dogPark: hasReadAllFromCategory('dogs'),
-                letterMatch: hasReadAllFromCategory('learning'),
-                storyBuilder: hasReadAllFromCategory('adventure'),
+                dogPark: totalBooks >= 10,
+                letterMatch: totalBooks >= 25,
+                storyBuilder: totalBooks >= 40,
                 slidingPuzzle: totalBooks >= 50,
-                dragonMaze: hasReadAllFromCategory('adventure'),
-                snowflake: hasReadAllFromCategory('winter'),
-                seasonSort: hasReadAllFromCategory('fall')
+                snowflake: totalBooks >= 75,
+                dragonMaze: totalBooks >= 100,
+                seasonSort: totalBooks >= 150
             };
+        }
+
+        // Check Subject Badges
+        function checkSubjectBadges() {
+            if (appData.currentChild === null || !appData.children[appData.currentChild]) {
+                return [];
+            }
+
+            const books = appData.children[appData.currentChild].books || [];
+            const categoryCounts = {};
+
+            // Count books per category
+            books.forEach(book => {
+                if (book.category) {
+                    categoryCounts[book.category] = (categoryCounts[book.category] || 0) + 1;
+                }
+            });
+
+            // Find categories with 3 or more books
+            const earnedBadges = [];
+            Object.entries(categoryCounts).forEach(([category, count]) => {
+                if (count >= 3 && bookSuggestions[category]) {
+                    earnedBadges.push({
+                        category: category,
+                        name: bookSuggestions[category].name,
+                        emoji: bookSuggestions[category].emoji,
+                        count: count
+                    });
+                }
+            });
+
+            return earnedBadges;
+        }
+
+        // Display Subject Badges
+        function displaySubjectBadges() {
+            const container = document.getElementById('subjectBadgesGrid');
+            if (!container) return;
+
+            const badges = checkSubjectBadges();
+
+            if (badges.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #adb5bd; padding: 20px;">No badges earned yet. Read 3 or more books from any category!</div>';
+                return;
+            }
+
+            container.innerHTML = badges.map(badge => `
+                <div style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border-radius: 15px;
+                    padding: 15px;
+                    text-align: center;
+                    color: white;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    transition: transform 0.3s;
+                    cursor: pointer;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 2.5em; margin-bottom: 5px;">${badge.emoji}</div>
+                    <div style="font-size: 0.9em; font-weight: bold;">${badge.name}</div>
+                    <div style="font-size: 0.8em; opacity: 0.9; margin-top: 5px;">${badge.count} books</div>
+                </div>
+            `).join('');
         }
 
         // Show Locked Message
