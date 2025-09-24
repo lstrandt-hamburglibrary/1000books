@@ -3099,6 +3099,8 @@
             };
 
             appData.children[appData.currentChild].books.push(newBook);
+
+            // Save data and wait for it to complete
             saveData();
 
             // Update streak
@@ -3115,7 +3117,12 @@
 
             // Check for new badges
             checkBadges();
-            updateDashboard();
+
+            // Update dashboard only if we're on the dashboard page
+            const activePage = document.querySelector('.page.active');
+            if (activePage && activePage.id === 'dashboard') {
+                updateDashboard();
+            }
 
             showToast(`Added "${book.title}" to your library! 📚`);
 
@@ -3127,15 +3134,6 @@
                     showToast(`🎉 Milestone reached: ${milestone.name}! ${milestone.emoji}`);
                 }, 1000);
             }
-
-            // Reset button after a delay
-            setTimeout(() => {
-                if (button) {
-                    button.textContent = 'Add Book';
-                    button.classList.remove('added');
-                    button.disabled = false;
-                }
-            }, 3000);
         }
 
         // Display Games
