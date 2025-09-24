@@ -2956,12 +2956,12 @@
             for (const [key, category] of Object.entries(bookSuggestions)) {
                 if (filter !== 'all' && filter !== key) continue;
 
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'suggestion-category collapsed';
-                categoryDiv.id = `category-${key}`;
                 const hasBadge = badgesByCategory[key] !== undefined;
                 const bookCount = badgesByCategory[key] || 0;
 
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'suggestion-category collapsed';
+                categoryDiv.id = `category-${key}`;
                 categoryDiv.innerHTML = `
                     <div class="suggestion-category-header" onclick="toggleCategory('${key}')">
                         <h3>
@@ -2991,7 +2991,7 @@
                                         <div class="suggestion-book-age">Ages ${book.age}</div>
                                     </div>
                                     <button class="add-suggestion-btn" id="suggest-${key}-${index}"
-                                            onclick="addSuggestedBook('${key}', ${index})">
+                                            data-category="${key}" data-index="${index}">
                                         Add Book
                                     </button>
                                 </div>
@@ -3008,6 +3008,15 @@
             if (firstCategory) {
                 firstCategory.classList.remove('collapsed');
             }
+
+            // Add event listeners to all suggestion buttons
+            container.querySelectorAll('.add-suggestion-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const categoryKey = this.dataset.category;
+                    const bookIndex = parseInt(this.dataset.index);
+                    addSuggestedBook(categoryKey, bookIndex);
+                });
+            });
         }
 
         // Toggle Category
