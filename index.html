@@ -2137,6 +2137,7 @@
             checkForUpdates();
             registerServiceWorker();
             populateCategoryDropdown();
+            setupSuggestionListeners();
         }
 
         // Populate Category Dropdown
@@ -2963,7 +2964,7 @@
                 categoryDiv.className = 'suggestion-category collapsed';
                 categoryDiv.id = `category-${key}`;
                 categoryDiv.innerHTML = `
-                    <div class="suggestion-category-header" onclick="toggleCategory('${key}')">
+                    <div class="suggestion-category-header">
                         <h3>
                             ${category.emoji} ${category.name}
                             ${hasBadge ? `
@@ -3009,14 +3010,29 @@
                 firstCategory.classList.remove('collapsed');
             }
 
-            // Add event listeners to all suggestion buttons
-            container.querySelectorAll('.add-suggestion-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const categoryKey = this.dataset.category;
-                    const bookIndex = parseInt(this.dataset.index);
-                    addSuggestedBook(categoryKey, bookIndex);
+        }
+
+        // Set up event delegation for suggestion buttons (call once on page load)
+        function setupSuggestionListeners() {
+            const container = document.getElementById('suggestionLists');
+            if (container) {
+                container.addEventListener('click', function(e) {
+                    // Handle add book button clicks
+                    if (e.target.classList.contains('add-suggestion-btn')) {
+                        e.preventDefault();
+                        const categoryKey = e.target.dataset.category;
+                        const bookIndex = parseInt(e.target.dataset.index);
+                        addSuggestedBook(categoryKey, bookIndex);
+                    }
+                    // Handle category header clicks
+                    else if (e.target.closest('.suggestion-category-header')) {
+                        const header = e.target.closest('.suggestion-category-header');
+                        const categoryDiv = header.parentElement;
+                        const key = categoryDiv.id.replace('category-', '');
+                        toggleCategory(key);
+                    }
                 });
-            });
+            }
         }
 
         // Toggle Category
