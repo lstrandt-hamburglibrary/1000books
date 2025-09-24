@@ -2095,10 +2095,6 @@
             { id: 'month-streak', name: 'Monthly Master', description: '30 day reading streak', emoji: '🏅', condition: (books) => calculateStreak(books) >= 30 },
             { id: 'weekend-warrior', name: 'Weekend Warrior', description: 'Read on 5 consecutive weekends', emoji: '🦸', condition: (books) => checkWeekendStreak(books) >= 5 },
 
-            // Reading Patterns
-            { id: 'night-owl', name: 'Night Owl', description: 'Read 10 bedtime stories', emoji: '🦉', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('bedtime')).length >= 10 },
-            { id: 'early-bird', name: 'Early Bird', description: 'Read 10 books before noon (add "morning" to notes)', emoji: '🐦', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('morning')).length >= 10 },
-            { id: 'story-time', name: 'Story Time Pro', description: 'Read at library story time 5 times (add "story time" to notes)', emoji: '🎭', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('story time')).length >= 5 },
 
             // Favorites & Ratings
             { id: 'favorite-finder', name: 'Favorite Finder', description: 'Mark 5 books as favorites', emoji: '⭐', condition: (books) => books.filter(b => b.isFavorite).length >= 5 },
@@ -2114,15 +2110,44 @@
             // Variety
             { id: 'variety-reader', name: 'Variety Reader', description: 'Read books from 10 different authors', emoji: '🌈', condition: (books) => new Set(books.map(b => b.author).filter(a => a)).size >= 10 },
             { id: 'author-fan', name: 'Author Fan', description: 'Read 5 books by the same author', emoji: '✍️', condition: (books) => checkSameAuthor(books) >= 5 },
-            { id: 'series-starter', name: 'Series Starter', description: 'Read 3 books from same series (add series name to notes)', emoji: '📚', condition: (books) => checkSeries(books) >= 3 },
+
+            // Major Milestones
+            { id: 'quarter-century', name: 'Quarter Century', description: 'Read 25 books', emoji: '📚', condition: (books) => books.length >= 25 },
+            { id: 'half-century', name: 'Half Century', description: 'Read 50 books', emoji: '📖', condition: (books) => books.length >= 50 },
+            { id: 'bookworm-legend', name: 'Bookworm Legend', description: 'Read 250 books', emoji: '🏆', condition: (books) => books.length >= 250 },
+            { id: 'reading-champion', name: 'Reading Champion', description: 'Read 500 books', emoji: '👑', condition: (books) => books.length >= 500 },
+            { id: 'ultimate-bookworm', name: 'Ultimate Bookworm', description: 'Read 1000 books!', emoji: '🎯', condition: (books) => books.length >= 1000 },
+
+            // Time Patterns
+            { id: 'new-year-starter', name: 'New Year Starter', description: 'Read a book in first week of January', emoji: '🎊', condition: (books) => checkNewYearStarter(books) },
+            { id: 'holiday-season', name: 'Holiday Season', description: 'Read 10 books in December', emoji: '🎄', condition: (books) => checkDecemberReading(books) >= 10 },
+            { id: 'back-to-school', name: 'Back to School', description: 'Read 15 books in September', emoji: '🎒', condition: (books) => checkSeptemberReading(books) >= 15 },
+            { id: 'spring-reader', name: 'Spring Reader', description: 'Read 20 books in March, April, or May', emoji: '🌸', condition: (books) => checkSpringReading(books) >= 20 },
+            { id: 'winter-warrior', name: 'Winter Warrior', description: 'Read 20 books in Dec, Jan, or Feb', emoji: '❄️', condition: (books) => checkWinterReading(books) >= 20 },
+            { id: 'summer-reader', name: 'Summer Reader', description: 'Read 30 books in June, July, or August', emoji: '☀️', condition: (books) => checkSummerReading(books) >= 30 },
+
+            // Monthly Achievements
+            { id: 'monthly-champion', name: 'Monthly Champion', description: 'Read 30+ books in a single month', emoji: '🏅', condition: (books) => checkMonthlyMax(books) >= 30 },
+            { id: 'consistent-reader', name: 'Consistent Reader', description: 'Read at least 1 book every month for 6 months', emoji: '📆', condition: (books) => checkMonthlyConsistency(books) >= 6 },
+            { id: 'year-long-reader', name: 'Year-Long Reader', description: 'Read at least 1 book every month for 12 months', emoji: '🗓️', condition: (books) => checkMonthlyConsistency(books) >= 12 },
+            { id: 'book-a-day', name: 'Book-a-Day', description: 'Read every single day for an entire month', emoji: '📅', condition: (books) => checkFullMonthStreak(books) },
+
+            // Growth & Improvement
+            { id: 'rising-star', name: 'Rising Star', description: 'Increase reading 3 months in a row', emoji: '📈', condition: (books) => checkRisingStreak(books) >= 3 },
+            { id: 'double-up', name: 'Double Up', description: 'Read twice as many books as previous month', emoji: '⏫', condition: (books) => checkDoubleUp(books) },
+            { id: 'personal-best', name: 'Personal Best', description: 'Beat your highest monthly record', emoji: '🥇', condition: (books) => checkPersonalBest(books) },
+
+            // Category Explorer
+            { id: 'explorer', name: 'Explorer', description: 'Read from 5 different categories', emoji: '🗺️', condition: (books) => new Set(books.map(b => b.category).filter(c => c)).size >= 5 },
+            { id: 'category-master', name: 'Category Master', description: 'Read from all available categories', emoji: '🎨', condition: (books) => checkAllCategories(books) },
+            { id: 'category-champion', name: 'Category Champion', description: 'Read 10+ books in a single category', emoji: '🏵️', condition: (books) => checkCategoryMax(books) >= 10 },
+
+            // Reading Times
+            { id: 'weekday-warrior', name: 'Weekday Warrior', description: 'Read Monday-Friday for 2 weeks straight', emoji: '💼', condition: (books) => checkWeekdayStreak(books) >= 10 },
+            { id: 'early-achiever', name: 'Early Achiever', description: 'Complete 100 books in your first year', emoji: '🌟', condition: (books) => checkEarlyAchiever(books) },
 
             // Special Achievements
-            { id: 'holiday-reader', name: 'Holiday Reader', description: 'Read holiday books (add "holiday" to notes)', emoji: '🎄', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('holiday')).length >= 5 },
-            { id: 'summer-reader', name: 'Summer Reader', description: 'Read 30 books in June, July, or August', emoji: '☀️', condition: (books) => checkSummerReading(books) >= 30 },
-            { id: 'rainy-day', name: 'Rainy Day Reader', description: 'Read on a rainy day (add "rainy day" to notes)', emoji: '🌧️', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('rainy day')).length >= 3 },
-            { id: 'library-lover', name: 'Library Lover', description: 'Read 20 library books (add "library book" to notes)', emoji: '🏛️', condition: (books) => books.filter(b => b.notes && b.notes.toLowerCase().includes('library book')).length >= 20 },
-            { id: 'rereader', name: 'Repeat Reader', description: 'Read the same book 3 times', emoji: '🔄', condition: (books) => checkRereads(books) >= 3 },
-            { id: 'note-taker', name: 'Note Taker', description: 'Add notes to 15 books', emoji: '📝', condition: (books) => books.filter(b => b.notes && b.notes.length > 10).length >= 15 }
+            { id: 'rereader', name: 'Repeat Reader', description: 'Read the same book 3 times', emoji: '🔄', condition: (books) => checkRereads(books) >= 3 }
         ];
 
         // Initialize App
@@ -2586,28 +2611,6 @@
         }
 
         // Check Series
-        function checkSeries(books) {
-            if (books.length === 0) return 0;
-
-            const seriesBooks = books.filter(b => b.notes &&
-                (b.notes.toLowerCase().includes('series') ||
-                 b.notes.toLowerCase().includes('book 1') ||
-                 b.notes.toLowerCase().includes('book 2') ||
-                 b.notes.toLowerCase().includes('book 3')));
-
-            // Try to identify series by matching titles
-            const titleGroups = {};
-            seriesBooks.forEach(book => {
-                const baseTitle = book.title.replace(/[:#]\s*book\s*\d+/i, '').trim();
-                if (!titleGroups[baseTitle]) {
-                    titleGroups[baseTitle] = 0;
-                }
-                titleGroups[baseTitle]++;
-            });
-
-            return Math.max(...Object.values(titleGroups), seriesBooks.length >= 3 ? 3 : 0);
-        }
-
         // Check Summer Reading
         function checkSummerReading(books) {
             if (books.length === 0) return 0;
@@ -2617,6 +2620,267 @@
                 const month = date.getMonth();
                 return month >= 5 && month <= 7; // June (5), July (6), August (7)
             }).length;
+        }
+
+        // New Year Starter - Read in first week of January
+        function checkNewYearStarter(books) {
+            return books.some(book => {
+                const date = new Date(book.readDate);
+                const month = date.getMonth();
+                const day = date.getDate();
+                return month === 0 && day <= 7; // January, first 7 days
+            });
+        }
+
+        // December Reading
+        function checkDecemberReading(books) {
+            return books.filter(book => {
+                const date = new Date(book.readDate);
+                return date.getMonth() === 11; // December
+            }).length;
+        }
+
+        // September Reading
+        function checkSeptemberReading(books) {
+            return books.filter(book => {
+                const date = new Date(book.readDate);
+                return date.getMonth() === 8; // September
+            }).length;
+        }
+
+        // Spring Reading (March, April, May)
+        function checkSpringReading(books) {
+            return books.filter(book => {
+                const date = new Date(book.readDate);
+                const month = date.getMonth();
+                return month >= 2 && month <= 4; // March (2), April (3), May (4)
+            }).length;
+        }
+
+        // Winter Reading (December, January, February)
+        function checkWinterReading(books) {
+            return books.filter(book => {
+                const date = new Date(book.readDate);
+                const month = date.getMonth();
+                return month === 11 || month === 0 || month === 1; // Dec, Jan, Feb
+            }).length;
+        }
+
+        // Check Monthly Max
+        function checkMonthlyMax(books) {
+            if (books.length === 0) return 0;
+
+            const monthlyCount = {};
+            books.forEach(book => {
+                const date = new Date(book.readDate);
+                const key = `${date.getFullYear()}-${date.getMonth()}`;
+                monthlyCount[key] = (monthlyCount[key] || 0) + 1;
+            });
+
+            return Math.max(...Object.values(monthlyCount), 0);
+        }
+
+        // Check Monthly Consistency
+        function checkMonthlyConsistency(books) {
+            if (books.length === 0) return 0;
+
+            const monthlyBooks = {};
+            books.forEach(book => {
+                const date = new Date(book.readDate);
+                const key = `${date.getFullYear()}-${date.getMonth()}`;
+                monthlyBooks[key] = true;
+            });
+
+            const months = Object.keys(monthlyBooks).sort();
+            if (months.length === 0) return 0;
+
+            let maxStreak = 1;
+            let currentStreak = 1;
+
+            for (let i = 1; i < months.length; i++) {
+                const [prevYear, prevMonth] = months[i - 1].split('-').map(Number);
+                const [currYear, currMonth] = months[i].split('-').map(Number);
+
+                const monthDiff = (currYear - prevYear) * 12 + (currMonth - prevMonth);
+                if (monthDiff === 1) {
+                    currentStreak++;
+                    maxStreak = Math.max(maxStreak, currentStreak);
+                } else {
+                    currentStreak = 1;
+                }
+            }
+
+            return maxStreak;
+        }
+
+        // Check Full Month Streak
+        function checkFullMonthStreak(books) {
+            if (books.length === 0) return false;
+
+            const dailyBooks = {};
+            books.forEach(book => {
+                const date = new Date(book.readDate);
+                const key = date.toISOString().split('T')[0];
+                dailyBooks[key] = `${date.getFullYear()}-${date.getMonth()}`;
+            });
+
+            const monthlyDays = {};
+            Object.entries(dailyBooks).forEach(([day, month]) => {
+                if (!monthlyDays[month]) {
+                    monthlyDays[month] = new Set();
+                }
+                const date = new Date(day);
+                monthlyDays[month].add(date.getDate());
+            });
+
+            return Object.entries(monthlyDays).some(([month, days]) => {
+                const [year, monthNum] = month.split('-').map(Number);
+                const daysInMonth = new Date(year, monthNum + 1, 0).getDate();
+                return days.size === daysInMonth;
+            });
+        }
+
+        // Check Rising Streak
+        function checkRisingStreak(books) {
+            if (books.length === 0) return 0;
+
+            const monthlyCount = {};
+            books.forEach(book => {
+                const date = new Date(book.readDate);
+                const key = `${date.getFullYear()}-${String(date.getMonth()).padStart(2, '0')}`;
+                monthlyCount[key] = (monthlyCount[key] || 0) + 1;
+            });
+
+            const sortedMonths = Object.entries(monthlyCount)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([, count]) => count);
+
+            let maxStreak = 0;
+            let currentStreak = 0;
+
+            for (let i = 1; i < sortedMonths.length; i++) {
+                if (sortedMonths[i] > sortedMonths[i - 1]) {
+                    currentStreak++;
+                    maxStreak = Math.max(maxStreak, currentStreak);
+                } else {
+                    currentStreak = 0;
+                }
+            }
+
+            return maxStreak + 1; // +1 because we count transitions
+        }
+
+        // Check Double Up
+        function checkDoubleUp(books) {
+            if (books.length === 0) return false;
+
+            const monthlyCount = {};
+            books.forEach(book => {
+                const date = new Date(book.readDate);
+                const key = `${date.getFullYear()}-${String(date.getMonth()).padStart(2, '0')}`;
+                monthlyCount[key] = (monthlyCount[key] || 0) + 1;
+            });
+
+            const sortedMonths = Object.entries(monthlyCount).sort(([a], [b]) => a.localeCompare(b));
+
+            for (let i = 1; i < sortedMonths.length; i++) {
+                if (sortedMonths[i][1] >= sortedMonths[i - 1][1] * 2) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Check Personal Best
+        function checkPersonalBest(books) {
+            if (books.length === 0) return false;
+
+            const monthlyCount = {};
+            books.forEach(book => {
+                const date = new Date(book.readDate);
+                const key = `${date.getFullYear()}-${String(date.getMonth()).padStart(2, '0')}`;
+                monthlyCount[key] = (monthlyCount[key] || 0) + 1;
+            });
+
+            const counts = Object.values(monthlyCount);
+            if (counts.length < 2) return false;
+
+            const sortedCounts = [...counts].sort((a, b) => b - a);
+            const latestMonth = Object.keys(monthlyCount).sort().pop();
+            const latestCount = monthlyCount[latestMonth];
+
+            return latestCount === sortedCounts[0] && latestCount > sortedCounts[1];
+        }
+
+        // Check All Categories
+        function checkAllCategories(books) {
+            const usedCategories = new Set(books.map(b => b.category).filter(c => c));
+            const totalCategories = Object.keys(bookSuggestions || {}).length;
+            return totalCategories > 0 && usedCategories.size === totalCategories;
+        }
+
+        // Check Category Max
+        function checkCategoryMax(books) {
+            if (books.length === 0) return 0;
+
+            const categoryCount = {};
+            books.forEach(book => {
+                if (book.category) {
+                    categoryCount[book.category] = (categoryCount[book.category] || 0) + 1;
+                }
+            });
+
+            return Math.max(...Object.values(categoryCount), 0);
+        }
+
+        // Check Weekday Streak
+        function checkWeekdayStreak(books) {
+            if (books.length === 0) return 0;
+
+            const weekdayDates = books
+                .map(book => new Date(book.readDate))
+                .filter(date => {
+                    const day = date.getDay();
+                    return day >= 1 && day <= 5; // Monday to Friday
+                })
+                .map(date => date.toISOString().split('T')[0])
+                .sort();
+
+            if (weekdayDates.length === 0) return 0;
+
+            let maxStreak = 0;
+            let currentStreak = 1;
+            let lastDate = new Date(weekdayDates[0]);
+
+            for (let i = 1; i < weekdayDates.length; i++) {
+                const currentDate = new Date(weekdayDates[i]);
+                const dayDiff = Math.floor((currentDate - lastDate) / (1000 * 60 * 60 * 24));
+
+                // Check if consecutive weekday (accounting for weekends)
+                if (dayDiff === 1 || (dayDiff === 3 && lastDate.getDay() === 5)) {
+                    currentStreak++;
+                    maxStreak = Math.max(maxStreak, currentStreak);
+                } else {
+                    currentStreak = 1;
+                }
+
+                lastDate = currentDate;
+            }
+
+            return Math.max(maxStreak, 1);
+        }
+
+        // Check Early Achiever
+        function checkEarlyAchiever(books) {
+            if (books.length < 100) return false;
+
+            const sortedBooks = [...books].sort((a, b) => new Date(a.readDate) - new Date(b.readDate));
+            const firstBook = new Date(sortedBooks[0].readDate);
+            const hundredthBook = new Date(sortedBooks[99].readDate);
+
+            const daysDiff = Math.floor((hundredthBook - firstBook) / (1000 * 60 * 60 * 24));
+            return daysDiff <= 365;
         }
 
         // Check Rereads
