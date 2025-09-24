@@ -2757,38 +2757,43 @@
                 a.title.toLowerCase().localeCompare(b.title.toLowerCase())
             );
 
-            // Display as a simple full-width list
-            container.innerHTML = sortedBooks.map((book, index) => `
-                <div style="
-                    display: flex;
-                    align-items: center;
-                    padding: 10px 20px;
-                    background: white;
-                    border-bottom: 1px solid #e9ecef;
-                    transition: background 0.2s;
-                " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
-                    <div style="
-                        flex: 0 0 50px;
-                        color: #adb5bd;
-                        font-size: 0.85em;
-                    ">${index + 1}.</div>
-                    <div style="
-                        flex: 1;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    ">
-                        <span style="font-weight: 600; color: #495057;">
-                            ${book.title}
-                        </span>
-                        ${book.isFavorite ? '⭐' : ''}
-                        ${book.author ? ` <span style="color: #6c757d;">by ${book.author}</span>` : ''}
-                    </div>
-                    <div style="color: #adb5bd; font-size: 0.85em; padding-left: 20px;">
-                        ${new Date(book.readDate).toLocaleDateString()}
-                    </div>
+            // Display like suggestion books - full width cards
+            container.innerHTML = `
+                <div style="display: grid; gap: 10px;">
+                    ${sortedBooks.map((book, index) => `
+                        <div style="
+                            background: white;
+                            padding: 15px;
+                            border-radius: 10px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            transition: all 0.3s;
+                        " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)'"
+                           onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">
+                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
+                                </div>
+                                ${book.author ? `<div style="color: #6c757d; font-size: 0.9rem;">by ${book.author}</div>` : ''}
+                                ${book.category && bookSuggestions[book.category] ?
+                                    `<div style="color: #adb5bd; font-size: 0.85rem; margin-top: 3px;">
+                                        ${bookSuggestions[book.category].emoji} ${bookSuggestions[book.category].name}
+                                    </div>` : ''}
+                            </div>
+                            <div style="
+                                background: #28a745;
+                                color: white;
+                                padding: 8px 15px;
+                                border-radius: 20px;
+                                font-size: 0.9rem;
+                            ">
+                                ✓ Read ${new Date(book.readDate).toLocaleDateString()}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
 
         // Search Books
@@ -2812,38 +2817,43 @@
                 return;
             }
 
-            // Display filtered results in same simple list style
-            container.innerHTML = sortedFiltered.map((book, index) => `
-                <div style="
-                    display: flex;
-                    align-items: center;
-                    padding: 10px 20px;
-                    background: white;
-                    border-bottom: 1px solid #e9ecef;
-                    transition: background 0.2s;
-                " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
-                    <div style="
-                        flex: 0 0 50px;
-                        color: #adb5bd;
-                        font-size: 0.85em;
-                    ">${index + 1}.</div>
-                    <div style="
-                        flex: 1;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    ">
-                        <span style="font-weight: 600; color: #495057;">
-                            ${book.title}
-                        </span>
-                        ${book.isFavorite ? '⭐' : ''}
-                        ${book.author ? ` <span style="color: #6c757d;">by ${book.author}</span>` : ''}
-                    </div>
-                    <div style="color: #adb5bd; font-size: 0.85em; padding-left: 20px;">
-                        ${new Date(book.readDate).toLocaleDateString()}
-                    </div>
+            // Display filtered results in same style
+            container.innerHTML = `
+                <div style="display: grid; gap: 10px;">
+                    ${sortedFiltered.map((book, index) => `
+                        <div style="
+                            background: white;
+                            padding: 15px;
+                            border-radius: 10px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            transition: all 0.3s;
+                        " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)'"
+                           onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">
+                                    ${book.title} ${book.isFavorite ? '⭐' : ''}
+                                </div>
+                                ${book.author ? `<div style="color: #6c757d; font-size: 0.9rem;">by ${book.author}</div>` : ''}
+                                ${book.category && bookSuggestions[book.category] ?
+                                    `<div style="color: #adb5bd; font-size: 0.85rem; margin-top: 3px;">
+                                        ${bookSuggestions[book.category].emoji} ${bookSuggestions[book.category].name}
+                                    </div>` : ''}
+                            </div>
+                            <div style="
+                                background: #28a745;
+                                color: white;
+                                padding: 8px 15px;
+                                border-radius: 20px;
+                                font-size: 0.9rem;
+                            ">
+                                ✓ Read ${new Date(book.readDate).toLocaleDateString()}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
 
         // Initialize Badges
