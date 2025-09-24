@@ -1747,313 +1747,313 @@
             "Dogs can learn over 150 words and can count to 4 or 5."
         ];
 
-        // Book Suggestions Database
-        const bookSuggestions = {
-            classic: {
-                name: "Popular Characters",
-                emoji: "⭐",
-                books: [
-                    { title: "The Very Hungry Caterpillar", author: "Eric Carle", age: "2-5" },
-                    { title: "Curious George", author: "H.A. Rey", age: "3-6" },
-                    { title: "If You Give a Mouse a Cookie", author: "Laura Numeroff", age: "3-6" },
-                    { title: "Don't Let the Pigeon Drive the Bus!", author: "Mo Willems", age: "3-6" },
-                    { title: "Elephant and Piggie: There Is a Bird on Your Head!", author: "Mo Willems", age: "3-6" },
-                    { title: "The Gruffalo", author: "Julia Donaldson", age: "3-6" },
-                    { title: "Chicka Chicka Boom Boom", author: "Bill Martin Jr.", age: "2-5" },
-                    { title: "Knuffle Bunny", author: "Mo Willems", age: "2-5" },
-                    { title: "The Pigeon Needs a Bath!", author: "Mo Willems", age: "3-6" },
-                    { title: "Press Here", author: "Hervé Tullet", age: "2-5" }
-                ]
-            },
-            bedtime: {
-                name: "Dr. Seuss Favorites",
-                emoji: "🎩",
-                books: [
-                    { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Green Eggs and Ham", author: "Dr. Seuss", age: "2-6" },
-                    { title: "One Fish Two Fish Red Fish Blue Fish", author: "Dr. Seuss", age: "2-6" },
-                    { title: "Fox in Socks", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Hop on Pop", author: "Dr. Seuss", age: "2-5" },
-                    { title: "The Cat in the Hat Comes Back", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Oh, the Places You'll Go!", author: "Dr. Seuss", age: "3-7" },
-                    { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Horton Hears a Who!", author: "Dr. Seuss", age: "3-7" },
-                    { title: "The Lorax", author: "Dr. Seuss", age: "3-7" }
-                ]
-            },
-            learning: {
-                name: "Disney & Pixar Friends",
-                emoji: "🏰",
-                books: [
-                    { title: "Frozen: A Sister More Like Me", author: "Disney", age: "3-6" },
-                    { title: "Moana: The Ocean Calls", author: "Disney", age: "3-6" },
-                    { title: "Finding Nemo: Ocean of Color", author: "Disney-Pixar", age: "3-6" },
-                    { title: "The Lion King", author: "Disney", age: "3-6" },
-                    { title: "Toy Story: Woody's New Friend", author: "Disney-Pixar", age: "3-6" },
-                    { title: "Cars: The Spooky Sound", author: "Disney-Pixar", age: "3-6" },
-                    { title: "Encanto: The Magic Within", author: "Disney", age: "3-6" },
-                    { title: "Tangled: Rapunzel's Tale", author: "Disney", age: "3-6" },
-                    { title: "Mickey Mouse Clubhouse: Mickey's Easter Hunt", author: "Disney", age: "2-5" },
-                    { title: "Winnie the Pooh: The Honey Tree", author: "Disney", age: "2-5" }
-                ]
-            },
-            dogs: {
-                name: "Favorite Series Characters",
-                emoji: "📚",
-                books: [
-                    { title: "Clifford the Big Red Dog", author: "Norman Bridwell", age: "2-5" },
-                    { title: "Pete the Cat: I Love My White Shoes", author: "Eric Litwin", age: "3-6" },
-                    { title: "Biscuit", author: "Alyssa Satin Capucilli", age: "1-3" },
-                    { title: "Spot's First Walk", author: "Eric Hill", age: "0-3" },
-                    { title: "Dog Man", author: "Dav Pilkey", age: "5-8" },
-                    { title: "Bluey: The Beach", author: "Bluey", age: "3-6" },
-                    { title: "PAW Patrol: The Great Pirate Rescue!", author: "Nickelodeon", age: "3-6" },
-                    { title: "Go, Dog. Go!", author: "P.D. Eastman", age: "2-5" },
-                    { title: "Harry the Dirty Dog", author: "Gene Zion", age: "3-6" },
-                    { title: "Skippyjon Jones", author: "Judy Schachner", age: "3-6" }
-                ]
-            },
-            cats: {
-                name: "Cat Stories",
-                emoji: "🐱",
-                books: [
-                    { title: "Pete the Cat: I Love My White Shoes", author: "Eric Litwin", age: "3-6" },
-                    { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Splat the Cat", author: "Rob Scotton", age: "3-6" },
-                    { title: "Millions of Cats", author: "Wanda Gág", age: "3-6" },
-                    { title: "The Three Little Kittens", author: "Paul Galdone", age: "2-5" },
-                    { title: "Bad Kitty", author: "Nick Bruel", age: "4-7" },
-                    { title: "Cookie's Week", author: "Cindy Ward", age: "2-5" },
-                    { title: "Kitten's First Full Moon", author: "Kevin Henkes", age: "2-5" },
-                    { title: "The Cat Who Came In Off The Roof", author: "Annie M.G. Schmidt", age: "4-7" },
-                    { title: "Six Dinner Sid", author: "Inga Moore", age: "3-6" }
-                ]
-            },
-            nature: {
-                name: "Nature & Outdoors",
-                emoji: "🌳",
-                books: [
-                    { title: "The Curious Garden", author: "Peter Brown", age: "4-7" },
-                    { title: "We Are the Gardeners", author: "Joanna Gaines", age: "4-7" },
-                    { title: "The Thing About Bees", author: "Shabazz Larkin", age: "4-7" },
-                    { title: "The Tiny Seed", author: "Eric Carle", age: "3-6" },
-                    { title: "A Tree Is Nice", author: "Janice May Udry", age: "3-6" },
-                    { title: "The Giving Tree", author: "Shel Silverstein", age: "4-7" },
-                    { title: "Planting a Rainbow", author: "Lois Ehlert", age: "2-5" },
-                    { title: "In the Tall, Tall Grass", author: "Denise Fleming", age: "2-5" },
-                    { title: "The Dandelion Seed", author: "Joseph Anthony", age: "4-7" },
-                    { title: "Up in the Garden and Down in the Dirt", author: "Kate Messner", age: "5-8" }
-                ]
-            },
-            adventure: {
-                name: "Adventure Stories",
-                emoji: "🚀",
-                books: [
-                    { title: "We're Going on a Bear Hunt", author: "Michael Rosen", age: "3-6" },
-                    { title: "The Little Engine That Could", author: "Watty Piper", age: "3-6" },
-                    { title: "Harold and the Purple Crayon", author: "Crockett Johnson", age: "3-6" },
-                    { title: "Oh, the Places You'll Go!", author: "Dr. Seuss", age: "3-7" },
-                    { title: "The Adventures of Beekle", author: "Dan Santat", age: "3-6" },
-                    { title: "Not a Box", author: "Antoinette Portis", age: "2-5" },
-                    { title: "Journey", author: "Aaron Becker", age: "4-7" },
-                    { title: "Where the Sidewalk Ends", author: "Shel Silverstein", age: "4-7" },
-                    { title: "The Snail and the Whale", author: "Julia Donaldson", age: "3-6" },
-                    { title: "Rosie's Walk", author: "Pat Hutchins", age: "2-5" }
-                ]
-            },
-            pirates: {
-                name: "Pirates & Treasure",
-                emoji: "🏴‍☠️",
-                books: [
-                    { title: "How I Became a Pirate", author: "Melinda Long", age: "4-7" },
-                    { title: "Pirates Don't Change Diapers", author: "Melinda Long", age: "4-7" },
-                    { title: "Shiver Me Letters", author: "June Sobel", age: "3-6" },
-                    { title: "The Night Pirates", author: "Peter Harris", age: "3-6" },
-                    { title: "Pirate Pete's Talk Like a Pirate", author: "Kim Kennedy", age: "3-6" },
-                    { title: "This Little Pirate", author: "Philemon Sturges", age: "2-5" },
-                    { title: "Pirates Love Underpants", author: "Claire Freedman", age: "3-6" },
-                    { title: "The Pirate Cruncher", author: "Jonny Duddle", age: "4-7" },
-                    { title: "Port Side Pirates", author: "Oscar Seaworthy", age: "3-6" },
-                    { title: "Goldilocks and the Three Pirates", author: "April Jones Prince", age: "4-7" }
-                ]
-            },
-            dinosaurs: {
-                name: "Dinosaur Adventures",
-                emoji: "🦕",
-                books: [
-                    { title: "How Do Dinosaurs Say Goodnight?", author: "Jane Yolen", age: "2-5" },
-                    { title: "Dinosaurs Love Underpants", author: "Claire Freedman", age: "3-6" },
-                    { title: "If the Dinosaurs Came Back", author: "Bernard Most", age: "3-6" },
-                    { title: "The Dinosaur Alphabet Book", author: "Jerry Pallotta", age: "4-7" },
-                    { title: "Goldilocks and the Three Dinosaurs", author: "Mo Willems", age: "3-6" },
-                    { title: "Danny and the Dinosaur", author: "Syd Hoff", age: "3-6" },
-                    { title: "Digging Up Dinosaurs", author: "Aliki", age: "4-7" },
-                    { title: "Dinosaur Bones", author: "Bob Barner", age: "3-6" },
-                    { title: "Dinosaurs, Dinosaurs", author: "Byron Barton", age: "2-5" },
-                    { title: "Dinosaur Roar!", author: "Paul and Henrietta Stickland", age: "2-5" }
-                ]
-            },
-            christmas: {
-                name: "Christmas Stories",
-                emoji: "🎄",
-                books: [
-                    { title: "The Polar Express", author: "Chris Van Allsburg", age: "3-7" },
-                    { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
-                    { title: "The Night Before Christmas", author: "Clement C. Moore", age: "3-7" },
-                    { title: "The Snowman", author: "Raymond Briggs", age: "2-6" },
-                    { title: "Olive, the Other Reindeer", author: "Vivian Walsh", age: "3-6" },
-                    { title: "The Little Drummer Boy", author: "Ezra Jack Keats", age: "3-6" },
-                    { title: "Bear Stays Up for Christmas", author: "Karma Wilson", age: "2-5" },
-                    { title: "The Christmas Wish", author: "Lori Evert", age: "4-7" },
-                    { title: "Dream Snow", author: "Eric Carle", age: "2-5" },
-                    { title: "Merry Christmas, Big Hungry Bear!", author: "Don and Audrey Wood", age: "2-5" }
-                ]
-            },
-            thanksgiving: {
-                name: "Thanksgiving Stories",
-                emoji: "🦃",
-                books: [
-                    { title: "Turkey Trouble", author: "Wendi Silvano", age: "3-6" },
-                    { title: "The Thankful Book", author: "Todd Parr", age: "2-5" },
-                    { title: "'Twas the Night Before Thanksgiving", author: "Dav Pilkey", age: "4-7" },
-                    { title: "Bear Says Thanks", author: "Karma Wilson", age: "2-5" },
-                    { title: "The Perfect Thanksgiving", author: "Eileen Spinelli", age: "3-6" },
-                    { title: "Thanksgiving Is for Giving Thanks", author: "Margaret Sutherland", age: "2-5" },
-                    { title: "Balloons Over Broadway", author: "Melissa Sweet", age: "4-7" },
-                    { title: "Gracias the Thanksgiving Turkey", author: "Joy Cowley", age: "3-6" },
-                    { title: "Pete the Cat: The First Thanksgiving", author: "James Dean", age: "3-6" },
-                    { title: "10 Fat Turkeys", author: "Tony Johnston", age: "2-5" }
-                ]
-            },
-            halloween: {
-                name: "Halloween Stories",
-                emoji: "🎃",
-                books: [
-                    { title: "Room on the Broom", author: "Julia Donaldson", age: "3-6" },
-                    { title: "It's the Great Pumpkin, Charlie Brown", author: "Charles M. Schulz", age: "3-7" },
-                    { title: "The Little Old Lady Who Was Not Afraid of Anything", author: "Linda Williams", age: "3-6" },
-                    { title: "Big Pumpkin", author: "Erica Silverman", age: "3-6" },
-                    { title: "Five Little Pumpkins", author: "Iris Van Rynbach", age: "2-5" },
-                    { title: "Skeleton Hiccups", author: "Margery Cuyler", age: "3-6" },
-                    { title: "The Biggest Pumpkin Ever", author: "Steven Kroll", age: "3-6" },
-                    { title: "Click, Clack, Boo!", author: "Doreen Cronin", age: "3-6" },
-                    { title: "Creepy Carrots!", author: "Aaron Reynolds", age: "4-7" },
-                    { title: "The Monster at the End of This Book", author: "Jon Stone", age: "2-5" }
-                ]
-            },
-            winter: {
-                name: "Winter Stories",
-                emoji: "❄️",
-                books: [
-                    { title: "The Snowy Day", author: "Ezra Jack Keats", age: "2-5" },
-                    { title: "The Mitten", author: "Jan Brett", age: "3-6" },
-                    { title: "Owl Moon", author: "Jane Yolen", age: "3-7" },
-                    { title: "The Snowman", author: "Raymond Briggs", age: "2-6" },
-                    { title: "Snow", author: "Uri Shulevitz", age: "2-5" },
-                    { title: "The Jacket I Wear in the Snow", author: "Shirley Neitzel", age: "2-5" },
-                    { title: "Over and Under the Snow", author: "Kate Messner", age: "4-7" },
-                    { title: "Snowflake Bentley", author: "Jacqueline Briggs Martin", age: "5-8" },
-                    { title: "Ten on the Sled", author: "Kim Norman", age: "2-5" },
-                    { title: "The First Day of Winter", author: "Denise Fleming", age: "2-5" }
-                ]
-            },
-            spring: {
-                name: "Spring Stories",
-                emoji: "🌷",
-                books: [
-                    { title: "The Curious Garden", author: "Peter Brown", age: "4-7" },
-                    { title: "Planting a Rainbow", author: "Lois Ehlert", age: "2-5" },
-                    { title: "The Carrot Seed", author: "Ruth Krauss", age: "2-5" },
-                    { title: "It's Spring!", author: "Linda Glaser", age: "3-6" },
-                    { title: "When Spring Comes", author: "Kevin Henkes", age: "3-6" },
-                    { title: "The Thing About Spring", author: "Daniel Kirk", age: "3-6" },
-                    { title: "Mouse's First Spring", author: "Lauren Thompson", age: "0-3" },
-                    { title: "Spring Is Here", author: "Taro Gomi", age: "2-5" },
-                    { title: "Hurray for Spring!", author: "Patricia Hubbell", age: "2-5" },
-                    { title: "And Then It's Spring", author: "Julie Fogliano", age: "3-6" }
-                ]
-            },
-            summer: {
-                name: "Summer Stories",
-                emoji: "☀️",
-                books: [
-                    { title: "The Watermelon Seed", author: "Greg Pizzoli", age: "2-5" },
-                    { title: "A Perfect Day", author: "Lane Smith", age: "3-6" },
-                    { title: "The Sandcastle That Lola Built", author: "Megan Maynor", age: "3-6" },
-                    { title: "Maisy Goes to the Beach", author: "Lucy Cousins", age: "0-3" },
-                    { title: "Beach Day", author: "Karen Roosa", age: "2-5" },
-                    { title: "Summer Days and Nights", author: "Wong Herbert Yee", age: "3-6" },
-                    { title: "Come On, Rain!", author: "Karen Hesse", age: "3-6" },
-                    { title: "The Summer My Father Was Ten", author: "Pat Brisson", age: "4-7" },
-                    { title: "How to Catch a Star", author: "Oliver Jeffers", age: "3-6" },
-                    { title: "The Night Before Summer Vacation", author: "Natasha Wing", age: "3-6" }
-                ]
-            },
-            fall: {
-                name: "Fall/Autumn Stories",
-                emoji: "🍂",
-                books: [
-                    { title: "Leaf Man", author: "Lois Ehlert", age: "3-6" },
-                    { title: "We're Going on a Leaf Hunt", author: "Steve Metzger", age: "2-5" },
-                    { title: "Red Leaf, Yellow Leaf", author: "Lois Ehlert", age: "3-6" },
-                    { title: "The Busy Little Squirrel", author: "Nancy Tafuri", age: "2-5" },
-                    { title: "Fall Is Not Easy", author: "Marty Kelley", age: "3-6" },
-                    { title: "Goodbye Summer, Hello Autumn", author: "Kenard Pak", age: "3-6" },
-                    { title: "Awesome Autumn", author: "Bruce Goldstone", age: "3-6" },
-                    { title: "The Apple Pie Tree", author: "Zoe Hall", age: "2-5" },
-                    { title: "Leaves", author: "David Ezra Stein", age: "2-5" },
-                    { title: "Fall Mixed Up", author: "Bob Raczka", age: "3-6" }
-                ]
-            },
-            classic: {
-                name: "Classic Picture Books",
-                emoji: "📖",
-                books: [
-                    { title: "The Very Hungry Caterpillar", author: "Eric Carle", age: "2-5" },
-                    { title: "Where the Wild Things Are", author: "Maurice Sendak", age: "3-6" },
-                    { title: "Goodnight Moon", author: "Margaret Wise Brown", age: "0-3" },
-                    { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Corduroy", author: "Don Freeman", age: "3-5" },
-                    { title: "Curious George", author: "H.A. Rey", age: "3-6" },
-                    { title: "The Rainbow Fish", author: "Marcus Pfister", age: "3-6" },
-                    { title: "Brown Bear, Brown Bear, What Do You See?", author: "Bill Martin Jr.", age: "0-3" },
-                    { title: "Madeline", author: "Ludwig Bemelmans", age: "3-6" },
-                    { title: "The Little House", author: "Virginia Lee Burton", age: "3-6" }
-                ]
-            },
-            bedtime: {
-                name: "Dr. Seuss Favorites",
-                emoji: "🎩",
-                books: [
-                    { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Green Eggs and Ham", author: "Dr. Seuss", age: "2-6" },
-                    { title: "One Fish Two Fish Red Fish Blue Fish", author: "Dr. Seuss", age: "2-6" },
-                    { title: "Fox in Socks", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Hop on Pop", author: "Dr. Seuss", age: "2-5" },
-                    { title: "The Cat in the Hat Comes Back", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Oh, the Places You'll Go!", author: "Dr. Seuss", age: "3-7" },
-                    { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
-                    { title: "Horton Hears a Who!", author: "Dr. Seuss", age: "3-7" },
-                    { title: "The Lorax", author: "Dr. Seuss", age: "3-7" }
-                ]
-            },
-            rhymes: {
-                name: "Nursery Rhymes",
-                emoji: "🎵",
-                books: [
-                    { title: "Mother Goose's Nursery Rhymes", author: "Various", age: "0-5" },
-                    { title: "The Real Mother Goose", author: "Blanche Fisher Wright", age: "0-5" },
-                    { title: "Mary Engelbreit's Mother Goose", author: "Mary Engelbreit", age: "0-5" },
-                    { title: "Tomie dePaola's Mother Goose", author: "Tomie dePaola", age: "0-5" },
-                    { title: "Richard Scarry's Best Mother Goose Ever", author: "Richard Scarry", age: "0-5" },
-                    { title: "Each Peach Pear Plum", author: "Janet & Allan Ahlberg", age: "0-3" },
-                    { title: "Hickory Dickory Dock", author: "Keith Baker", age: "0-3" },
-                    { title: "Hey Diddle Diddle", author: "Salley Mavor", age: "0-3" },
-                    { title: "Pat-a-Cake", author: "Mary Brigid Barrett", age: "0-3" },
-                    { title: "This Little Piggy", author: "Jane Yolen", age: "0-3" }
-                ]
-            }
-        };
+        // Book Suggestions loaded from external file
+//         // const bookSuggestions = {
+//             classic: {
+//                 name: "Popular Characters",
+//                 emoji: "⭐",
+//                 books: [
+//                     { title: "The Very Hungry Caterpillar", author: "Eric Carle", age: "2-5" },
+//                     { title: "Curious George", author: "H.A. Rey", age: "3-6" },
+//                     { title: "If You Give a Mouse a Cookie", author: "Laura Numeroff", age: "3-6" },
+//                     { title: "Don't Let the Pigeon Drive the Bus!", author: "Mo Willems", age: "3-6" },
+//                     { title: "Elephant and Piggie: There Is a Bird on Your Head!", author: "Mo Willems", age: "3-6" },
+//                     { title: "The Gruffalo", author: "Julia Donaldson", age: "3-6" },
+//                     { title: "Chicka Chicka Boom Boom", author: "Bill Martin Jr.", age: "2-5" },
+//                     { title: "Knuffle Bunny", author: "Mo Willems", age: "2-5" },
+//                     { title: "The Pigeon Needs a Bath!", author: "Mo Willems", age: "3-6" },
+//                     { title: "Press Here", author: "Hervé Tullet", age: "2-5" }
+//                 ]
+//             },
+//             bedtime: {
+//                 name: "Dr. Seuss Favorites",
+//                 emoji: "🎩",
+//                 books: [
+//                     { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Green Eggs and Ham", author: "Dr. Seuss", age: "2-6" },
+//                     { title: "One Fish Two Fish Red Fish Blue Fish", author: "Dr. Seuss", age: "2-6" },
+//                     { title: "Fox in Socks", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Hop on Pop", author: "Dr. Seuss", age: "2-5" },
+//                     { title: "The Cat in the Hat Comes Back", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Oh, the Places You'll Go!", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Horton Hears a Who!", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "The Lorax", author: "Dr. Seuss", age: "3-7" }
+//                 ]
+//             },
+//             learning: {
+//                 name: "Disney & Pixar Friends",
+//                 emoji: "🏰",
+//                 books: [
+//                     { title: "Frozen: A Sister More Like Me", author: "Disney", age: "3-6" },
+//                     { title: "Moana: The Ocean Calls", author: "Disney", age: "3-6" },
+//                     { title: "Finding Nemo: Ocean of Color", author: "Disney-Pixar", age: "3-6" },
+//                     { title: "The Lion King", author: "Disney", age: "3-6" },
+//                     { title: "Toy Story: Woody's New Friend", author: "Disney-Pixar", age: "3-6" },
+//                     { title: "Cars: The Spooky Sound", author: "Disney-Pixar", age: "3-6" },
+//                     { title: "Encanto: The Magic Within", author: "Disney", age: "3-6" },
+//                     { title: "Tangled: Rapunzel's Tale", author: "Disney", age: "3-6" },
+//                     { title: "Mickey Mouse Clubhouse: Mickey's Easter Hunt", author: "Disney", age: "2-5" },
+//                     { title: "Winnie the Pooh: The Honey Tree", author: "Disney", age: "2-5" }
+//                 ]
+//             },
+//             dogs: {
+//                 name: "Favorite Series Characters",
+//                 emoji: "📚",
+//                 books: [
+//                     { title: "Clifford the Big Red Dog", author: "Norman Bridwell", age: "2-5" },
+//                     { title: "Pete the Cat: I Love My White Shoes", author: "Eric Litwin", age: "3-6" },
+//                     { title: "Biscuit", author: "Alyssa Satin Capucilli", age: "1-3" },
+//                     { title: "Spot's First Walk", author: "Eric Hill", age: "0-3" },
+//                     { title: "Dog Man", author: "Dav Pilkey", age: "5-8" },
+//                     { title: "Bluey: The Beach", author: "Bluey", age: "3-6" },
+//                     { title: "PAW Patrol: The Great Pirate Rescue!", author: "Nickelodeon", age: "3-6" },
+//                     { title: "Go, Dog. Go!", author: "P.D. Eastman", age: "2-5" },
+//                     { title: "Harry the Dirty Dog", author: "Gene Zion", age: "3-6" },
+//                     { title: "Skippyjon Jones", author: "Judy Schachner", age: "3-6" }
+//                 ]
+//             },
+//             cats: {
+//                 name: "Cat Stories",
+//                 emoji: "🐱",
+//                 books: [
+//                     { title: "Pete the Cat: I Love My White Shoes", author: "Eric Litwin", age: "3-6" },
+//                     { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Splat the Cat", author: "Rob Scotton", age: "3-6" },
+//                     { title: "Millions of Cats", author: "Wanda Gág", age: "3-6" },
+//                     { title: "The Three Little Kittens", author: "Paul Galdone", age: "2-5" },
+//                     { title: "Bad Kitty", author: "Nick Bruel", age: "4-7" },
+//                     { title: "Cookie's Week", author: "Cindy Ward", age: "2-5" },
+//                     { title: "Kitten's First Full Moon", author: "Kevin Henkes", age: "2-5" },
+//                     { title: "The Cat Who Came In Off The Roof", author: "Annie M.G. Schmidt", age: "4-7" },
+//                     { title: "Six Dinner Sid", author: "Inga Moore", age: "3-6" }
+//                 ]
+//             },
+//             nature: {
+//                 name: "Nature & Outdoors",
+//                 emoji: "🌳",
+//                 books: [
+//                     { title: "The Curious Garden", author: "Peter Brown", age: "4-7" },
+//                     { title: "We Are the Gardeners", author: "Joanna Gaines", age: "4-7" },
+//                     { title: "The Thing About Bees", author: "Shabazz Larkin", age: "4-7" },
+//                     { title: "The Tiny Seed", author: "Eric Carle", age: "3-6" },
+//                     { title: "A Tree Is Nice", author: "Janice May Udry", age: "3-6" },
+//                     { title: "The Giving Tree", author: "Shel Silverstein", age: "4-7" },
+//                     { title: "Planting a Rainbow", author: "Lois Ehlert", age: "2-5" },
+//                     { title: "In the Tall, Tall Grass", author: "Denise Fleming", age: "2-5" },
+//                     { title: "The Dandelion Seed", author: "Joseph Anthony", age: "4-7" },
+//                     { title: "Up in the Garden and Down in the Dirt", author: "Kate Messner", age: "5-8" }
+//                 ]
+//             },
+//             adventure: {
+//                 name: "Adventure Stories",
+//                 emoji: "🚀",
+//                 books: [
+//                     { title: "We're Going on a Bear Hunt", author: "Michael Rosen", age: "3-6" },
+//                     { title: "The Little Engine That Could", author: "Watty Piper", age: "3-6" },
+//                     { title: "Harold and the Purple Crayon", author: "Crockett Johnson", age: "3-6" },
+//                     { title: "Oh, the Places You'll Go!", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "The Adventures of Beekle", author: "Dan Santat", age: "3-6" },
+//                     { title: "Not a Box", author: "Antoinette Portis", age: "2-5" },
+//                     { title: "Journey", author: "Aaron Becker", age: "4-7" },
+//                     { title: "Where the Sidewalk Ends", author: "Shel Silverstein", age: "4-7" },
+//                     { title: "The Snail and the Whale", author: "Julia Donaldson", age: "3-6" },
+//                     { title: "Rosie's Walk", author: "Pat Hutchins", age: "2-5" }
+//                 ]
+//             },
+//             pirates: {
+//                 name: "Pirates & Treasure",
+//                 emoji: "🏴‍☠️",
+//                 books: [
+//                     { title: "How I Became a Pirate", author: "Melinda Long", age: "4-7" },
+//                     { title: "Pirates Don't Change Diapers", author: "Melinda Long", age: "4-7" },
+//                     { title: "Shiver Me Letters", author: "June Sobel", age: "3-6" },
+//                     { title: "The Night Pirates", author: "Peter Harris", age: "3-6" },
+//                     { title: "Pirate Pete's Talk Like a Pirate", author: "Kim Kennedy", age: "3-6" },
+//                     { title: "This Little Pirate", author: "Philemon Sturges", age: "2-5" },
+//                     { title: "Pirates Love Underpants", author: "Claire Freedman", age: "3-6" },
+//                     { title: "The Pirate Cruncher", author: "Jonny Duddle", age: "4-7" },
+//                     { title: "Port Side Pirates", author: "Oscar Seaworthy", age: "3-6" },
+//                     { title: "Goldilocks and the Three Pirates", author: "April Jones Prince", age: "4-7" }
+//                 ]
+//             },
+//             dinosaurs: {
+//                 name: "Dinosaur Adventures",
+//                 emoji: "🦕",
+//                 books: [
+//                     { title: "How Do Dinosaurs Say Goodnight?", author: "Jane Yolen", age: "2-5" },
+//                     { title: "Dinosaurs Love Underpants", author: "Claire Freedman", age: "3-6" },
+//                     { title: "If the Dinosaurs Came Back", author: "Bernard Most", age: "3-6" },
+//                     { title: "The Dinosaur Alphabet Book", author: "Jerry Pallotta", age: "4-7" },
+//                     { title: "Goldilocks and the Three Dinosaurs", author: "Mo Willems", age: "3-6" },
+//                     { title: "Danny and the Dinosaur", author: "Syd Hoff", age: "3-6" },
+//                     { title: "Digging Up Dinosaurs", author: "Aliki", age: "4-7" },
+//                     { title: "Dinosaur Bones", author: "Bob Barner", age: "3-6" },
+//                     { title: "Dinosaurs, Dinosaurs", author: "Byron Barton", age: "2-5" },
+//                     { title: "Dinosaur Roar!", author: "Paul and Henrietta Stickland", age: "2-5" }
+//                 ]
+//             },
+//             christmas: {
+//                 name: "Christmas Stories",
+//                 emoji: "🎄",
+//                 books: [
+//                     { title: "The Polar Express", author: "Chris Van Allsburg", age: "3-7" },
+//                     { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "The Night Before Christmas", author: "Clement C. Moore", age: "3-7" },
+//                     { title: "The Snowman", author: "Raymond Briggs", age: "2-6" },
+//                     { title: "Olive, the Other Reindeer", author: "Vivian Walsh", age: "3-6" },
+//                     { title: "The Little Drummer Boy", author: "Ezra Jack Keats", age: "3-6" },
+//                     { title: "Bear Stays Up for Christmas", author: "Karma Wilson", age: "2-5" },
+//                     { title: "The Christmas Wish", author: "Lori Evert", age: "4-7" },
+//                     { title: "Dream Snow", author: "Eric Carle", age: "2-5" },
+//                     { title: "Merry Christmas, Big Hungry Bear!", author: "Don and Audrey Wood", age: "2-5" }
+//                 ]
+//             },
+//             thanksgiving: {
+//                 name: "Thanksgiving Stories",
+//                 emoji: "🦃",
+//                 books: [
+//                     { title: "Turkey Trouble", author: "Wendi Silvano", age: "3-6" },
+//                     { title: "The Thankful Book", author: "Todd Parr", age: "2-5" },
+//                     { title: "'Twas the Night Before Thanksgiving", author: "Dav Pilkey", age: "4-7" },
+//                     { title: "Bear Says Thanks", author: "Karma Wilson", age: "2-5" },
+//                     { title: "The Perfect Thanksgiving", author: "Eileen Spinelli", age: "3-6" },
+//                     { title: "Thanksgiving Is for Giving Thanks", author: "Margaret Sutherland", age: "2-5" },
+//                     { title: "Balloons Over Broadway", author: "Melissa Sweet", age: "4-7" },
+//                     { title: "Gracias the Thanksgiving Turkey", author: "Joy Cowley", age: "3-6" },
+//                     { title: "Pete the Cat: The First Thanksgiving", author: "James Dean", age: "3-6" },
+//                     { title: "10 Fat Turkeys", author: "Tony Johnston", age: "2-5" }
+//                 ]
+//             },
+//             halloween: {
+//                 name: "Halloween Stories",
+//                 emoji: "🎃",
+//                 books: [
+//                     { title: "Room on the Broom", author: "Julia Donaldson", age: "3-6" },
+//                     { title: "It's the Great Pumpkin, Charlie Brown", author: "Charles M. Schulz", age: "3-7" },
+//                     { title: "The Little Old Lady Who Was Not Afraid of Anything", author: "Linda Williams", age: "3-6" },
+//                     { title: "Big Pumpkin", author: "Erica Silverman", age: "3-6" },
+//                     { title: "Five Little Pumpkins", author: "Iris Van Rynbach", age: "2-5" },
+//                     { title: "Skeleton Hiccups", author: "Margery Cuyler", age: "3-6" },
+//                     { title: "The Biggest Pumpkin Ever", author: "Steven Kroll", age: "3-6" },
+//                     { title: "Click, Clack, Boo!", author: "Doreen Cronin", age: "3-6" },
+//                     { title: "Creepy Carrots!", author: "Aaron Reynolds", age: "4-7" },
+//                     { title: "The Monster at the End of This Book", author: "Jon Stone", age: "2-5" }
+//                 ]
+//             },
+//             winter: {
+//                 name: "Winter Stories",
+//                 emoji: "❄️",
+//                 books: [
+//                     { title: "The Snowy Day", author: "Ezra Jack Keats", age: "2-5" },
+//                     { title: "The Mitten", author: "Jan Brett", age: "3-6" },
+//                     { title: "Owl Moon", author: "Jane Yolen", age: "3-7" },
+//                     { title: "The Snowman", author: "Raymond Briggs", age: "2-6" },
+//                     { title: "Snow", author: "Uri Shulevitz", age: "2-5" },
+//                     { title: "The Jacket I Wear in the Snow", author: "Shirley Neitzel", age: "2-5" },
+//                     { title: "Over and Under the Snow", author: "Kate Messner", age: "4-7" },
+//                     { title: "Snowflake Bentley", author: "Jacqueline Briggs Martin", age: "5-8" },
+//                     { title: "Ten on the Sled", author: "Kim Norman", age: "2-5" },
+//                     { title: "The First Day of Winter", author: "Denise Fleming", age: "2-5" }
+//                 ]
+//             },
+//             spring: {
+//                 name: "Spring Stories",
+//                 emoji: "🌷",
+//                 books: [
+//                     { title: "The Curious Garden", author: "Peter Brown", age: "4-7" },
+//                     { title: "Planting a Rainbow", author: "Lois Ehlert", age: "2-5" },
+//                     { title: "The Carrot Seed", author: "Ruth Krauss", age: "2-5" },
+//                     { title: "It's Spring!", author: "Linda Glaser", age: "3-6" },
+//                     { title: "When Spring Comes", author: "Kevin Henkes", age: "3-6" },
+//                     { title: "The Thing About Spring", author: "Daniel Kirk", age: "3-6" },
+//                     { title: "Mouse's First Spring", author: "Lauren Thompson", age: "0-3" },
+//                     { title: "Spring Is Here", author: "Taro Gomi", age: "2-5" },
+//                     { title: "Hurray for Spring!", author: "Patricia Hubbell", age: "2-5" },
+//                     { title: "And Then It's Spring", author: "Julie Fogliano", age: "3-6" }
+//                 ]
+//             },
+//             summer: {
+//                 name: "Summer Stories",
+//                 emoji: "☀️",
+//                 books: [
+//                     { title: "The Watermelon Seed", author: "Greg Pizzoli", age: "2-5" },
+//                     { title: "A Perfect Day", author: "Lane Smith", age: "3-6" },
+//                     { title: "The Sandcastle That Lola Built", author: "Megan Maynor", age: "3-6" },
+//                     { title: "Maisy Goes to the Beach", author: "Lucy Cousins", age: "0-3" },
+//                     { title: "Beach Day", author: "Karen Roosa", age: "2-5" },
+//                     { title: "Summer Days and Nights", author: "Wong Herbert Yee", age: "3-6" },
+//                     { title: "Come On, Rain!", author: "Karen Hesse", age: "3-6" },
+//                     { title: "The Summer My Father Was Ten", author: "Pat Brisson", age: "4-7" },
+//                     { title: "How to Catch a Star", author: "Oliver Jeffers", age: "3-6" },
+//                     { title: "The Night Before Summer Vacation", author: "Natasha Wing", age: "3-6" }
+//                 ]
+//             },
+//             fall: {
+//                 name: "Fall/Autumn Stories",
+//                 emoji: "🍂",
+//                 books: [
+//                     { title: "Leaf Man", author: "Lois Ehlert", age: "3-6" },
+//                     { title: "We're Going on a Leaf Hunt", author: "Steve Metzger", age: "2-5" },
+//                     { title: "Red Leaf, Yellow Leaf", author: "Lois Ehlert", age: "3-6" },
+//                     { title: "The Busy Little Squirrel", author: "Nancy Tafuri", age: "2-5" },
+//                     { title: "Fall Is Not Easy", author: "Marty Kelley", age: "3-6" },
+//                     { title: "Goodbye Summer, Hello Autumn", author: "Kenard Pak", age: "3-6" },
+//                     { title: "Awesome Autumn", author: "Bruce Goldstone", age: "3-6" },
+//                     { title: "The Apple Pie Tree", author: "Zoe Hall", age: "2-5" },
+//                     { title: "Leaves", author: "David Ezra Stein", age: "2-5" },
+//                     { title: "Fall Mixed Up", author: "Bob Raczka", age: "3-6" }
+//                 ]
+//             },
+//             classic: {
+//                 name: "Classic Picture Books",
+//                 emoji: "📖",
+//                 books: [
+//                     { title: "The Very Hungry Caterpillar", author: "Eric Carle", age: "2-5" },
+//                     { title: "Where the Wild Things Are", author: "Maurice Sendak", age: "3-6" },
+//                     { title: "Goodnight Moon", author: "Margaret Wise Brown", age: "0-3" },
+//                     { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Corduroy", author: "Don Freeman", age: "3-5" },
+//                     { title: "Curious George", author: "H.A. Rey", age: "3-6" },
+//                     { title: "The Rainbow Fish", author: "Marcus Pfister", age: "3-6" },
+//                     { title: "Brown Bear, Brown Bear, What Do You See?", author: "Bill Martin Jr.", age: "0-3" },
+//                     { title: "Madeline", author: "Ludwig Bemelmans", age: "3-6" },
+//                     { title: "The Little House", author: "Virginia Lee Burton", age: "3-6" }
+//                 ]
+//             },
+//             bedtime: {
+//                 name: "Dr. Seuss Favorites",
+//                 emoji: "🎩",
+//                 books: [
+//                     { title: "The Cat in the Hat", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Green Eggs and Ham", author: "Dr. Seuss", age: "2-6" },
+//                     { title: "One Fish Two Fish Red Fish Blue Fish", author: "Dr. Seuss", age: "2-6" },
+//                     { title: "Fox in Socks", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Hop on Pop", author: "Dr. Seuss", age: "2-5" },
+//                     { title: "The Cat in the Hat Comes Back", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Oh, the Places You'll Go!", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "How the Grinch Stole Christmas", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "Horton Hears a Who!", author: "Dr. Seuss", age: "3-7" },
+//                     { title: "The Lorax", author: "Dr. Seuss", age: "3-7" }
+//                 ]
+//             },
+//             rhymes: {
+//                 name: "Nursery Rhymes",
+//                 emoji: "🎵",
+//                 books: [
+//                     { title: "Mother Goose's Nursery Rhymes", author: "Various", age: "0-5" },
+//                     { title: "The Real Mother Goose", author: "Blanche Fisher Wright", age: "0-5" },
+//                     { title: "Mary Engelbreit's Mother Goose", author: "Mary Engelbreit", age: "0-5" },
+//                     { title: "Tomie dePaola's Mother Goose", author: "Tomie dePaola", age: "0-5" },
+//                     { title: "Richard Scarry's Best Mother Goose Ever", author: "Richard Scarry", age: "0-5" },
+//                     { title: "Each Peach Pear Plum", author: "Janet & Allan Ahlberg", age: "0-3" },
+//                     { title: "Hickory Dickory Dock", author: "Keith Baker", age: "0-3" },
+//                     { title: "Hey Diddle Diddle", author: "Salley Mavor", age: "0-3" },
+//                     { title: "Pat-a-Cake", author: "Mary Brigid Barrett", age: "0-3" },
+//                     { title: "This Little Piggy", author: "Jane Yolen", age: "0-3" }
+//                 ]
+//             }
+//         // }; // Book suggestions now loaded from js/bookSuggestions.js
 
         // Milestones
         const milestones = [
@@ -4866,5 +4866,6 @@
             }
         });
     </script>
+    <script src="js/bookSuggestions.js"></script>
 </body>
 </html>
