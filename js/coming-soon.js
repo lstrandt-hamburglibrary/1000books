@@ -1,5 +1,6 @@
 // Coming Soon Features for 1000 Books Before Kindergarten
 // This file contains placeholders and UI for upcoming features
+// All features listed here CAN be implemented on GitHub Pages (no backend required)
 
 // Feature categories with their upcoming features
 const comingSoonFeatures = {
@@ -9,9 +10,10 @@ const comingSoonFeatures = {
             {
                 name: "Book Scanner",
                 icon: "📷",
-                description: "Scan book barcodes to quickly add books",
+                description: "Scan ISBN barcodes using camera",
                 priority: "high",
-                status: "planned"
+                status: "planned",
+                note: "Uses device camera + free ISBN API"
             },
             {
                 name: "Reading Timer",
@@ -35,11 +37,11 @@ const comingSoonFeatures = {
                 status: "planned"
             },
             {
-                name: "Reading Streaks",
-                icon: "🔥",
-                description: "Track consecutive reading days",
+                name: "Book Search",
+                icon: "🔍",
+                description: "Search and filter your library",
                 priority: "high",
-                status: "in-progress"
+                status: "planned"
             }
         ]
     },
@@ -47,31 +49,33 @@ const comingSoonFeatures = {
         title: "👨‍👩‍👧‍👦 Parent/Child Features",
         features: [
             {
-                name: "Multiple Profiles",
-                icon: "👶",
-                description: "Support multiple children in one app",
-                priority: "high",
-                status: "planned"
-            },
-            {
-                name: "Voice Recording",
-                icon: "🎙️",
-                description: "Record child reading their favorite books",
-                priority: "medium",
-                status: "planned"
-            },
-            {
-                name: "Photo Memories",
-                icon: "📸",
-                description: "Attach photos to each book read",
-                priority: "medium",
-                status: "planned"
-            },
-            {
-                name: "Progress Sharing",
+                name: "Progress Reports",
                 icon: "📊",
-                description: "Beautiful reports to share with family",
+                description: "Create beautiful reports to share",
+                priority: "high",
+                status: "planned",
+                note: "PDF/image generation"
+            },
+            {
+                name: "Reading Certificates",
+                icon: "🏆",
+                description: "Generate achievement certificates",
+                priority: "medium",
+                status: "planned",
+                note: "Printable awards"
+            },
+            {
+                name: "Book Notes",
+                icon: "📝",
+                description: "Add personal notes to each book",
                 priority: "low",
+                status: "planned"
+            },
+            {
+                name: "Reading Calendar",
+                icon: "📅",
+                description: "Visual calendar of reading history",
+                priority: "medium",
                 status: "planned"
             }
         ]
@@ -121,41 +125,45 @@ const comingSoonFeatures = {
             }
         ]
     },
-    social: {
-        title: "🌟 Social & Community",
+    sharing: {
+        title: "🌟 Sharing & Backup",
         features: [
             {
-                name: "Reading Buddies",
-                icon: "👫",
-                description: "Connect with other families",
-                priority: "low",
-                status: "planned"
-            },
-            {
-                name: "Friend Recommendations",
-                icon: "💭",
-                description: "See what friends are reading",
-                priority: "low",
-                status: "planned"
-            },
-            {
-                name: "Library Integration",
-                icon: "🏛️",
-                description: "Check book availability at library",
+                name: "Family Sharing",
+                icon: "👨‍👩‍👧‍👦",
+                description: "Share progress via codes",
                 priority: "medium",
-                status: "research"
+                status: "planned",
+                note: "Uses shareable links"
+            },
+            {
+                name: "Library Lookup",
+                icon: "🏛️",
+                description: "Check book availability",
+                priority: "medium",
+                status: "research",
+                note: "Uses OpenLibrary API"
             },
             {
                 name: "Monthly Challenges",
                 icon: "🏆",
-                description: "Themed reading challenges",
+                description: "Built-in reading challenges",
                 priority: "medium",
-                status: "planned"
+                status: "planned",
+                note: "Pre-programmed challenges"
             },
             {
-                name: "Leaderboards",
-                icon: "📈",
-                description: "Friendly competition (optional)",
+                name: "Export Options",
+                icon: "💾",
+                description: "Multiple backup formats",
+                priority: "high",
+                status: "planned",
+                note: "JSON, CSV, PDF exports"
+            },
+            {
+                name: "QR Code Sharing",
+                icon: "📱",
+                description: "Share progress via QR codes",
                 priority: "low",
                 status: "planned"
             }
@@ -179,17 +187,17 @@ const comingSoonFeatures = {
                 status: "planned"
             },
             {
-                name: "Genre Tracker",
-                icon: "📚",
-                description: "Track reading diversity",
-                priority: "low",
+                name: "Reading Patterns",
+                icon: "📊",
+                description: "Analyze reading habits and trends",
+                priority: "medium",
                 status: "planned"
             },
             {
-                name: "Reading Level",
-                icon: "📏",
-                description: "Track book complexity over time",
-                priority: "low",
+                name: "Visual Reports",
+                icon: "📉",
+                description: "Charts and graphs of progress",
+                priority: "medium",
                 status: "planned"
             }
         ]
@@ -203,14 +211,21 @@ function createComingSoonUI() {
         <div style="padding: 20px;">
             <h2 style="margin-bottom: 20px;">🚀 Coming Soon Features</h2>
             <p style="margin-bottom: 20px; color: #666;">
-                Exciting features in development! Tap any feature to learn more.
+                All features below can be implemented without a server - they work entirely in your browser!
             </p>
+            <div style="margin-bottom: 20px; padding: 15px; background: #e8f5e9; border-radius: 10px; border: 2px solid #4caf50;">
+                <strong style="color: #2e7d32;">✅ No Backend Required!</strong>
+                <p style="margin: 5px 0 0 0; color: #2e7d32;">
+                    Every feature here works with GitHub Pages using browser storage,
+                    free APIs, and client-side JavaScript.
+                </p>
+            </div>
             ${Object.entries(comingSoonFeatures).map(([key, category]) => `
                 <div style="margin-bottom: 30px;">
                     <h3 style="margin-bottom: 15px; color: #667eea;">${category.title}</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">
                         ${category.features.map(feature => `
-                            <div onclick="showFeatureDetails('${feature.name}', '${feature.description}')"
+                            <div onclick="showFeatureDetails('${feature.name}', '${feature.description}', '${feature.note || ''}')"
                                  style="
                                     padding: 15px;
                                     background: ${getStatusColor(feature.status)};
@@ -224,6 +239,9 @@ function createComingSoonUI() {
                                  onmouseout="this.style.transform='scale(1)'">
                                 <div style="font-size: 2rem; margin-bottom: 5px;">${feature.icon}</div>
                                 <div style="font-size: 0.9rem; font-weight: bold;">${feature.name}</div>
+                                ${feature.note ?
+                                    '<div style="font-size: 0.7rem; margin-top: 5px; opacity: 0.8;">💡 ' + feature.note + '</div>' :
+                                    ''}
                                 ${feature.status === 'in-progress' ?
                                     '<span style="position: absolute; top: 5px; right: 5px; background: #ffc107; color: white; padding: 2px 5px; border-radius: 5px; font-size: 0.7rem;">IN PROGRESS</span>' :
                                     ''}
@@ -248,8 +266,9 @@ function getStatusColor(status) {
 }
 
 // Show feature details
-function showFeatureDetails(name, description) {
-    showToast(`${name}: ${description}`, 3000);
+function showFeatureDetails(name, description, note) {
+    const message = note ? `${name}: ${description}\n💡 ${note}` : `${name}: ${description}`;
+    showToast(message, 3000);
 }
 
 // Create placeholder game cards for coming soon games
@@ -352,31 +371,8 @@ function initComingSoon() {
 
 // Add features to dashboard
 function addDashboardFeatures() {
-    const dashboard = document.getElementById('dashboard');
-    if (dashboard) {
-        // Add reading streak indicator placeholder
-        const streakPlaceholder = document.createElement('div');
-        streakPlaceholder.innerHTML = `
-            <div style="
-                margin: 20px 0;
-                padding: 15px;
-                background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-                color: white;
-                border-radius: 10px;
-                text-align: center;
-            ">
-                <h3>🔥 Reading Streaks Coming Soon!</h3>
-                <p style="margin: 5px 0; font-size: 0.9rem;">
-                    Track consecutive reading days and earn rewards
-                </p>
-            </div>
-        `;
-
-        const quickStats = dashboard.querySelector('.quick-stats');
-        if (quickStats) {
-            quickStats.parentElement.insertBefore(streakPlaceholder, quickStats);
-        }
-    }
+    // Currently no dashboard placeholders needed since streaks already exist
+    // This function kept for future dashboard enhancements
 }
 
 // Add placeholders to library page
