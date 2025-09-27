@@ -5626,6 +5626,13 @@
                    document.referrer.includes('android-app://');
         }
 
+        // Show install button if not installed
+        window.addEventListener('load', () => {
+            if (!isStandalone() && permanentInstallBtn) {
+                permanentInstallBtn.style.display = 'block';
+            }
+        });
+
         // Listen for the install prompt event
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevent the default prompt
