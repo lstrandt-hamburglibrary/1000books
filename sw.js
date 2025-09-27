@@ -1,5 +1,5 @@
 // Service Worker for 1000 Books Before Kindergarten
-const VERSION = '3.3.0';
+const VERSION = '3.3.1';
 const CACHE_NAME = `1000books-v${VERSION}`;
 const BYPASS_CACHE = true; // Temporary: bypass cache to force updates
 
@@ -149,16 +149,25 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
-  if (event.action === 'read') {
+  if (event.action === 'backup') {
+    // Open settings page for backup
+    event.waitUntil(
+      clients.openWindow('./?page=settings#backup')
+    );
+  } else if (event.action === 'view') {
+    // View progress dashboard
+    event.waitUntil(
+      clients.openWindow('./?page=dashboard')
+    );
+  } else if (event.action === 'add' || event.action === 'read') {
     // Open the app to add a book
     event.waitUntil(
       clients.openWindow('./?page=add-book')
     );
   } else if (event.action === 'later') {
-    // Schedule another reminder in 2 hours
-    // Note: This would need backend support for rescheduling
+    // Just close for now - they'll get reminded next week
     event.waitUntil(
-      clients.openWindow('./?snooze=true')
+      clients.openWindow('./')
     );
   } else {
     // Default click - open app

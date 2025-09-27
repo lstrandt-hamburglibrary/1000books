@@ -1,4 +1,5 @@
 // Notification Management System for 1000 Books Before Kindergarten
+// Designed to be helpful but not annoying - focuses on weekly reminders
 
 // Check if browser supports notifications
 function checkNotificationSupport() {
@@ -24,7 +25,7 @@ async function requestNotificationPermission() {
         localStorage.setItem('notificationPermission', 'granted');
 
         // Show success message
-        showToast('Notifications enabled! You\'ll get daily reading reminders 📚');
+        showToast('Notifications enabled! You\'ll get weekly reminders 📚');
 
         // Schedule initial notifications
         scheduleNotifications();
@@ -45,26 +46,33 @@ function scheduleNotifications() {
 
     if (!settings.enabled) return;
 
-    // For now, we'll use local notifications
-    // In a production app, you'd use a backend service for push notifications
-    scheduleLocalNotifications(settings);
+    // Schedule weekly notifications
+    scheduleWeeklyNotifications(settings);
 }
 
-// Schedule local notifications (using setTimeout for demo)
-function scheduleLocalNotifications(settings) {
+// Schedule weekly notifications
+function scheduleWeeklyNotifications(settings) {
     const now = new Date();
-    const scheduledTime = new Date();
+    const nextNotification = new Date();
 
-    // Parse the reminder time (e.g., "09:00")
+    // Default to Sunday at the specified time
+    const dayOfWeek = settings.backupReminderDay || 0; // 0 = Sunday
     const [hours, minutes] = settings.reminderTime.split(':').map(Number);
-    scheduledTime.setHours(hours, minutes, 0, 0);
 
-    // If the time has already passed today, schedule for tomorrow
-    if (scheduledTime <= now) {
-        scheduledTime.setDate(scheduledTime.getDate() + 1);
+    // Find next occurrence of the specified day
+    nextNotification.setHours(hours, minutes, 0, 0);
+
+    // Calculate days until next notification day
+    const daysUntilNotification = (dayOfWeek + 7 - now.getDay()) % 7;
+
+    // If it's the notification day but time has passed, schedule for next week
+    if (daysUntilNotification === 0 && nextNotification <= now) {
+        nextNotification.setDate(nextNotification.getDate() + 7);
+    } else if (daysUntilNotification > 0) {
+        nextNotification.setDate(nextNotification.getDate() + daysUntilNotification);
     }
 
-    const timeUntilNotification = scheduledTime - now;
+    const timeUntilNotification = nextNotification - now;
 
     // Clear any existing scheduled notification
     if (window.notificationTimeout) {
@@ -73,36 +81,50 @@ function scheduleLocalNotifications(settings) {
 
     // Schedule the notification
     window.notificationTimeout = setTimeout(() => {
-        showLocalNotification(settings);
-        // Reschedule for the next day
-        scheduleLocalNotifications(settings);
+        determineAndShowNotification(settings);
+        // Reschedule for next week
+        scheduleWeeklyNotifications(settings);
     }, timeUntilNotification);
 
-    console.log(`Notification scheduled for ${scheduledTime.toLocaleString()}`);
+    console.log(`Next notification scheduled for ${nextNotification.toLocaleString()}`);
 }
 
-// Show a local notification
-async function showLocalNotification(settings) {
+// Determine which notification to show
+async function determineAndShowNotification(settings) {
+    const lastBackup = localStorage.getItem('lastBackupTime');
+    const lastBackupDate = lastBackup ? new Date(lastBackup) : null;
+    const daysSinceBackup = lastBackupDate ?
+        Math.floor((Date.now() - lastBackupDate) / (1000 * 60 * 60 * 24)) : 999;
+
+    // Priority 1: Backup reminder (if more than 7 days or never backed up)
+    if (settings.backupReminders && daysSinceBackup >= 7) {
+        await showBackupReminder();
+    }
+    // Priority 2: Weekly reading summary
+    else if (settings.weeklyProgress) {
+        await showWeeklySummary();
+    }
+}
+
+// Show backup reminder notification
+async function showBackupReminder() {
     if (Notification.permission !== 'granted') return;
 
     const registration = await navigator.serviceWorker.ready;
+    const books = JSON.parse(localStorage.getItem('books') || '[]');
+    const childName = localStorage.getItem('childName') || 'your child';
 
-    // Get reading statistics
-    const stats = getReadingStats();
-    const messages = getNotificationMessage(stats, settings);
-
-    // Show notification through service worker
-    registration.showNotification(messages.title, {
-        body: messages.body,
+    registration.showNotification('📱 Time to Backup Reading Progress', {
+        body: `${childName} has read ${books.length} books! Tap to backup your reading log and keep it safe.`,
         icon: './icon-192.png',
         badge: './icon-96.png',
-        tag: 'reading-reminder',
-        requireInteraction: settings.requireInteraction || false,
+        tag: 'backup-reminder',
+        requireInteraction: true,
         vibrate: [200, 100, 200],
         actions: [
             {
-                action: 'read',
-                title: 'Start Reading'
+                action: 'backup',
+                title: 'Backup Now'
             },
             {
                 action: 'later',
@@ -110,101 +132,85 @@ async function showLocalNotification(settings) {
             }
         ],
         data: {
-            type: 'daily-reminder',
+            type: 'backup-reminder',
             timestamp: Date.now()
         }
     });
 }
 
-// Get personalized notification message based on progress
-function getNotificationMessage(stats, settings) {
-    const childName = localStorage.getItem('childName') || 'Little Reader';
-    const messages = {
-        title: '',
-        body: ''
-    };
+// Show weekly reading summary
+async function showWeeklySummary() {
+    if (Notification.permission !== 'granted') return;
 
-    // Check for streak
-    if (stats.currentStreak > 0) {
-        messages.title = `${stats.currentStreak} Day Streak! Keep it up, ${childName}! 🔥`;
+    const registration = await navigator.serviceWorker.ready;
+    const stats = getWeeklyStats();
+    const childName = localStorage.getItem('childName') || 'Your reader';
+
+    let title = `📚 ${childName}'s Weekly Reading Summary`;
+    let body = '';
+
+    if (stats.booksThisWeek === 0) {
+        body = `No books logged this week. Let's get back to reading! Total: ${stats.totalBooks}/1000 books`;
+    } else if (stats.booksThisWeek === 1) {
+        body = `1 book read this week! Total progress: ${stats.totalBooks}/1000 books`;
     } else {
-        messages.title = `Reading Time, ${childName}! 📚`;
+        body = `${stats.booksThisWeek} books read this week! Amazing! Total: ${stats.totalBooks}/1000 books`;
     }
 
-    // Personalized body message
-    if (stats.booksToday === 0) {
-        messages.body = `Let's read your first book today! ${stats.totalBooks}/1000 books so far.`;
-    } else if (stats.booksToday < settings.dailyGoal) {
-        messages.body = `${stats.booksToday} book${stats.booksToday > 1 ? 's' : ''} today! ${settings.dailyGoal - stats.booksToday} more to reach your goal.`;
-    } else {
-        messages.body = `Amazing! You've reached today's goal! Total: ${stats.totalBooks}/1000 📖`;
+    // Add milestone notifications
+    if (stats.totalBooks >= 900 && stats.totalBooks < 1000) {
+        body += ` - Almost there! Only ${1000 - stats.totalBooks} books to go!`;
+    } else if (stats.totalBooks % 100 === 0 && stats.totalBooks > 0) {
+        body += ` - Milestone reached! 🎉`;
     }
 
-    return messages;
+    registration.showNotification(title, {
+        body: body,
+        icon: './icon-192.png',
+        badge: './icon-96.png',
+        tag: 'weekly-summary',
+        vibrate: [200, 100, 200],
+        actions: [
+            {
+                action: 'view',
+                title: 'View Progress'
+            },
+            {
+                action: 'add',
+                title: 'Add Book'
+            }
+        ],
+        data: {
+            type: 'weekly-summary',
+            timestamp: Date.now()
+        }
+    });
 }
 
-// Get reading statistics
-function getReadingStats() {
+// Get weekly reading statistics
+function getWeeklyStats() {
     const books = JSON.parse(localStorage.getItem('books') || '[]');
-    const today = new Date().toDateString();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    const booksToday = books.filter(book =>
-        new Date(book.dateAdded).toDateString() === today
+    const booksThisWeek = books.filter(book =>
+        new Date(book.dateAdded) >= oneWeekAgo
     ).length;
 
-    const totalBooks = books.length;
-    const currentStreak = calculateReadingStreak(books);
-
     return {
-        booksToday,
-        totalBooks,
-        currentStreak
+        booksThisWeek,
+        totalBooks: books.length
     };
-}
-
-// Calculate reading streak
-function calculateReadingStreak(books) {
-    if (books.length === 0) return 0;
-
-    const booksByDate = {};
-    books.forEach(book => {
-        const date = new Date(book.dateAdded).toDateString();
-        booksByDate[date] = true;
-    });
-
-    let streak = 0;
-    let checkDate = new Date();
-
-    while (booksByDate[checkDate.toDateString()]) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-    }
-
-    // Check if streak was broken (yesterday has no books)
-    checkDate = new Date();
-    checkDate.setDate(checkDate.getDate() - 1);
-    if (streak === 0 && booksByDate[checkDate.toDateString()]) {
-        // Count previous streak
-        while (booksByDate[checkDate.toDateString()]) {
-            streak++;
-            checkDate.setDate(checkDate.getDate() - 1);
-        }
-        // But mark it as broken
-        streak = 0;
-    }
-
-    return streak;
 }
 
 // Get notification settings
 function getNotificationSettings() {
     const defaultSettings = {
         enabled: false,
-        reminderTime: '09:00',
-        dailyGoal: 3,
-        requireInteraction: false,
-        soundEnabled: true,
-        weekendReminders: true
+        backupReminders: true,      // Weekly backup reminders
+        weeklyProgress: false,       // Weekly progress summary
+        reminderTime: '10:00',       // Time of day for notifications
+        backupReminderDay: 0,        // 0 = Sunday, 1 = Monday, etc.
     };
 
     const saved = localStorage.getItem('notificationSettings');
@@ -225,20 +231,18 @@ function saveNotificationSettings(settings) {
     }
 }
 
-// Test notification
-async function testNotification() {
+// Test notification - let user choose which type
+async function testNotification(type = 'backup') {
     if (Notification.permission !== 'granted') {
         const granted = await requestNotificationPermission();
         if (!granted) return;
     }
 
-    const registration = await navigator.serviceWorker.ready;
-    registration.showNotification('Test Notification 🎉', {
-        body: 'Great! Notifications are working. You\'ll get daily reading reminders.',
-        icon: './icon-192.png',
-        badge: './icon-96.png',
-        vibrate: [200, 100, 200]
-    });
+    if (type === 'backup') {
+        await showBackupReminder();
+    } else if (type === 'summary') {
+        await showWeeklySummary();
+    }
 }
 
 // Initialize notification system
@@ -275,5 +279,5 @@ window.notificationManager = {
     testNotification: testNotification,
     getSettings: getNotificationSettings,
     saveSettings: saveNotificationSettings,
-    getStats: getReadingStats
+    getWeeklyStats: getWeeklyStats
 };
