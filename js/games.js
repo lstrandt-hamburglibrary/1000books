@@ -18,7 +18,7 @@ function launchGame(gameName) {
     }
 }
 
-// Pete's Button Hunt Game
+// Pete's Button Sorting Game
 function launchPeteButtonGame() {
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
@@ -37,13 +37,13 @@ function launchPeteButtonGame() {
                 background: white;
                 padding: 2rem;
                 border-radius: 20px;
-                max-width: 600px;
+                max-width: 700px;
                 width: 90%;
                 max-height: 90vh;
                 overflow-y: auto;
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h2>🔘 Pete's Button Hunt</h2>
+                    <h2>🔘 Pete's Button Sort</h2>
                     <button onclick="closeMiniGame()" style="
                         background: #dc3545;
                         color: white;
@@ -55,7 +55,38 @@ function launchPeteButtonGame() {
                     ">Close ✕</button>
                 </div>
 
-                <p style="margin-bottom: 1rem;">Help Pete find all 4 of his groovy buttons! Click on them when you see them.</p>
+                <!-- Level Selection -->
+                <div id="levelSelect" style="margin-bottom: 1rem;">
+                    <p style="margin-bottom: 0.5rem;">Choose a sorting challenge:</p>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+                        <button onclick="startButtonSort(1)" style="
+                            padding: 0.5rem 1rem;
+                            background: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Level 1: Sort by Color</button>
+                        <button onclick="startButtonSort(2)" style="
+                            padding: 0.5rem 1rem;
+                            background: #fbbf24;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Level 2: Sort by Size</button>
+                        <button onclick="startButtonSort(3)" style="
+                            padding: 0.5rem 1rem;
+                            background: #dc3545;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Level 3: Sort by Shape</button>
+                    </div>
+                </div>
+
+                <p id="sortInstructions" style="margin-bottom: 1rem; text-align: center; font-weight: bold;">Select a level to start!</p>
 
                 <div id="buttonGameScore" style="
                     display: flex;
@@ -65,18 +96,29 @@ function launchPeteButtonGame() {
                     background: #f8f9fa;
                     border-radius: 10px;
                 ">
-                    <span>Buttons Found: <strong id="buttonsFound">0</strong>/4</span>
-                    <span>Time: <strong id="gameTimer">0</strong>s</span>
+                    <span>Sorted: <strong id="buttonsSorted">0</strong>/<strong id="totalButtons">0</strong></span>
+                    <span>Score: <strong id="gameScore">0</strong></span>
                 </div>
 
                 <div id="buttonGameArea" style="
                     position: relative;
-                    height: 400px;
-                    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                    min-height: 200px;
+                    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
                     border-radius: 15px;
-                    overflow: hidden;
+                    padding: 1rem;
+                    margin-bottom: 1rem;
                 ">
-                    <!-- Buttons will appear here -->
+                    <!-- Buttons to sort will appear here -->
+                </div>
+
+                <!-- Sorting bins -->
+                <div id="sortingBins" style="
+                    display: flex;
+                    gap: 1rem;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                ">
+                    <!-- Bins will be created based on level -->
                 </div>
 
                 <div id="gameComplete" style="
@@ -84,9 +126,9 @@ function launchPeteButtonGame() {
                     text-align: center;
                     margin-top: 1rem;
                 ">
-                    <h3 style="color: #28a745;">🎉 Groovy! You found all the buttons!</h3>
-                    <p>Time: <span id="finalTime">0</span> seconds</p>
-                    <button onclick="startPeteGame()" style="
+                    <h3 style="color: #28a745;">🎉 Groovy! All buttons sorted!</h3>
+                    <p>Score: <span id="finalScore">0</span></p>
+                    <button onclick="location.reload()" style="
                         margin-top: 1rem;
                         padding: 0.75rem 2rem;
                         background: #667eea;
@@ -101,86 +143,244 @@ function launchPeteButtonGame() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', gameHTML);
-    startPeteGame();
 }
 
-// Start Pete's Button Game
-function startPeteGame() {
-    let buttonsFound = 0;
-    let gameTime = 0;
-    let gameTimer;
-    const buttonColors = ['#ff0000', '#0000ff', '#ffff00', '#00ff00'];
+// Button Sorting Game Logic
+let currentSortLevel = 0;
+let buttonsToSort = [];
+let sortedCount = 0;
+let gameScore = 0;
+
+function startButtonSort(level) {
+    currentSortLevel = level;
+    sortedCount = 0;
+    gameScore = 0;
+    buttonsToSort = [];
+
     const gameArea = document.getElementById('buttonGameArea');
+    const binsArea = document.getElementById('sortingBins');
+    const instructions = document.getElementById('sortInstructions');
 
-    // Reset game
-    document.getElementById('buttonsFound').textContent = '0';
-    document.getElementById('gameTimer').textContent = '0';
-    document.getElementById('gameComplete').style.display = 'none';
+    // Clear areas
     gameArea.innerHTML = '';
+    binsArea.innerHTML = '';
+    document.getElementById('gameComplete').style.display = 'none';
 
-    // Start timer
-    gameTimer = setInterval(() => {
-        gameTime++;
-        document.getElementById('gameTimer').textContent = gameTime;
-    }, 1000);
+    // Set up level-specific configurations
+    let bins = [];
+    let buttonConfigs = [];
 
-    // Create buttons at random positions
-    buttonColors.forEach((color, index) => {
-        setTimeout(() => {
-            const button = document.createElement('button');
-            button.style.cssText = `
-                position: absolute;
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                background: ${color};
-                border: 3px solid white;
-                cursor: pointer;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                animation: buttonFloat 3s ease-in-out infinite;
-                top: ${Math.random() * 70 + 10}%;
-                left: ${Math.random() * 70 + 10}%;
-            `;
+    if (level === 1) {
+        // Sort by Color
+        instructions.textContent = 'Drag buttons to the matching color bin!';
+        bins = [
+            { id: 'red', label: 'Red Buttons', color: '#ffcccc' },
+            { id: 'blue', label: 'Blue Buttons', color: '#ccccff' }
+        ];
 
-            button.onclick = function() {
-                buttonsFound++;
-                document.getElementById('buttonsFound').textContent = buttonsFound;
-                button.style.animation = 'buttonCollect 0.5s ease';
+        // Create 8 buttons (4 red, 4 blue)
+        for (let i = 0; i < 4; i++) {
+            buttonConfigs.push({ color: '#ff4444', bin: 'red', shape: 'circle' });
+            buttonConfigs.push({ color: '#4444ff', bin: 'blue', shape: 'circle' });
+        }
 
-                setTimeout(() => {
-                    button.remove();
+    } else if (level === 2) {
+        // Sort by Size
+        instructions.textContent = 'Sort buttons by size - big or small!';
+        bins = [
+            { id: 'big', label: 'Big Buttons', color: '#ffe4cc' },
+            { id: 'small', label: 'Small Buttons', color: '#ccffe4' }
+        ];
 
-                    if (buttonsFound === 4) {
-                        clearInterval(gameTimer);
-                        document.getElementById('finalTime').textContent = gameTime;
-                        document.getElementById('gameComplete').style.display = 'block';
+        // Create 8 buttons (4 big, 4 small)
+        for (let i = 0; i < 4; i++) {
+            buttonConfigs.push({ color: '#667eea', size: 50, bin: 'big', shape: 'circle' });
+            buttonConfigs.push({ color: '#667eea', size: 30, bin: 'small', shape: 'circle' });
+        }
 
-                        // Add achievement check
-                        checkGameAchievement('pete-buttons', gameTime);
-                    }
-                }, 400);
-            };
+    } else if (level === 3) {
+        // Sort by Shape
+        instructions.textContent = 'Sort buttons by their shape!';
+        bins = [
+            { id: 'circle', label: 'Round', color: '#ffccff' },
+            { id: 'square', label: 'Square', color: '#ffffcc' },
+            { id: 'star', label: 'Star', color: '#ccffff' }
+        ];
 
-            gameArea.appendChild(button);
-        }, index * 1000);
+        // Create 9 buttons (3 of each shape)
+        for (let i = 0; i < 3; i++) {
+            buttonConfigs.push({ color: '#ff6b6b', shape: 'circle', bin: 'circle' });
+            buttonConfigs.push({ color: '#4ecdc4', shape: 'square', bin: 'square' });
+            buttonConfigs.push({ color: '#ffd93d', shape: 'star', bin: 'star' });
+        }
+    }
+
+    // Shuffle button configs
+    buttonConfigs.sort(() => Math.random() - 0.5);
+
+    // Update score display
+    document.getElementById('totalButtons').textContent = buttonConfigs.length;
+    document.getElementById('buttonsSorted').textContent = '0';
+    document.getElementById('gameScore').textContent = '0';
+
+    // Create sorting bins
+    bins.forEach(bin => {
+        const binDiv = document.createElement('div');
+        binDiv.id = `bin-${bin.id}`;
+        binDiv.className = 'sort-bin';
+        binDiv.dataset.binId = bin.id;
+        binDiv.style.cssText = `
+            min-width: 140px;
+            min-height: 140px;
+            background: ${bin.color};
+            border: 3px dashed #666;
+            border-radius: 15px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        `;
+        binDiv.innerHTML = `
+            <div style="font-weight: bold; margin-bottom: 10px;">${bin.label}</div>
+            <div id="bin-content-${bin.id}" style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                justify-content: center;
+                min-height: 80px;
+            "></div>
+        `;
+
+        binsArea.appendChild(binDiv);
     });
 
-    // Add animations
-    if (!document.getElementById('gameAnimations')) {
-        const style = document.createElement('style');
-        style.id = 'gameAnimations';
-        style.textContent = `
-            @keyframes buttonFloat {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-20px); }
+    // Create buttons to sort
+    buttonConfigs.forEach((config, index) => {
+        createSortableButton(config, index);
+    });
+
+    // Add click handlers for bins (for mobile)
+    document.querySelectorAll('.sort-bin').forEach(bin => {
+        bin.onclick = function() {
+            if (window.selectedButton) {
+                const binId = bin.dataset.binId;
+                checkButtonSort(window.selectedButton, binId);
             }
-            @keyframes buttonCollect {
-                0% { transform: scale(1) rotate(0deg); }
-                100% { transform: scale(0) rotate(360deg); opacity: 0; }
-            }
+        };
+    });
+}
+
+function createSortableButton(config, index) {
+    const gameArea = document.getElementById('buttonGameArea');
+    const button = document.createElement('div');
+    button.id = `sort-button-${index}`;
+    button.dataset.correctBin = config.bin;
+    button.className = 'sortable-button';
+
+    const size = config.size || 40;
+
+    // Base styles
+    let baseStyle = `
+        display: inline-block;
+        width: ${size}px;
+        height: ${size}px;
+        margin: 5px;
+        background: ${config.color};
+        cursor: pointer;
+        transition: transform 0.2s;
+        position: relative;
+    `;
+
+    // Shape-specific styles
+    if (config.shape === 'circle') {
+        baseStyle += 'border-radius: 50%; border: 2px solid rgba(0,0,0,0.2);';
+    } else if (config.shape === 'square') {
+        baseStyle += 'border-radius: 5px; border: 2px solid rgba(0,0,0,0.2);';
+    } else if (config.shape === 'star') {
+        button.innerHTML = '⭐';
+        baseStyle += `
+            background: transparent;
+            font-size: ${size}px;
+            line-height: ${size}px;
+            text-align: center;
         `;
-        document.head.appendChild(style);
     }
+
+    button.style.cssText = baseStyle;
+
+    // Click to select/deselect
+    button.onclick = function() {
+        if (window.selectedButton === button) {
+            window.selectedButton = null;
+            button.style.transform = 'scale(1)';
+            button.style.boxShadow = '';
+        } else {
+            if (window.selectedButton) {
+                window.selectedButton.style.transform = 'scale(1)';
+                window.selectedButton.style.boxShadow = '';
+            }
+            window.selectedButton = button;
+            button.style.transform = 'scale(1.2)';
+            button.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+        }
+    };
+
+    gameArea.appendChild(button);
+    buttonsToSort.push(button);
+}
+
+function checkButtonSort(button, binId) {
+    const correctBin = button.dataset.correctBin;
+
+    if (correctBin === binId) {
+        // Correct!
+        gameScore += 10;
+        sortedCount++;
+
+        // Move button to bin
+        const binContent = document.getElementById(`bin-content-${binId}`);
+        button.style.transform = 'scale(1)';
+        button.style.boxShadow = '';
+        button.style.cursor = 'default';
+        button.onclick = null;
+        binContent.appendChild(button);
+
+        // Update score
+        document.getElementById('buttonsSorted').textContent = sortedCount;
+        document.getElementById('gameScore').textContent = gameScore;
+
+        // Clear selection
+        window.selectedButton = null;
+
+        // Check if all sorted
+        if (sortedCount === buttonsToSort.length) {
+            document.getElementById('finalScore').textContent = gameScore;
+            document.getElementById('gameComplete').style.display = 'block';
+            checkGameAchievement('button-sort', currentSortLevel);
+        }
+    } else {
+        // Wrong bin - shake animation
+        gameScore = Math.max(0, gameScore - 5);
+        document.getElementById('gameScore').textContent = gameScore;
+
+        button.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+            button.style.animation = '';
+        }, 500);
+    }
+}
+
+// Add shake animation
+if (!document.getElementById('sortAnimations')) {
+    const style = document.createElement('style');
+    style.id = 'sortAnimations';
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) scale(1.2); }
+            25% { transform: translateX(-10px) scale(1.2); }
+            75% { transform: translateX(10px) scale(1.2); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Story Match Memory Game
