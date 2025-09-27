@@ -1,5 +1,5 @@
 // Service Worker for 1000 Books Before Kindergarten
-const VERSION = '2.8.1';
+const VERSION = '2.9.0';
 const CACHE_NAME = `1000books-v${VERSION}`;
 const BYPASS_CACHE = true; // Temporary: bypass cache to force updates
 
@@ -7,6 +7,7 @@ const urlsToCache = [
   './',
   './index.html',
   './js/bookSuggestions.js',
+  './js/games.js',
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg',
