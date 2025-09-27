@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '2.9.2';</script>
+    <script>window.APP_VERSION = '2.9.3';</script>
     <style>
         * {
             margin: 0;
@@ -1668,26 +1668,19 @@
                         <h3>🐕 Dog Park Dash!</h3>
                         <button class="game-close-btn" onclick="closeGame('dogPark')">✕</button>
                     </div>
-                    <div class="game-instructions">
-                        <p>Use ⬆️⬇️ arrow keys to move! Collect bones 🦴 for points!</p>
-                        <p style="color: #dc3545; font-weight: bold;">⚠️ AVOID THE SQUIRRELS! 🐿️ You have 3 lives!</p>
+                    <div class="game-instructions" style="padding: 8px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;">
+                            <span>⬆️⬇️ Arrow keys to move</span>
+                            <span style="color: #28a745;">🦴 Collect bones for points!</span>
+                            <span style="color: #dc3545; font-weight: bold;">🐿️ Avoid squirrels!</span>
+                        </div>
                     </div>
-                    <div class="game-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Score:</span>
-                            <span id="parkScore">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Time:</span>
-                            <span id="parkTimer">60</span>s
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Bones:</span>
-                            <span id="bonesCollected">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Lives:</span>
-                            <span id="livesLeft">❤️❤️❤️</span>
+                    <div class="game-stats" style="padding: 8px;">
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+                            <span><strong>Score:</strong> <span id="parkScore">0</span></span>
+                            <span><strong>Time:</strong> <span id="parkTimer">60</span>s</span>
+                            <span><strong>Bones:</strong> <span id="bonesCollected">0</span></span>
+                            <span><strong>Lives:</strong> <span id="livesLeft">❤️❤️❤️</span></span>
                         </div>
                     </div>
                     <div class="park-game-area" id="parkGameArea">
@@ -1723,28 +1716,20 @@
                     <h3>❄️ Snowflake Catcher!</h3>
                     <button class="game-close-btn" onclick="closeGame('snowflake')">✕</button>
                 </div>
-                <div class="game-instructions">
-                    <p>Move your glove to catch falling snowflakes!</p>
-                    <p style="color: #4169E1;">⛄ Every 10 catches builds a snowman part (40 total to win!)</p>
-                    <p style="color: #28a745;">🎯 Keep combos alive by not missing any!</p>
-                    <p style="color: #dc3545;">⛔ Miss 10 snowflakes and you lose!</p>
+                <div class="game-instructions" style="padding: 8px; font-size: 0.9em;">
+                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;">
+                        <span>🧤 Move glove to catch snowflakes</span>
+                        <span style="color: #4169E1;">⛄ 40 catches to win!</span>
+                        <span style="color: #28a745;">🎯 Keep combos!</span>
+                        <span style="color: #dc3545;">⛔ 10 misses = lose</span>
+                    </div>
                 </div>
-                <div class="game-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Caught:</span>
-                        <span id="snowCaught">0</span>/40
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Time:</span>
-                        <span id="snowTimer">60</span>s
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Combo:</span>
-                        <span id="snowCombo" style="font-size: 1.2em; font-weight: bold;">0</span> in a row
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Best Combo:</span>
-                        <span id="snowMaxCombo">0</span>
+                <div class="game-stats" style="padding: 8px;">
+                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+                        <span><strong>Caught:</strong> <span id="snowCaught">0</span>/40</span>
+                        <span><strong>Time:</strong> <span id="snowTimer">60</span>s</span>
+                        <span><strong>Combo:</strong> <span id="snowCombo" style="font-size: 1.1em; color: #28a745;">0</span></span>
+                        <span><strong>Best:</strong> <span id="snowMaxCombo">0</span></span>
                     </div>
                 </div>
                 <div class="snow-game-area" id="snowGameArea">
