@@ -1440,10 +1440,10 @@
             <!-- Add Book Page -->
             <div id="add-book" class="page">
                 <h2>Add a New Book</h2>
-                <form id="addBookForm" onsubmit="addBook(event); return false;">
+                <form id="addBookForm">
                     <div class="form-group">
                         <label for="bookTitle">Book Title *</label>
-                        <input type="text" id="bookTitle" required autocomplete="off" autocorrect="off">
+                        <input type="text" id="bookTitle" required autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label for="bookAuthor">Author</label>
@@ -3113,9 +3113,24 @@
                 }, 1000);
             }
 
-            // Show confirmation dialog after a brief delay
+            // Show confirmation - use native confirm for mobile Safari
             setTimeout(() => {
-                showAddBookConfirmation();
+                // Check if mobile Safari
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+                if (isIOS) {
+                    // Use native confirm for iOS
+                    if (confirm('Book added! Would you like to add another book?')) {
+                        // User wants to add another - form already reset, stay on page
+                        console.log('User chose to add another book');
+                    } else {
+                        // User wants to go home
+                        showPage('dashboard', document.querySelector('.nav-tab'));
+                    }
+                } else {
+                    // Use custom dialog for desktop/Android
+                    showAddBookConfirmation();
+                }
             }, 500);
 
             // Reset form
@@ -5648,7 +5663,33 @@
         window.showLockedMessage = showLockedMessage;
 
         // Initialize app when page loads
-        window.addEventListener('DOMContentLoaded', initApp);
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+
+            // Add form submit handler for mobile compatibility
+            const addBookForm = document.getElementById('addBookForm');
+            if (addBookForm) {
+                addBookForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addBook(e);
+                    return false;
+                });
+
+                // Prevent Enter key from clearing form on iOS
+                addBookForm.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        // Only submit if title is filled
+                        const title = document.getElementById('bookTitle').value;
+                        if (title && title.trim()) {
+                            addBook(e);
+                        }
+                        return false;
+                    }
+                });
+            }
+        });
 
         // Developer test mode - Press Ctrl+Shift+G to toggle test mode (G for Games)
         document.addEventListener('keydown', function(e) {
