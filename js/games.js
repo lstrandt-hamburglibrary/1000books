@@ -527,6 +527,22 @@ let currentWordBuilt = '';
 let targetWordForGame = '';
 let currentWordBuilderLevel = 0;
 let missingLetterPositions = [];
+let wordPattern = '';  // Store the pattern like "BU_" or "_OO_"
+
+// Complete word lists for validation
+const allValidWords3Letter = ['CAT', 'DOG', 'SUN', 'BED', 'HAT', 'BAT', 'RUN', 'HOP', 'PIG', 'BUG',
+    'BUT', 'BUS', 'BUM', 'BUN', 'BUD', 'CUT', 'CUP', 'CUB', 'CUD', 'RAT', 'RUT', 'RUM', 'RUG',
+    'MAT', 'MUD', 'MUG', 'SIT', 'SAT', 'SET', 'SOT', 'PET', 'POT', 'PUT', 'PIT', 'PAT', 'HOT',
+    'HIT', 'HUT', 'DOT', 'DUG', 'DAD', 'DID', 'BOX', 'BOY', 'TOP', 'TOY', 'LOG', 'FOG', 'JOG',
+    'BAG', 'BIG', 'TAG', 'WAG', 'LEG', 'PEG', 'DIG', 'FIG', 'JIG', 'RIG', 'WIG', 'ZIG', 'ZAG',
+    'FAN', 'MAN', 'CAN', 'PAN', 'RAN', 'TAN', 'VAN', 'WAN', 'BAN', 'FUN', 'GUN', 'NUN', 'PUN',
+    'CAR', 'JAR', 'TAR', 'BAR', 'FAR', 'WAR', 'NET', 'JET', 'MET', 'LET', 'GET', 'VET', 'WET'];
+
+const allValidWords4Letter = ['BOOK', 'JUMP', 'FISH', 'BIRD', 'TREE', 'STAR', 'MOON', 'FROG', 'DUCK', 'SHIP',
+    'BALL', 'CAKE', 'DOOR', 'FARM', 'GATE', 'HAND', 'LAMP', 'MILK', 'NOSE', 'RAIN', 'SOCK', 'TAIL',
+    'BEAR', 'BOAT', 'COAT', 'DESK', 'FACE', 'GAME', 'HOME', 'KITE', 'LEAF', 'NEST', 'PARK', 'RING',
+    'SAND', 'TENT', 'WAVE', 'YARD', 'BABY', 'BATH', 'BIKE', 'BLUE', 'COLD', 'DARK', 'FAST', 'GOOD',
+    'HELP', 'KIND', 'LONG', 'NAME', 'OPEN', 'PLAY', 'ROOM', 'SLOW', 'TALL', 'WARM', 'WORK', 'BACK'];
 
 function selectWordBuilderLevel(level) {
     currentWordBuilderLevel = level;
@@ -537,10 +553,10 @@ function selectWordBuilderLevel(level) {
             instructions.textContent = 'Build the word by clicking letters in order!';
             break;
         case 2:
-            instructions.textContent = 'Fill in the missing letter to complete the word!';
+            instructions.textContent = 'Fill in the missing letter to complete ANY valid word!';
             break;
         case 3:
-            instructions.textContent = 'Fill in the TWO missing letters to complete the word!';
+            instructions.textContent = 'Fill in the TWO missing letters to complete ANY valid word!';
             break;
     }
 
@@ -593,10 +609,26 @@ function startWordBuilder() {
                 currentWordBuilt += targetWordForGame[i];
             }
         }
+        wordPattern = displayWord;
+
+        // Find all possible valid letters that could complete valid words
+        const possibleLetters = new Set();
+        allValidWords3Letter.forEach(word => {
+            let matches = true;
+            for (let i = 0; i < word.length; i++) {
+                if (!missingLetterPositions.includes(i) && word[i] !== displayWord[i]) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches) {
+                possibleLetters.add(word[missingPos]);
+            }
+        });
 
         document.getElementById('targetWord').textContent = displayWord;
         document.getElementById('currentWord').textContent = currentWordBuilt;
-        createLetterButtons(targetWordForGame[missingPos]);
+        createLetterButtons(Array.from(possibleLetters).join(''));
 
     } else if (currentWordBuilderLevel === 3) {
         // Level 3: Two missing letters in 4-letter word
@@ -609,21 +641,42 @@ function startWordBuilder() {
         missingLetterPositions.sort();
 
         let displayWord = '';
-        let missingLetters = '';
         for (let i = 0; i < targetWordForGame.length; i++) {
             if (missingLetterPositions.includes(i)) {
                 displayWord += '_';
                 currentWordBuilt += '_';
-                missingLetters += targetWordForGame[i];
             } else {
                 displayWord += targetWordForGame[i];
                 currentWordBuilt += targetWordForGame[i];
             }
         }
+        wordPattern = displayWord;
+
+        // Find all possible valid letters that could complete valid words
+        const possibleLetterPairs = new Set();
+        allValidWords4Letter.forEach(word => {
+            let matches = true;
+            for (let i = 0; i < word.length; i++) {
+                if (!missingLetterPositions.includes(i) && word[i] !== displayWord[i]) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches) {
+                possibleLetterPairs.add(word[missingLetterPositions[0]] + word[missingLetterPositions[1]]);
+            }
+        });
+
+        // Collect all unique letters from valid pairs
+        const allPossibleLetters = new Set();
+        possibleLetterPairs.forEach(pair => {
+            allPossibleLetters.add(pair[0]);
+            allPossibleLetters.add(pair[1]);
+        });
 
         document.getElementById('targetWord').textContent = displayWord;
         document.getElementById('currentWord').textContent = currentWordBuilt;
-        createLetterButtons(missingLetters);
+        createLetterButtons(Array.from(allPossibleLetters).join(''));
     }
 
     document.getElementById('wordResult').textContent = '';
@@ -711,9 +764,45 @@ function clearWord() {
 
 function checkWord() {
     const result = document.getElementById('wordResult');
-    if (currentWordBuilt === targetWordForGame) {
+
+    // Check if blanks are filled
+    if (currentWordBuilt.includes('_')) {
+        result.style.color = '#dc3545';
+        result.textContent = 'Please fill in all the blanks!';
+        return;
+    }
+
+    let isValid = false;
+
+    if (currentWordBuilderLevel === 1) {
+        // Level 1: Must match the target word exactly
+        isValid = currentWordBuilt === targetWordForGame;
+    } else if (currentWordBuilderLevel === 2) {
+        // Level 2: Check if it's any valid 3-letter word
+        isValid = allValidWords3Letter.includes(currentWordBuilt.toUpperCase());
+    } else if (currentWordBuilderLevel === 3) {
+        // Level 3: Check if it's any valid 4-letter word that matches the pattern
+        isValid = allValidWords4Letter.includes(currentWordBuilt.toUpperCase());
+
+        // Also verify it matches the non-blank letters
+        if (isValid) {
+            for (let i = 0; i < wordPattern.length; i++) {
+                if (wordPattern[i] !== '_' && wordPattern[i] !== currentWordBuilt[i]) {
+                    isValid = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (isValid) {
         result.style.color = '#28a745';
-        result.textContent = '🎉 Correct! Great job!';
+        const word = currentWordBuilt.toUpperCase();
+        if (currentWordBuilderLevel > 1 && word !== targetWordForGame) {
+            result.textContent = `🎉 Correct! "${word}" is a valid word!`;
+        } else {
+            result.textContent = '🎉 Correct! Great job!';
+        }
         checkGameAchievement('word-builder', currentWordBuilderLevel);
 
         setTimeout(() => {
@@ -721,10 +810,10 @@ function checkWord() {
         }, 2000);
     } else {
         result.style.color = '#dc3545';
-        if (currentWordBuilt.includes('_')) {
-            result.textContent = 'Please fill in all the blanks!';
-        } else {
+        if (currentWordBuilderLevel === 1) {
             result.textContent = 'Not quite right. Try again!';
+        } else {
+            result.textContent = `"${currentWordBuilt}" is not a valid word. Try again!`;
         }
     }
 }
