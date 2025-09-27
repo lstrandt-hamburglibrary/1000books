@@ -685,7 +685,14 @@ function startWordBuilder() {
 
         document.getElementById('targetWord').textContent = displayWord;
         document.getElementById('currentWord').textContent = currentWordBuilt;
-        createLetterButtons(Array.from(possibleLetters).join(''));
+
+        // Limit possible letters to avoid overwhelming choices
+        let lettersToShow = Array.from(possibleLetters);
+        if (lettersToShow.length > 6) {
+            // If too many valid options, randomly select a subset
+            lettersToShow = lettersToShow.sort(() => Math.random() - 0.5).slice(0, 6);
+        }
+        createLetterButtons(lettersToShow.join(''));
 
     } else if (currentWordBuilderLevel === 3) {
         // Level 3: Two missing letters in 4-letter word
@@ -733,7 +740,14 @@ function startWordBuilder() {
 
         document.getElementById('targetWord').textContent = displayWord;
         document.getElementById('currentWord').textContent = currentWordBuilt;
-        createLetterButtons(Array.from(allPossibleLetters).join(''));
+
+        // Limit possible letters to avoid overwhelming choices
+        let lettersToShow = Array.from(allPossibleLetters);
+        if (lettersToShow.length > 6) {
+            // If too many valid options, randomly select a subset
+            lettersToShow = lettersToShow.sort(() => Math.random() - 0.5).slice(0, 6);
+        }
+        createLetterButtons(lettersToShow.join(''));
     }
 
     document.getElementById('wordResult').textContent = '';
@@ -744,13 +758,30 @@ function createLetterButtons(neededLetters) {
     letterButtons.innerHTML = '';
 
     const letters = neededLetters.split('');
-    const extraLetters = ['A', 'E', 'I', 'O', 'U', 'M', 'N', 'R', 'S', 'T', 'L', 'B', 'C', 'D'];
+    const extraLetters = ['A', 'E', 'I', 'O', 'U', 'M', 'N', 'R', 'S', 'T', 'L', 'B', 'C', 'D', 'P', 'G', 'H', 'K', 'F', 'W'];
     const allLetters = [...letters];
 
-    // Add random letters based on level
-    const extraCount = currentWordBuilderLevel === 1 ? 5 : currentWordBuilderLevel === 2 ? 7 : 6;
+    // Calculate how many extra letters to add to reach 8 total
+    // For Level 1: 3 letter word = 3 correct + up to 5 extra = 8 total
+    // For Level 2: 1 missing letter + extras to make 8 total
+    // For Level 3: 2 missing letters + extras to make 8 total
+    const targetTotal = 8;
+    const currentCount = letters.length;
+    const extraCount = Math.max(0, targetTotal - currentCount);
+
+    // Add random extra letters
     for (let i = 0; i < extraCount; i++) {
-        allLetters.push(extraLetters[Math.floor(Math.random() * extraLetters.length)]);
+        let randomLetter;
+        do {
+            randomLetter = extraLetters[Math.floor(Math.random() * extraLetters.length)];
+        } while (allLetters.filter(l => l === randomLetter).length >= 2); // Avoid too many duplicates
+
+        allLetters.push(randomLetter);
+    }
+
+    // Ensure we don't exceed 8 letters
+    while (allLetters.length > 8) {
+        allLetters.pop();
     }
 
     // Shuffle letters
