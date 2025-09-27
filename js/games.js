@@ -188,8 +188,8 @@ function startButtonSort(level) {
         // Sort by Size
         instructions.textContent = 'Sort buttons by size - big or small!';
         bins = [
-            { id: 'big', label: 'Big Buttons', color: '#ffe4cc', icon: '🟢' },
-            { id: 'small', label: 'Small Buttons', color: '#ccffe4', icon: '🟣' }
+            { id: 'big', label: 'Big Buttons', color: '#ffe4cc', icon: '⭕', iconSize: '2.5em' },
+            { id: 'small', label: 'Small Buttons', color: '#ccffe4', icon: '⭕', iconSize: '1.2em' }
         ];
 
         // Create 8 buttons (4 big, 4 small)
@@ -240,7 +240,7 @@ function startButtonSort(level) {
             cursor: pointer;
         `;
         binDiv.innerHTML = `
-            <div style="font-size: 2em; margin-bottom: 5px;">${bin.icon || ''}</div>
+            <div style="font-size: ${bin.iconSize || '2em'}; margin-bottom: 5px; line-height: 1;">${bin.icon || ''}</div>
             <div style="font-weight: bold; margin-bottom: 10px;">${bin.label}</div>
             <div id="bin-content-${bin.id}" style="
                 display: flex;
