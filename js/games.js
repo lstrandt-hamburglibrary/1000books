@@ -188,8 +188,8 @@ function startButtonSort(level) {
         // Sort by Size
         instructions.textContent = 'Sort buttons by size - big or small!';
         bins = [
-            { id: 'big', label: 'Big Buttons', color: '#ffe4cc', icon: '⭕', iconSize: '2.5em' },
-            { id: 'small', label: 'Small Buttons', color: '#ccffe4', icon: '⭕', iconSize: '1.2em' }
+            { id: 'big', label: 'Big Buttons', color: '#ffe4cc', icon: '●', iconSize: '2.5em' },
+            { id: 'small', label: 'Small Buttons', color: '#ccffe4', icon: '●', iconSize: '1.2em' }
         ];
 
         // Create 8 buttons (4 big, 4 small)
@@ -202,9 +202,9 @@ function startButtonSort(level) {
         // Sort by Shape
         instructions.textContent = 'Sort buttons by their shape!';
         bins = [
-            { id: 'circle', label: 'Round', color: '#ffccff', icon: '⭕' },
-            { id: 'square', label: 'Square', color: '#ffffcc', icon: '⬜' },
-            { id: 'star', label: 'Star', color: '#ccffff', icon: '⭐' }
+            { id: 'circle', label: 'Round', color: '#ffccff', icon: '●' },
+            { id: 'square', label: 'Square', color: '#ffffcc', icon: '■' },
+            { id: 'star', label: 'Star', color: '#ccffff', icon: '★' }
         ];
 
         // Create 9 buttons (3 of each shape)
