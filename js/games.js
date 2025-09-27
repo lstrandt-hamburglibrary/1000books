@@ -1587,5 +1587,24 @@ function checkGameAchievement(game, score) {
     }
 }
 
+// Export functions to global window object for onclick handlers
+window.startButtonSort = startButtonSort;
+window.createSortableButton = createSortableButton;
+window.checkButtonSort = checkButtonSort;
+window.launchGame = launchGame;
+window.launchPeteButtonGame = launchPeteButtonGame;
+window.launchStoryMatchGame = launchStoryMatchGame;
+window.launchWordBuilderGame = launchWordBuilderGame;
+window.launchLetterMatchGame = launchLetterMatchGame;
+window.startStoryMatch = startStoryMatch;
+window.checkCard = checkCard;
+window.selectWordBuilderLevel = selectWordBuilderLevel;
+window.newWordForLevel = newWordForLevel;
+window.clearWord = clearWord;
+window.checkWord = checkWord;
+window.toggleCategory = toggleCategory;
+window.closeMiniGame = closeMiniGame;
+window.checkGameAchievement = checkGameAchievement;
+
 // Empty data.js file (functionality is built into main app.js)
 // This file can be used for additional data management if needed
