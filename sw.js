@@ -3,12 +3,12 @@ const VERSION = '1.0.2';
 const CACHE_NAME = `1000books-v${VERSION}`;
 
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/js/bookSuggestions.js',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg',
+  './',
+  './index.html',
+  './js/bookSuggestions.js',
+  './manifest.json',
+  './icon-192.svg',
+  './icon-512.svg',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'
 ];
 
@@ -56,7 +56,7 @@ self.addEventListener('fetch', event => {
           return response;
         }).catch(() => {
           // Return offline fallback if available
-          return caches.match('/index.html');
+          return caches.match('./index.html');
         });
       })
   );
