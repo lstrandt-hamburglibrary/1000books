@@ -618,14 +618,14 @@ function launchLetterMatchGame() {
                 <div id="gameBoard" style="
                     position: relative;
                     display: flex;
-                    gap: 1rem;
-                    justify-content: center;
+                    gap: ${window.innerWidth <= 480 ? '0.5rem' : '1rem'};
+                    justify-content: space-evenly;
                     align-items: start;
-                    padding: 1rem 0.5rem;
+                    padding: ${window.innerWidth <= 480 ? '0.5rem' : '1rem'};
                     background: linear-gradient(135deg, #fbbf24, #f97316);
                     border-radius: 15px;
                     min-height: 400px;
-                    overflow-x: auto;
+                    overflow: hidden;
                 ">
                     <!-- SVG Canvas for drawing lines -->
                     <svg id="connectionCanvas" style="
@@ -647,11 +647,11 @@ function launchLetterMatchGame() {
                         z-index: 2;
                         min-width: fit-content;
                     ">
-                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: 1rem;">Uppercase</h3>
+                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: ${window.innerWidth <= 480 ? '0.9rem' : '1rem'};">Uppercase</h3>
                         <div id="uppercaseLetters" style="
                             display: flex;
                             flex-direction: column;
-                            gap: 0.8rem;
+                            gap: ${window.innerWidth <= 480 ? '0.5rem' : '0.8rem'};
                         ">
                             <!-- Uppercase letter cards will appear here -->
                         </div>
@@ -663,7 +663,7 @@ function launchLetterMatchGame() {
                         flex-direction: column;
                         justify-content: center;
                         align-items: center;
-                        min-width: 100px;
+                        min-width: ${window.innerWidth <= 480 ? '30px' : '60px'};
                         z-index: 2;
                     ">
                         <div id="matchIndicator" style="
@@ -681,11 +681,11 @@ function launchLetterMatchGame() {
                         z-index: 2;
                         min-width: fit-content;
                     ">
-                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: 1rem;">Lowercase</h3>
+                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: ${window.innerWidth <= 480 ? '0.9rem' : '1rem'};">Lowercase</h3>
                         <div id="lowercaseLetters" style="
                             display: flex;
                             flex-direction: column;
-                            gap: 0.8rem;
+                            gap: ${window.innerWidth <= 480 ? '0.5rem' : '0.8rem'};
                         ">
                             <!-- Lowercase letter cards will appear here -->
                         </div>
@@ -783,9 +783,19 @@ function startLetterMatch() {
         const card = document.createElement('div');
         card.dataset.letter = letter.toUpperCase();
         card.dataset.type = type;
-        const isMobile = window.innerWidth <= 768;
-        const cardSize = isMobile ? '60px' : '80px';
-        const fontSize = isMobile ? '1.8rem' : '2.5rem';
+        const screenWidth = window.innerWidth;
+        let cardSize, fontSize;
+
+        if (screenWidth <= 480) {
+            cardSize = '50px';
+            fontSize = '1.5rem';
+        } else if (screenWidth <= 768) {
+            cardSize = '60px';
+            fontSize = '1.8rem';
+        } else {
+            cardSize = '80px';
+            fontSize = '2.5rem';
+        }
 
         card.style.cssText = `
             width: ${cardSize};
