@@ -529,20 +529,77 @@ let currentWordBuilderLevel = 0;
 let missingLetterPositions = [];
 let wordPattern = '';  // Store the pattern like "BU_" or "_OO_"
 
-// Complete word lists for validation
-const allValidWords3Letter = ['CAT', 'DOG', 'SUN', 'BED', 'HAT', 'BAT', 'RUN', 'HOP', 'PIG', 'BUG',
+// Complete word lists for validation - expanded to include many more common words
+const allValidWords3Letter = [
+    // Original words
+    'CAT', 'DOG', 'SUN', 'BED', 'HAT', 'BAT', 'RUN', 'HOP', 'PIG', 'BUG',
     'BUT', 'BUS', 'BUM', 'BUN', 'BUD', 'CUT', 'CUP', 'CUB', 'CUD', 'RAT', 'RUT', 'RUM', 'RUG',
     'MAT', 'MUD', 'MUG', 'SIT', 'SAT', 'SET', 'SOT', 'PET', 'POT', 'PUT', 'PIT', 'PAT', 'HOT',
     'HIT', 'HUT', 'DOT', 'DUG', 'DAD', 'DID', 'BOX', 'BOY', 'TOP', 'TOY', 'LOG', 'FOG', 'JOG',
     'BAG', 'BIG', 'TAG', 'WAG', 'LEG', 'PEG', 'DIG', 'FIG', 'JIG', 'RIG', 'WIG', 'ZIG', 'ZAG',
     'FAN', 'MAN', 'CAN', 'PAN', 'RAN', 'TAN', 'VAN', 'WAN', 'BAN', 'FUN', 'GUN', 'NUN', 'PUN',
-    'CAR', 'JAR', 'TAR', 'BAR', 'FAR', 'WAR', 'NET', 'JET', 'MET', 'LET', 'GET', 'VET', 'WET'];
+    'CAR', 'JAR', 'TAR', 'BAR', 'FAR', 'WAR', 'NET', 'JET', 'MET', 'LET', 'GET', 'VET', 'WET',
+    // Additional common words
+    'ADD', 'AGE', 'AGO', 'AID', 'AIM', 'AIR', 'ALL', 'AND', 'ANT', 'ANY', 'APE', 'ARC', 'ARE', 'ARK', 'ARM', 'ART', 'ASK', 'ATE',
+    'BAD', 'BAM', 'BAY', 'BEE', 'BET', 'BID', 'BIN', 'BIT', 'BOB', 'BOG', 'BOT', 'BOW', 'BOY', 'BUB', 'BUY',
+    'CAB', 'CAD', 'CAM', 'CAP', 'CAW', 'COB', 'COD', 'COG', 'COT', 'COW', 'COX', 'COY', 'COZ', 'CRY', 'CUE', 'CUR',
+    'DAB', 'DAM', 'DAY', 'DEN', 'DEW', 'DIE', 'DIM', 'DIN', 'DIP', 'DOC', 'DOE', 'DRY', 'DUB', 'DUD', 'DUE', 'DUN', 'DUO', 'DYE',
+    'EAR', 'EAT', 'EEL', 'EGG', 'ELF', 'ELK', 'ELM', 'EMU', 'END', 'ERA', 'EVE', 'EWE', 'EYE',
+    'FAD', 'FAG', 'FAR', 'FAT', 'FAX', 'FAY', 'FED', 'FEE', 'FEN', 'FEW', 'FEZ', 'FIB', 'FIN', 'FIR', 'FIT', 'FIX', 'FLU', 'FLY', 'FOB', 'FOE', 'FOP', 'FOR', 'FOX', 'FRY', 'FUG', 'FUR',
+    'GAB', 'GAG', 'GAL', 'GAP', 'GAS', 'GAY', 'GEE', 'GEL', 'GEM', 'GOB', 'GOD', 'GOT', 'GOO', 'GUM', 'GUT', 'GUY', 'GYM',
+    'HAD', 'HAG', 'HAM', 'HAS', 'HAW', 'HAY', 'HEM', 'HEN', 'HEP', 'HER', 'HEW', 'HEX', 'HEY', 'HID', 'HIM', 'HIP', 'HIS', 'HOB', 'HOD', 'HOE', 'HOG', 'HOW', 'HOY', 'HUB', 'HUE', 'HUG', 'HUM', 'HUN', 'HUP',
+    'ICE', 'ICY', 'ILL', 'IMP', 'INK', 'INN', 'ION', 'IRE', 'IRK', 'ITS', 'IVY',
+    'JAB', 'JAG', 'JAM', 'JAW', 'JAY', 'JOB', 'JOT', 'JOY', 'JUG', 'JUT',
+    'KEG', 'KEN', 'KEY', 'KID', 'KIN', 'KIT',
+    'LAB', 'LAC', 'LAD', 'LAG', 'LAM', 'LAP', 'LAW', 'LAX', 'LAY', 'LED', 'LEI', 'LET', 'LID', 'LIE', 'LIP', 'LIT', 'LOG', 'LOT', 'LOW', 'LUG',
+    'MAC', 'MAD', 'MAM', 'MAP', 'MAR', 'MAW', 'MAX', 'MAY', 'MEN', 'MEW', 'MID', 'MIX', 'MOB', 'MOD', 'MOM', 'MOP', 'MOW',
+    'NAB', 'NAG', 'NAP', 'NAY', 'NEE', 'NEW', 'NIB', 'NIT', 'NIX', 'NOB', 'NOD', 'NOG', 'NOM', 'NOR', 'NOT', 'NOW', 'NUB', 'NUT',
+    'OAK', 'OAR', 'OAT', 'ODD', 'OFF', 'OFT', 'OHM', 'OIL', 'OLD', 'ONE', 'OPT', 'ORB', 'ORE', 'OUR', 'OUT', 'OWE', 'OWL', 'OWN',
+    'PAD', 'PAL', 'PAP', 'PAR', 'PAS', 'PAW', 'PAX', 'PAY', 'PEA', 'PEC', 'PED', 'PEE', 'PEN', 'PEP', 'PER', 'PEW', 'PHI', 'PIC', 'PIE', 'PIN', 'PIP', 'PLY', 'POD', 'POP', 'POW', 'POX', 'PRO', 'PRY', 'PUB', 'PUD', 'PUG', 'PUP', 'PUS', 'PYX',
+    'QUA',
+    'RAG', 'RAM', 'RAP', 'RAW', 'RAY', 'RED', 'REF', 'REM', 'REP', 'RIB', 'RID', 'RIM', 'RIP', 'ROB', 'ROD', 'ROE', 'ROT', 'ROW', 'RUB', 'RUE', 'RYE',
+    'SAC', 'SAD', 'SAG', 'SAP', 'SAW', 'SAX', 'SAY', 'SEA', 'SEE', 'SEW', 'SEX', 'SHE', 'SHY', 'SIN', 'SIP', 'SIR', 'SIS', 'SIX', 'SKI', 'SKY', 'SLY', 'SOB', 'SOD', 'SON', 'SOP', 'SOW', 'SOX', 'SOY', 'SPA', 'SPY', 'STY', 'SUB', 'SUM', 'SUP',
+    'TAB', 'TAD', 'TAP', 'TAT', 'TAU', 'TAX', 'TEA', 'TED', 'TEE', 'TEN', 'THE', 'THY', 'TIC', 'TIE', 'TIN', 'TIP', 'TOE', 'TOG', 'TON', 'TOO', 'TOT', 'TOW', 'TRY', 'TUB', 'TUG', 'TUN', 'TUT', 'TWO',
+    'UMP', 'UNO', 'UPS', 'URB', 'URN', 'USE',
+    'VAC', 'VAT', 'VIA', 'VIE', 'VOW',
+    'WAD', 'WAR', 'WAS', 'WAX', 'WAY', 'WEB', 'WED', 'WEE', 'WHO', 'WHY', 'WIN', 'WIT', 'WOE', 'WOK', 'WON', 'WOO', 'WOW',
+    'YAK', 'YAM', 'YAP', 'YAW', 'YEA', 'YEP', 'YES', 'YET', 'YEW', 'YIN', 'YIP', 'YON', 'YOU', 'YOW', 'YUK', 'YUM', 'YUP',
+    'ZAP', 'ZED', 'ZEE', 'ZEN', 'ZIP', 'ZIT', 'ZOO'
+];
 
-const allValidWords4Letter = ['BOOK', 'JUMP', 'FISH', 'BIRD', 'TREE', 'STAR', 'MOON', 'FROG', 'DUCK', 'SHIP',
+const allValidWords4Letter = [
+    // Original words
+    'BOOK', 'JUMP', 'FISH', 'BIRD', 'TREE', 'STAR', 'MOON', 'FROG', 'DUCK', 'SHIP',
     'BALL', 'CAKE', 'DOOR', 'FARM', 'GATE', 'HAND', 'LAMP', 'MILK', 'NOSE', 'RAIN', 'SOCK', 'TAIL',
     'BEAR', 'BOAT', 'COAT', 'DESK', 'FACE', 'GAME', 'HOME', 'KITE', 'LEAF', 'NEST', 'PARK', 'RING',
     'SAND', 'TENT', 'WAVE', 'YARD', 'BABY', 'BATH', 'BIKE', 'BLUE', 'COLD', 'DARK', 'FAST', 'GOOD',
-    'HELP', 'KIND', 'LONG', 'NAME', 'OPEN', 'PLAY', 'ROOM', 'SLOW', 'TALL', 'WARM', 'WORK', 'BACK'];
+    'HELP', 'KIND', 'LONG', 'NAME', 'OPEN', 'PLAY', 'ROOM', 'SLOW', 'TALL', 'WARM', 'WORK', 'BACK',
+    // Additional common words
+    'ABLE', 'ALSO', 'AREA', 'AWAY', 'BASE', 'BEEN', 'BELL', 'BEST', 'BILL', 'BLOW', 'BODY', 'BONE', 'BOTH', 'BOWL', 'BURN', 'BUSY',
+    'CALL', 'CALM', 'CAME', 'CAMP', 'CARD', 'CARE', 'CART', 'CASE', 'CASH', 'CAST', 'CAVE', 'CELL', 'CITY', 'CLAP', 'CLAY', 'CLEAN', 'CLUB', 'CODE', 'COIN', 'COME', 'COOK', 'COOL', 'COPY', 'CORN', 'COST', 'CRAB', 'CROW', 'CUTE',
+    'DARE', 'DATE', 'DAWN', 'DAYS', 'DEAD', 'DEAL', 'DEAR', 'DEEP', 'DEER', 'DICE', 'DIRT', 'DISH', 'DOES', 'DOLL', 'DONE', 'DOWN', 'DRAG', 'DRAW', 'DREW', 'DRIP', 'DROP', 'DRUM', 'DUST',
+    'EACH', 'EARN', 'EARS', 'EASY', 'EDGE', 'ELSE', 'EVEN', 'EVER', 'EXIT', 'EYES',
+    'FACT', 'FAIL', 'FAIR', 'FALL', 'FAME', 'FARE', 'FEAR', 'FEEL', 'FEET', 'FELL', 'FELT', 'FILE', 'FILL', 'FILM', 'FIND', 'FINE', 'FIRE', 'FIRM', 'FIVE', 'FLAG', 'FLAT', 'FLEW', 'FLIP', 'FLOW', 'FOAM', 'FOLD', 'FOLK', 'FOOD', 'FOOL', 'FOOT', 'FORK', 'FORM', 'FORT', 'FOUR', 'FREE', 'FROM', 'FULL', 'FUND',
+    'GAIN', 'GAVE', 'GEAR', 'GIFT', 'GIRL', 'GIVE', 'GLAD', 'GLOW', 'GLUE', 'GOAL', 'GOAT', 'GOES', 'GOLD', 'GOLF', 'GONE', 'GRAB', 'GRAY', 'GREW', 'GREY', 'GRID', 'GRIN', 'GRIP', 'GROW',
+    'HAIR', 'HALF', 'HALL', 'HANG', 'HARD', 'HARE', 'HARM', 'HATE', 'HAVE', 'HEAD', 'HEAR', 'HEAT', 'HELD', 'HERE', 'HERO', 'HIDE', 'HIGH', 'HILL', 'HINT', 'HIRE', 'HOLD', 'HOLE', 'HOPE', 'HORN', 'HOUR', 'HUGE', 'HUNT', 'HURT',
+    'IDEA', 'IRON', 'ITEM',
+    'JAIL', 'JAZZ', 'JEANS', 'JELLY', 'JOIN', 'JOKE', 'JULY', 'JUNE', 'JUNK', 'JUST',
+    'KEEP', 'KEPT', 'KICK', 'KING', 'KISS', 'KNEE', 'KNEW', 'KNIT', 'KNOT', 'KNOW',
+    'LACE', 'LACK', 'LADY', 'LAID', 'LAKE', 'LAND', 'LANE', 'LAST', 'LATE', 'LAZY', 'LEAD', 'LEAN', 'LEAP', 'LEFT', 'LEND', 'LENS', 'LESS', 'LIAR', 'LICE', 'LIFE', 'LIFT', 'LIKE', 'LIME', 'LINE', 'LINK', 'LION', 'LIST', 'LIVE', 'LOAD', 'LOAF', 'LOAN', 'LOCK', 'LOFT', 'LOOK', 'LOOP', 'LOSE', 'LOSS', 'LOST', 'LOUD', 'LOVE', 'LUCK', 'LUMP',
+    'MADE', 'MAIL', 'MAIN', 'MAKE', 'MALE', 'MALL', 'MANY', 'MARK', 'MARS', 'MASK', 'MASS', 'MATH', 'MEAL', 'MEAN', 'MEAT', 'MEET', 'MELT', 'MENU', 'MESS', 'MICE', 'MILD', 'MILE', 'MIND', 'MINE', 'MINT', 'MISS', 'MIST', 'MODE', 'MOLD', 'MOLE', 'MORE', 'MOST', 'MOTH', 'MOVE', 'MUCH',
+    'NAIL', 'NEAR', 'NEAT', 'NECK', 'NEED', 'NEWS', 'NEXT', 'NICE', 'NINE', 'NODE', 'NONE', 'NOON', 'NOTE',
+    'OBEY', 'ODDS', 'ONCE', 'ONLY', 'ONTO', 'OVEN', 'OVER', 'OWES', 'OWNS',
+    'PACE', 'PACK', 'PAGE', 'PAID', 'PAIN', 'PAIR', 'PALE', 'PALM', 'PANT', 'PART', 'PASS', 'PAST', 'PATH', 'PEAK', 'PEAR', 'PEAS', 'PEEK', 'PEEL', 'PEER', 'PENS', 'PETS', 'PICK', 'PILE', 'PILL', 'PINE', 'PING', 'PINK', 'PIPE', 'PLAN', 'PLOT', 'PLUG', 'PLUS', 'POEM', 'POET', 'POLE', 'POLL', 'POND', 'PONY', 'POOL', 'POOR', 'PORK', 'PORT', 'POST', 'POUR', 'PRAY', 'PREP', 'PREY', 'PROP', 'PULL', 'PUMP', 'PURE', 'PUSH',
+    'QUIT', 'QUIZ',
+    'RACE', 'RACK', 'RAFT', 'RAGE', 'RAIL', 'RAKE', 'RANK', 'RARE', 'RATE', 'READ', 'REAL', 'REAP', 'REAR', 'RELY', 'RENT', 'REST', 'RICE', 'RICH', 'RIDE', 'RIND', 'RINK', 'RIPE', 'RISE', 'RISK', 'ROAD', 'ROAR', 'ROBE', 'ROCK', 'RODE', 'ROLE', 'ROLL', 'ROOF', 'ROOT', 'ROPE', 'ROSE', 'RUDE', 'RULE', 'RUSH', 'RUST',
+    'SACK', 'SAFE', 'SAGE', 'SAID', 'SAIL', 'SAKE', 'SALE', 'SALT', 'SAME', 'SANG', 'SANK', 'SAVE', 'SCAN', 'SCAR', 'SEAL', 'SEAM', 'SEAT', 'SEED', 'SEEK', 'SEEM', 'SEEN', 'SELF', 'SELL', 'SEND', 'SENT', 'SETS', 'SHED', 'SHIN', 'SHOP', 'SHOT', 'SHOW', 'SHUT', 'SICK', 'SIDE', 'SIFT', 'SIGN', 'SILK', 'SILL', 'SING', 'SINK', 'SIZE', 'SKIP', 'SLAM', 'SLAP', 'SLED', 'SLID', 'SLIM', 'SLIP', 'SLOT', 'SNAP', 'SNOW', 'SOAK', 'SOAP', 'SOAR', 'SOFT', 'SOIL', 'SOLD', 'SOLE', 'SOME', 'SONG', 'SOON', 'SORE', 'SORT', 'SOUL', 'SOUP', 'SOUR', 'SPAN', 'SPIN', 'SPOT', 'STAB', 'STAY', 'STEM', 'STEP', 'STEW', 'STOP', 'SUCH', 'SUIT', 'SUNG', 'SUNK', 'SURE', 'SWAN', 'SWAP', 'SWIM', 'SWAM',
+    'TACK', 'TAKE', 'TALE', 'TALK', 'TAME', 'TANK', 'TAPE', 'TASK', 'TEAM', 'TEAR', 'TELL', 'TERM', 'TEST', 'TEXT', 'THAN', 'THAT', 'THEM', 'THEN', 'THEY', 'THIN', 'THIS', 'THUD', 'TICK', 'TIDE', 'TIED', 'TIER', 'TIES', 'TILE', 'TILL', 'TILT', 'TIME', 'TINY', 'TIPS', 'TIRE', 'TOAD', 'TOES', 'TOLD', 'TOLL', 'TOMB', 'TONE', 'TOOK', 'TOOL', 'TOPS', 'TORE', 'TORN', 'TOSS', 'TOUR', 'TOWN', 'TOYS', 'TRAP', 'TRAY', 'TRIM', 'TRIP', 'TROT', 'TRUE', 'TUBE', 'TUCK', 'TUNE', 'TURF', 'TURN', 'TWIG', 'TWIN', 'TYPE',
+    'UGLY', 'UNDO', 'UNIT', 'UPON', 'USED', 'USER', 'USES',
+    'VAIN', 'VARY', 'VAST', 'VEIL', 'VEIN', 'VENT', 'VERB', 'VERY', 'VEST', 'VIEW', 'VINE', 'VOID', 'VOTE',
+    'WADE', 'WAGE', 'WAIL', 'WAIT', 'WAKE', 'WALK', 'WALL', 'WAND', 'WANT', 'WARD', 'WARE', 'WARN', 'WART', 'WASH', 'WASP', 'WAYS', 'WEAK', 'WEAR', 'WEED', 'WEEK', 'WELL', 'WENT', 'WERE', 'WEST', 'WHAT', 'WHEN', 'WHIP', 'WHOM', 'WIDE', 'WIFE', 'WILD', 'WILL', 'WILT', 'WIND', 'WINE', 'WING', 'WINK', 'WINS', 'WIPE', 'WIRE', 'WISE', 'WISH', 'WITH', 'WOKE', 'WOLF', 'WOOD', 'WOOL', 'WORD', 'WORE', 'WORM', 'WORN', 'WRAP',
+    'YANK', 'YARN', 'YAWN', 'YEAR', 'YELL', 'YOGA', 'YOKE', 'YOLK', 'YOUR', 'YOYO',
+    'ZEAL', 'ZERO', 'ZEST', 'ZINC', 'ZONE', 'ZOOM'
+];
 
 function selectWordBuilderLevel(level) {
     currentWordBuilderLevel = level;
