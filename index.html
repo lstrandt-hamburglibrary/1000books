@@ -1340,6 +1340,9 @@
         <!-- Header -->
         <div class="app-header">
             <h1>📚 1000 Books Before Kindergarten</h1>
+            <button id="permanentInstallBtn" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 8px 15px; border-radius: 25px; cursor: pointer; font-size: 0.9rem; display: none;" onclick="triggerInstall()">
+                📲 Install App
+            </button>
             <div class="child-selector">
                 <select id="childSelect" onchange="switchChild(this.value)">
                     <option value="">Select Child</option>
@@ -5614,6 +5617,7 @@
         const installPrompt = document.getElementById('installPrompt');
         const installBtn = document.getElementById('installBtn');
         const dismissBtn = document.getElementById('dismissBtn');
+        const permanentInstallBtn = document.getElementById('permanentInstallBtn');
 
         // Check if app is already installed
         function isStandalone() {
@@ -5629,6 +5633,11 @@
             // Store the event for later use
             deferredPrompt = e;
 
+            // Show the permanent install button
+            if (permanentInstallBtn && !isStandalone()) {
+                permanentInstallBtn.style.display = 'block';
+            }
+
             // Check if user has previously dismissed the prompt
             const promptDismissed = localStorage.getItem('installPromptDismissed');
             const dismissedTime = localStorage.getItem('installPromptDismissedTime');
@@ -5642,6 +5651,40 @@
                 }, 2000); // Show after 2 seconds
             }
         });
+
+        // Function to trigger install from permanent button
+        function triggerInstall() {
+            if (!deferredPrompt) {
+                // For iOS, show instructions
+                if (isIOS()) {
+                    alert('To install on iOS:\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"');
+                } else {
+                    alert('To install:\n1. Look for the install icon in your browser\'s address bar\n2. Or use the browser menu → "Install app"');
+                }
+                return;
+            }
+
+            // Show the browser's install prompt
+            deferredPrompt.prompt();
+
+            // Wait for user choice
+            deferredPrompt.userChoice.then((result) => {
+                console.log(`User choice: ${result.outcome}`);
+
+                // Hide the button if installed
+                if (result.outcome === 'accepted') {
+                    permanentInstallBtn.style.display = 'none';
+                    localStorage.removeItem('installPromptDismissed');
+                    localStorage.removeItem('installPromptDismissedTime');
+                }
+
+                // Clear the deferred prompt
+                deferredPrompt = null;
+            });
+        }
+
+        // Make triggerInstall globally accessible
+        window.triggerInstall = triggerInstall;
 
         // Handle install button click
         installBtn.addEventListener('click', async () => {
@@ -5691,6 +5734,11 @@
 
         // Show iOS install instructions if needed
         if (isIOS() && !isStandalone()) {
+            // Show the permanent install button for iOS
+            if (permanentInstallBtn) {
+                permanentInstallBtn.style.display = 'block';
+            }
+
             // Check if not dismissed recently
             const iosDismissed = localStorage.getItem('iosInstallDismissed');
             const iosDismissedTime = localStorage.getItem('iosInstallDismissedTime');
