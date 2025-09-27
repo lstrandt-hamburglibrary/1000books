@@ -3309,32 +3309,77 @@
         // Initialize Badges
         function initializeBadges() {
             const container = document.getElementById('badgesGrid');
+            if (!container) {
+                console.error('Badges container not found');
+                return;
+            }
+
             container.innerHTML = badges.map(badge => `
                 <div class="badge-card locked" id="badge-${badge.id}">
                     <div class="badge-icon">${badge.emoji}</div>
                     <div class="badge-name">${badge.name}</div>
                     <div class="badge-description">${badge.description}</div>
+                    <div class="badge-status"></div>
                 </div>
             `).join('');
+
+            // Immediately check badge status after initializing
+            checkBadges();
         }
 
-        // Check Badges
+        // Check Badges (also aliased as updateBadges for consistency)
         function checkBadges() {
             if (appData.currentChild === null) return;
 
             const books = appData.children[appData.currentChild].books || [];
+            console.log(`Checking badges for ${books.length} books`);
 
             badges.forEach(badge => {
                 const element = document.getElementById(`badge-${badge.id}`);
-                if (badge.condition(books)) {
-                    element.classList.remove('locked');
-                    element.classList.add('earned');
+                if (element) {
+                    const statusElement = element.querySelector('.badge-status');
+                    const isEarned = badge.condition(books);
+
+                    if (isEarned) {
+                        element.classList.remove('locked');
+                        element.classList.add('earned');
+                        element.style.display = 'block';
+                        element.style.opacity = '1';
+
+                        if (statusElement) {
+                            statusElement.textContent = '✓ Earned!';
+                            statusElement.style.color = '#28a745';
+                            statusElement.style.fontWeight = 'bold';
+                            statusElement.style.marginTop = '5px';
+                        }
+
+                        // Check if this badge was just earned
+                        if (!appData.earnedBadges?.includes(badge.id)) {
+                            if (!appData.earnedBadges) appData.earnedBadges = [];
+                            appData.earnedBadges.push(badge.id);
+                            console.log(`New badge earned: ${badge.name}`);
+                        }
+                    } else {
+                        element.classList.add('locked');
+                        element.classList.remove('earned');
+                        element.style.display = 'block';
+                        element.style.opacity = '0.6';
+
+                        if (statusElement) {
+                            statusElement.textContent = '🔒 Locked';
+                            statusElement.style.color = '#6c757d';
+                            statusElement.style.fontWeight = 'normal';
+                            statusElement.style.marginTop = '5px';
+                        }
+                    }
                 } else {
-                    element.classList.add('locked');
-                    element.classList.remove('earned');
+                    console.error(`Badge element not found: badge-${badge.id}`);
                 }
             });
         }
+
+        // Alias for consistency with milestones
+        const updateBadges = checkBadges;
 
         // Initialize Milestones
         function initializeMilestones() {
