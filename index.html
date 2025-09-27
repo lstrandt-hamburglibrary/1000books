@@ -2439,6 +2439,10 @@
                 displaySuggestions();
             } else if (pageName === 'games') {
                 displayGames();
+            } else if (pageName === 'milestones') {
+                updateMilestones();
+            } else if (pageName === 'badges') {
+                updateBadges();
             }
         }
 
@@ -3335,11 +3339,20 @@
         // Initialize Milestones
         function initializeMilestones() {
             const container = document.getElementById('milestonesGrid');
-            container.innerHTML = milestones.map(milestone => `
+            if (!container) {
+                console.error('Milestones container not found');
+                return;
+            }
+
+            // Sort milestones by book count
+            const sortedMilestones = [...milestones].sort((a, b) => a.books - b.books);
+
+            container.innerHTML = sortedMilestones.map(milestone => `
                 <div class="badge-card locked" id="milestone-${milestone.books}">
                     <div class="badge-icon">${milestone.emoji}</div>
                     <div class="badge-name">${milestone.name}</div>
                     <div class="badge-description">${milestone.books} books</div>
+                    <div class="badge-status"></div>
                 </div>
             `).join('');
 
@@ -3351,15 +3364,38 @@
             if (appData.currentChild === null) return;
 
             const bookCount = appData.children[appData.currentChild]?.books?.length || 0;
+            console.log(`Updating milestones for ${bookCount} books`);
 
             milestones.forEach(milestone => {
                 const element = document.getElementById(`milestone-${milestone.books}`);
-                if (bookCount >= milestone.books) {
-                    element.classList.remove('locked');
-                    element.classList.add('earned');
+                if (element) {
+                    const statusElement = element.querySelector('.badge-status');
+                    if (bookCount >= milestone.books) {
+                        element.classList.remove('locked');
+                        element.classList.add('earned');
+                        // Make sure earned milestones are always visible
+                        element.style.display = 'block';
+                        element.style.opacity = '1';
+                        if (statusElement) {
+                            statusElement.textContent = '✓ Earned!';
+                            statusElement.style.color = '#28a745';
+                            statusElement.style.fontWeight = 'bold';
+                        }
+                        console.log(`Milestone earned: ${milestone.name} (${milestone.books} books)`);
+                    } else {
+                        element.classList.add('locked');
+                        element.classList.remove('earned');
+                        element.style.display = 'block';
+                        element.style.opacity = '0.6';
+                        if (statusElement) {
+                            const booksNeeded = milestone.books - bookCount;
+                            statusElement.textContent = `${booksNeeded} more books needed`;
+                            statusElement.style.color = '#6c757d';
+                            statusElement.style.fontWeight = 'normal';
+                        }
+                    }
                 } else {
-                    element.classList.add('locked');
-                    element.classList.remove('earned');
+                    console.error(`Milestone element not found: milestone-${milestone.books}`);
                 }
             });
         }
