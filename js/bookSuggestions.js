@@ -1,7 +1,7 @@
 // Book Suggestions Database - 350 books in 35 categories
 const bookSuggestions = {
     abc: {
-        name: "ABC Books",
+        name: "ABCs",
         emoji: "🔤",
         books: [
             { title: "A Busy Creature's Day Eating!", author: "Mo Willems", age: "3-6" },
@@ -17,7 +17,7 @@ const bookSuggestions = {
         ]
     },
     bears: {
-        name: "Bear Stories",
+        name: "Bears",
         emoji: "🐻",
         books: [
             { title: "Bear Snores On", author: "Karma Wilson", age: "2-5" },
@@ -33,7 +33,7 @@ const bookSuggestions = {
         ]
     },
     bedtime: {
-        name: "Bedtime Stories",
+        name: "Bedtime",
         emoji: "🌙",
         books: [
             { title: "Good Night, Gorilla", author: "Peggy Rathmann", age: "2-5" },
@@ -49,7 +49,7 @@ const bookSuggestions = {
         ]
     },
     birds: {
-        name: "Bird Books",
+        name: "Birds",
         emoji: "🐦",
         books: [
             { title: "A Sick Day for Amos McGee", author: "Philip C. Stead", age: "3-6" },
@@ -65,7 +65,7 @@ const bookSuggestions = {
         ]
     },
     birthdays: {
-        name: "Birthday Books",
+        name: "Birthdays",
         emoji: "🎂",
         books: [
             { title: "A Birthday for Cow!", author: "Jan Thomas", age: "2-5" },
@@ -81,7 +81,7 @@ const bookSuggestions = {
         ]
     },
     bugs: {
-        name: "Bug Books",
+        name: "Bugs",
         emoji: "🐛",
         books: [
             { title: "Bugs! Bugs! Bugs!", author: "Bob Barner", age: "2-5" },
@@ -97,7 +97,7 @@ const bookSuggestions = {
         ]
     },
     bunnies: {
-        name: "Bunny Books",
+        name: "Bunnies",
         emoji: "🐰",
         books: [
             { title: "Guess How Much I Love You", author: "Sam McBratney", age: "2-5" },
@@ -129,7 +129,7 @@ const bookSuggestions = {
         ]
     },
     christmas: {
-        name: "Christmas Books",
+        name: "Christmas",
         emoji: "🎄",
         books: [
             { title: "Bear Stays Up for Christmas", author: "Karma Wilson", age: "2-5" },
@@ -145,7 +145,7 @@ const bookSuggestions = {
         ]
     },
     classics: {
-        name: "Classic Picture Books",
+        name: "Classics",
         emoji: "📚",
         books: [
             { title: "Alexander and the Terrible, Horrible, No Good, Very Bad Day", author: "Judith Viorst", age: "4-7" },
@@ -161,7 +161,7 @@ const bookSuggestions = {
         ]
     },
     colors: {
-        name: "Color Books",
+        name: "Colors",
         emoji: "🌈",
         books: [
             { title: "A Color of His Own", author: "Leo Lionni", age: "3-6" },
@@ -177,7 +177,7 @@ const bookSuggestions = {
         ]
     },
     counting: {
-        name: "Counting Books",
+        name: "Counting",
         emoji: "🔢",
         books: [
             { title: "Anno's Counting Book", author: "Mitsumasa Anno", age: "3-6" },
@@ -193,7 +193,7 @@ const bookSuggestions = {
         ]
     },
     dinosaurs: {
-        name: "Dinosaur Books",
+        name: "Dinosaurs",
         emoji: "🦕",
         books: [
             { title: "Brontorina", author: "James Howe", age: "3-6" },
@@ -209,7 +209,7 @@ const bookSuggestions = {
         ]
     },
     dogs: {
-        name: "Dog Stories",
+        name: "Dogs",
         emoji: "🐕",
         books: [
             { title: "Biscuit (series)", author: "Alyssa Satin Capucilli", age: "1-3" },
@@ -257,7 +257,7 @@ const bookSuggestions = {
         ]
     },
     fall: {
-        name: "Fall Books",
+        name: "Fall",
         emoji: "🍂",
         books: [
             { title: "Apples and Pumpkins", author: "Anne Rockwell", age: "2-5" },
@@ -273,7 +273,7 @@ const bookSuggestions = {
         ]
     },
     families: {
-        name: "Family Stories",
+        name: "Family",
         emoji: "👨‍👩‍👧‍👦",
         books: [
             { title: "A Chair for My Mother", author: "Vera B. Williams", age: "4-7" },
@@ -289,7 +289,7 @@ const bookSuggestions = {
         ]
     },
     food: {
-        name: "Food Books",
+        name: "Food",
         emoji: "🍕",
         books: [
             { title: "Cloudy with a Chance of Meatballs", author: "Judi Barrett", age: "4-7" },
@@ -305,7 +305,7 @@ const bookSuggestions = {
         ]
     },
     halloween: {
-        name: "Halloween Books",
+        name: "Halloween",
         emoji: "🎃",
         books: [
             { title: "Big Pumpkin", author: "Erica Silverman", age: "3-6" },
@@ -385,7 +385,7 @@ const bookSuggestions = {
         ]
     },
     pets: {
-        name: "Pet Stories",
+        name: "Pets",
         emoji: "🐾",
         books: [
             { title: "A Pet for Petunia", author: "Paul Schmid", age: "3-6" },
@@ -433,7 +433,7 @@ const bookSuggestions = {
         ]
     },
     shapes: {
-        name: "Shape Books",
+        name: "Shapes",
         emoji: "⭐",
         books: [
             { title: "City Shapes", author: "Diana Murray", age: "2-5" },
@@ -449,7 +449,7 @@ const bookSuggestions = {
         ]
     },
     space: {
-        name: "Space Books",
+        name: "Space",
         emoji: "🚀",
         books: [
             { title: "Astro Girl", author: "Ken Wilson-Max", age: "3-6" },
@@ -465,7 +465,7 @@ const bookSuggestions = {
         ]
     },
     spring: {
-        name: "Spring Books",
+        name: "Spring",
         emoji: "🌸",
         books: [
             { title: "And Then It's Spring", author: "Julie Fogliano", age: "3-6" },
@@ -481,7 +481,7 @@ const bookSuggestions = {
         ]
     },
     summer: {
-        name: "Summer Books",
+        name: "Summer",
         emoji: "☀️",
         books: [
             { title: "A Beach Tail", author: "Karen Lynn Williams", age: "3-6" },
@@ -497,7 +497,7 @@ const bookSuggestions = {
         ]
     },
     thanksgiving: {
-        name: "Thanksgiving Books",
+        name: "Thanksgiving",
         emoji: "🦃",
         books: [
             { title: "A Plump and Perky Turkey", author: "Teresa Bateman", age: "3-6" },
@@ -529,7 +529,7 @@ const bookSuggestions = {
         ]
     },
     toys: {
-        name: "Toy Stories",
+        name: "Toys",
         emoji: "🧸",
         books: [
             { title: "Corduroy Lost and Found", author: "B.G. Hennessy", age: "3-6" },
@@ -545,7 +545,7 @@ const bookSuggestions = {
         ]
     },
     winter: {
-        name: "Winter Books",
+        name: "Winter",
         emoji: "❄️",
         books: [
             { title: "A Loud Winter's Nap", author: "Katy Hudson", age: "3-6" },
