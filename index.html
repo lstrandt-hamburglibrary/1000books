@@ -1440,10 +1440,10 @@
             <!-- Add Book Page -->
             <div id="add-book" class="page">
                 <h2>Add a New Book</h2>
-                <form id="addBookForm" onsubmit="addBook(event)">
+                <form id="addBookForm" onsubmit="addBook(event); return false;">
                     <div class="form-group">
                         <label for="bookTitle">Book Title *</label>
-                        <input type="text" id="bookTitle" required>
+                        <input type="text" id="bookTitle" required autocomplete="off" autocorrect="off">
                     </div>
                     <div class="form-group">
                         <label for="bookAuthor">Author</label>
@@ -3046,7 +3046,10 @@
 
         // Add Book
         function addBook(event) {
-            event.preventDefault();
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
 
             if (appData.currentChild === null) {
                 showToast('Please select or add a child first!');
@@ -5903,15 +5906,15 @@
     </script>
 
     <!-- Add Book Confirmation Dialog -->
-    <div id="addBookConfirmation" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 15px; padding: 25px; max-width: 90%; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-            <h3 style="margin: 0 0 15px 0; color: #333;">📚 Book Added!</h3>
-            <p style="margin: 0 0 20px 0; color: #666;">Would you like to add another book?</p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="addAnotherBook()" style="flex: 1; padding: 12px 20px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+    <div id="addBookConfirmation" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 999999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; padding: 25px; max-width: 90%; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; margin: 20px;">
+            <h3 style="margin: 0 0 15px 0; color: #333; font-size: 1.5rem;">📚 Book Added!</h3>
+            <p style="margin: 0 0 20px 0; color: #666; font-size: 1.1rem;">Would you like to add another book?</p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="addAnotherBook()" style="flex: 1; min-width: 120px; padding: 14px 20px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
                     ➕ Add Another
                 </button>
-                <button onclick="returnToHome()" style="flex: 1; padding: 12px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                <button onclick="returnToHome()" style="flex: 1; min-width: 120px; padding: 14px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
                     🏠 Return Home
                 </button>
             </div>
@@ -5921,24 +5924,45 @@
     <script>
         // Show add book confirmation dialog
         function showAddBookConfirmation() {
+            console.log('Showing add book confirmation dialog');
             const dialog = document.getElementById('addBookConfirmation');
-            dialog.style.display = 'flex';
+            if (dialog) {
+                dialog.style.display = 'flex';
+                // Ensure it's on top on mobile
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error('Add book confirmation dialog not found');
+            }
         }
 
         // Add another book
         function addAnotherBook() {
+            console.log('Add another book clicked');
             const dialog = document.getElementById('addBookConfirmation');
-            dialog.style.display = 'none';
+            if (dialog) {
+                dialog.style.display = 'none';
+                document.body.style.overflow = '';
+            }
             // Stay on the add book page, form is already reset
-            showPage('add', document.querySelector('.nav-tab'));
+            const addTab = Array.from(document.querySelectorAll('.nav-tab')).find(tab => tab.textContent.includes('Add Book'));
+            if (addTab) {
+                showPage('add', addTab);
+            }
         }
 
         // Return to home dashboard
         function returnToHome() {
+            console.log('Return home clicked');
             const dialog = document.getElementById('addBookConfirmation');
-            dialog.style.display = 'none';
+            if (dialog) {
+                dialog.style.display = 'none';
+                document.body.style.overflow = '';
+            }
             // Go to dashboard
-            showPage('dashboard', document.querySelector('.nav-tab'));
+            const dashTab = Array.from(document.querySelectorAll('.nav-tab')).find(tab => tab.textContent.includes('Dashboard'));
+            if (dashTab) {
+                showPage('dashboard', dashTab);
+            }
         }
 
         // Make functions globally accessible
