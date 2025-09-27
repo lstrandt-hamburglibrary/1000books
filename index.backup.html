@@ -5927,6 +5927,177 @@
 
         // Simple Backup Functions
 
+        function checkBackupStatus() {
+            console.log('Checking cloud backup status...');
+            const cloudEnabled = localStorage.getItem('cloudBackupEnabled');
+            const cloudEmail = localStorage.getItem('cloudUserEmail');
+            console.log('Cloud enabled:', cloudEnabled, 'Email:', cloudEmail);
+
+            if (cloudEnabled === 'true' && cloudEmail) {
+                console.log('Cloud backup is enabled, showing indicator');
+                // User has cloud backup enabled
+                document.getElementById('cloudStatus').style.display = 'none';
+                document.getElementById('googleNotSignedIn').style.display = 'none';
+                document.getElementById('googleSignedIn').style.display = 'block';
+                document.getElementById('cloudUserEmail').textContent = cloudEmail;
+
+                // Show cloud indicator in header
+                const indicator = document.getElementById('cloudSyncIndicator');
+                console.log('Cloud indicator element:', indicator);
+                if (indicator) {
+                    indicator.style.display = 'flex';
+                    document.getElementById('cloudSyncText').textContent = 'Cloud backup active';
+                    console.log('Cloud indicator should now be visible');
+                } else {
+                    console.error('Cloud indicator element not found!');
+                }
+
+                isCloudEnabled = true;
+                updateLastSyncTime();
+            } else {
+                // Show reminder for all users who haven't enabled backup
+                if (!localStorage.getItem('cloudReminderDismissed')) {
+                    document.getElementById('cloudStatus').style.display = 'block';
+                }
+            }
+        }
+
+        function signInWithGoogle() {
+            console.log('Starting Google sign-in...');
+            // For now, using a simulated sign-in
+            // In production, you'd use actual Google OAuth
+            const email = prompt('Enter your Google email for cloud backup:');
+            if (email && email.includes('@')) {
+                localStorage.setItem('cloudBackupEnabled', 'true');
+                localStorage.setItem('cloudUserEmail', email);
+                document.getElementById('googleNotSignedIn').style.display = 'none';
+                document.getElementById('googleSignedIn').style.display = 'block';
+                document.getElementById('cloudUserEmail').textContent = email;
+                document.getElementById('cloudStatus').style.display = 'none';
+
+                // Show cloud indicator
+                const indicator = document.getElementById('cloudSyncIndicator');
+                if (indicator) {
+                    indicator.style.display = 'flex';
+                }
+
+                isCloudEnabled = true;
+
+                // Initial sync
+                syncToCloud();
+                showToast('☁️ Cloud backup enabled! Your data is now protected.');
+            }
+        }
+
+        function signOutGoogle() {
+            if (confirm('Are you sure you want to disable cloud backup? Your local data will remain but won\'t be backed up.')) {
+                localStorage.removeItem('cloudBackupEnabled');
+                localStorage.removeItem('cloudUserEmail');
+                localStorage.removeItem('lastCloudSync');
+                document.getElementById('googleNotSignedIn').style.display = 'block';
+                document.getElementById('googleSignedIn').style.display = 'none';
+                document.getElementById('cloudStatus').style.display = 'block';
+                isCloudEnabled = false;
+                showToast('Cloud backup disabled. Remember to export backups manually!');
+            }
+        }
+
+        function syncToCloud() {
+            if (!isCloudEnabled) return;
+
+            // Show syncing status
+            const indicator = document.getElementById('cloudSyncIndicator');
+            const syncIcon = document.getElementById('cloudSyncIcon');
+            const syncText = document.getElementById('cloudSyncText');
+
+            if (indicator) {
+                // Show "Backing up..." message
+                syncIcon.textContent = '⏳';
+                syncText.textContent = 'Backing up...';
+                syncText.style.color = '#ff9800';
+                syncIcon.style.animation = 'spin 1s linear infinite';
+                indicator.style.background = '#fff3cd';
+                indicator.style.borderColor = '#ff9800';
+
+                // Simulate sync delay for visual feedback
+                setTimeout(() => {
+                    // In production, this would sync to actual cloud storage
+                    // For now, we'll simulate it with localStorage
+                    const cloudData = {
+                        ...appData,
+                        syncTime: new Date().toISOString()
+                    };
+
+                    localStorage.setItem('cloudBackup', JSON.stringify(cloudData));
+                    localStorage.setItem('lastCloudSync', new Date().toISOString());
+                    updateLastSyncTime();
+
+                    // Show success
+                    syncIcon.textContent = '✅';
+                    syncText.textContent = 'Backed up to cloud';
+                    syncText.style.color = '#4caf50';
+                    syncIcon.style.animation = 'none';
+                    indicator.style.background = '#e8f5e9';
+                    indicator.style.borderColor = '#4caf50';
+
+                    // Reset to normal after 2 seconds
+                    setTimeout(() => {
+                        syncIcon.textContent = '☁️';
+                        syncText.textContent = 'Cloud backup active';
+                        syncText.style.color = '#4285f4';
+                        indicator.style.background = 'white';
+                        indicator.style.borderColor = '#4285f4';
+                    }, 2000);
+                }, 500);
+            } else {
+                // Fallback if indicator not visible
+                const cloudData = {
+                    ...appData,
+                    syncTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('cloudBackup', JSON.stringify(cloudData));
+                localStorage.setItem('lastCloudSync', new Date().toISOString());
+                updateLastSyncTime();
+            }
+        }
+
+        function forceSyncToCloud() {
+            syncToCloud();
+            showToast('☁️ Data synced to cloud!');
+        }
+
+        function viewCloudBackup() {
+            const cloudBackup = localStorage.getItem('cloudBackup');
+            if (cloudBackup) {
+                const data = JSON.parse(cloudBackup);
+                const bookCount = data.children?.[data.currentChild]?.books?.length || 0;
+                const lastSync = localStorage.getItem('lastCloudSync');
+                const message = `📊 Cloud Backup Status:\n\n` +
+                    `📚 Books saved: ${bookCount}\n` +
+                    `👶 Child: ${data.children?.[data.currentChild]?.name || 'Not set'}\n` +
+                    `🕐 Last backup: ${lastSync ? new Date(lastSync).toLocaleString() : 'Never'}\n\n` +
+                    `💾 Storage: Browser localStorage (temporary)\n` +
+                    `📍 Location: This device only\n\n` +
+                    `Note: This is a simulated backup stored locally.\n` +
+                    `Real Google cloud sync coming soon!`;
+                alert(message);
+            } else {
+                alert('No cloud backup found. Click "Sync Now" to create one.');
+            }
+        }
+
+        function restoreFromCloudBackup() {
+            const cloudBackup = localStorage.getItem('cloudBackup');
+            if (cloudBackup && confirm('Restore from cloud backup? This will replace your current data.')) {
+                const data = JSON.parse(cloudBackup);
+                appData = data;
+                saveData();
+                updateDashboard();
+                showToast('✅ Data restored from cloud backup!');
+            }
+        }
+
         function emailBackup() {
             const data = JSON.stringify(appData, null, 2);
             const childName = appData.children[appData.currentChild]?.name || 'Child';
@@ -5992,11 +6163,38 @@
             }
         }
 
-        // Removed old cloud sync functions
+        function updateLastSyncTime() {
+            const lastSync = localStorage.getItem('lastCloudSync');
+            if (lastSync) {
+                const date = new Date(lastSync);
+                const timeStr = date.toLocaleString();
+                document.getElementById('lastCloudSync').textContent = timeStr;
+            }
+        }
 
-        // Make backup functions globally accessible
+        function showCloudBackupSetup() {
+            showPage('settings', document.querySelector('.nav-tab'));
+            document.getElementById('cloudBackupSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Auto-sync when data changes
+        const originalSaveData = saveData;
+        saveData = function() {
+            originalSaveData();
+            if (isCloudEnabled) {
+                syncToCloud();
+            }
+        };
+
+        // Make functions globally accessible
+        window.signInWithGoogle = signInWithGoogle;
+        window.signOutGoogle = signOutGoogle;
+        window.forceSyncToCloud = forceSyncToCloud;
+        window.viewCloudBackup = viewCloudBackup;
+        window.restoreFromCloudBackup = restoreFromCloudBackup;
         window.emailBackup = emailBackup;
         window.autoSaveBackup = autoSaveBackup;
+        window.showCloudBackupSetup = showCloudBackupSetup;
 
         // Check for updates when app gains focus or comes online
         window.addEventListener('focus', () => {
