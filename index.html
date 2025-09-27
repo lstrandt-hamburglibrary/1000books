@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '2.5.0';</script>
+    <script>window.APP_VERSION = '2.6.0';</script>
     <style>
         * {
             margin: 0;
@@ -1428,7 +1428,7 @@
             <button class="nav-tab" onclick="showPage('add-book', this)">➕ Add Book</button>
             <button class="nav-tab" onclick="showPage('suggestions', this)">💡 Suggestions</button>
             <button class="nav-tab" onclick="showPage('library', this)">📚 Library</button>
-            <button class="nav-tab" onclick="showPage('badges', this)">🏆 Badges</button>
+            <button class="nav-tab" onclick="showPage('badges', this)">🏆 Achievements</button>
             <button class="nav-tab" onclick="showPage('games', this)">🎮 Games</button>
             <button class="nav-tab" onclick="showPage('settings', this)">⚙️ Settings</button>
         </div>
@@ -1448,13 +1448,8 @@
                     <div class="progress-label">books read</div>
                 </div>
 
-                <div class="milestone-tracker" id="milestoneTracker">
-                    <div id="earnedMilestones" style="margin-bottom: 15px;"></div>
-                    <div id="nextMilestoneSection" style="padding: 12px; background: linear-gradient(135deg, #f6f6f6, #f0f0f0); border-radius: 10px;">
-                        <div class="milestone-title">🎯 Next Milestone</div>
-                        <div class="milestone-progress" id="milestoneProgress"></div>
-                        <div class="next-milestone" id="nextMilestone"></div>
-                    </div>
+                <div class="milestone-tracker" id="milestoneTracker" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                    <div id="currentMilestone" style="text-align: center; color: #6c757d; font-size: 0.95em;"></div>
                 </div>
 
                 <div class="stats-grid">
@@ -1561,10 +1556,23 @@
                 </div>
             </div>
 
-            <!-- Badges Page -->
+            <!-- Badges/Achievements Page -->
             <div id="badges" class="page">
-                <h2>Your Badges</h2>
-                <div class="badges-grid" id="badgesGrid"></div>
+                <h2>Achievements & Milestones</h2>
+
+                <!-- Milestones Section -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📖 Reading Milestones</h3>
+                    <p style="color: #6c757d; margin-bottom: 20px; font-size: 0.95em;">Major achievements based on books read</p>
+                    <div class="badges-grid" id="milestonesGrid"></div>
+                </div>
+
+                <!-- Badges Section -->
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🏆 Special Badges</h3>
+                    <p style="color: #6c757d; margin-bottom: 20px; font-size: 0.95em;">Earned by completing challenges</p>
+                    <div class="badges-grid" id="badgesGrid"></div>
+                </div>
             </div>
 
             <!-- Games Page -->
@@ -2655,6 +2663,7 @@
             } else if (pageName === 'games') {
                 displayGames();
             } else if (pageName === 'badges') {
+                updateMilestones();
                 updateBadges();
             }
         }
@@ -2784,70 +2793,28 @@
 
         // Update Milestone Tracker
         function updateMilestoneTracker(bookCount) {
-            const tracker = document.getElementById('milestoneTracker');
-            const earnedMilestonesDiv = document.getElementById('earnedMilestones');
-            const nextMilestoneSection = document.getElementById('nextMilestoneSection');
+            const currentMilestoneDiv = document.getElementById('currentMilestone');
 
-            // Show earned milestones
-            const earnedMilestones = milestones.filter(m => m.books <= bookCount);
-            if (earnedMilestones.length > 0) {
-                earnedMilestonesDiv.innerHTML = `
-                    <div style="margin-bottom: 10px; font-weight: 600; color: #28a745;">🏆 Milestones Reached:</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        ${earnedMilestones.map(m => `
-                            <div style="
-                                padding: 6px 12px;
-                                background: linear-gradient(135deg, #28a745, #20c997);
-                                color: white;
-                                border-radius: 20px;
-                                font-size: 0.9em;
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 5px;
-                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                            ">
-                                ${m.emoji} ${m.name}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            } else {
-                earnedMilestonesDiv.innerHTML = '';
-            }
-
-            // Show next milestone
+            // Find current milestone
+            const currentMilestone = milestones.filter(m => m.books <= bookCount).pop();
             const nextMilestone = milestones.find(m => m.books > bookCount);
-            if (nextMilestone) {
-                nextMilestoneSection.style.display = 'block';
-                const booksNeeded = nextMilestone.books - bookCount;
-                document.getElementById('milestoneProgress').innerHTML = `
-                    <div style="margin: 10px 0;">
-                        <div style="background: #e9ecef; border-radius: 10px; height: 20px; overflow: hidden;">
-                            <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: ${(bookCount / nextMilestone.books) * 100}%; transition: width 0.3s;"></div>
-                        </div>
-                        <div style="margin-top: 5px; color: #6c757d;">
-                            ${bookCount} / ${nextMilestone.books} books (${booksNeeded} more to go!)
-                        </div>
-                    </div>
-                `;
-                document.getElementById('nextMilestone').innerHTML = `
-                    <div style="font-size: 1.2em; margin-top: 5px;">
-                        ${nextMilestone.emoji} <strong>${nextMilestone.name}</strong>
-                    </div>
-                `;
-            } else {
-                // All milestones complete!
-                nextMilestoneSection.innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 2em;">🎊</div>
-                        <div style="font-size: 1.1em; font-weight: 600; color: #28a745;">
-                            Congratulations! All milestones completed!
-                        </div>
-                    </div>
-                `;
-            }
 
-            tracker.style.display = 'block';
+            if (currentMilestone) {
+                let displayText = `${currentMilestone.emoji} Current: ${currentMilestone.name}`;
+
+                if (nextMilestone) {
+                    const booksNeeded = nextMilestone.books - bookCount;
+                    displayText += ` • Next: ${nextMilestone.name} (${booksNeeded} books to go)`;
+                } else {
+                    displayText += ` • 🎉 All milestones complete!`;
+                }
+
+                currentMilestoneDiv.innerHTML = displayText;
+            } else if (nextMilestone) {
+                // Haven't reached first milestone yet
+                const booksNeeded = nextMilestone.books - bookCount;
+                currentMilestoneDiv.innerHTML = `📚 ${booksNeeded} books until first milestone: ${nextMilestone.name}`;
+            }
         }
 
         // Calculate Days Active
