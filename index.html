@@ -1814,6 +1814,7 @@
                             <p style="color: #666; font-size: 0.9em;">Signed in as: <strong id="cloudUserEmail"></strong></p>
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
                                 <button onclick="forceSyncToCloud()" style="flex: 1; padding: 8px; background: #4caf50; color: white; border: none; border-radius: 5px;">🔄 Sync Now</button>
+                                <button onclick="viewCloudBackup()" style="flex: 1; padding: 8px; background: #2196f3; color: white; border: none; border-radius: 5px;">👁️ View Backup</button>
                                 <button onclick="signOutGoogle()" style="flex: 1; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 5px;">Sign Out</button>
                             </div>
                             <small style="color: #666; display: block; margin-top: 10px;">Last synced: <span id="lastCloudSync">Never</span></small>
@@ -6084,6 +6085,37 @@
             showToast('☁️ Data synced to cloud!');
         }
 
+        function viewCloudBackup() {
+            const cloudBackup = localStorage.getItem('cloudBackup');
+            if (cloudBackup) {
+                const data = JSON.parse(cloudBackup);
+                const bookCount = data.children?.[data.currentChild]?.books?.length || 0;
+                const lastSync = localStorage.getItem('lastCloudSync');
+                const message = `📊 Cloud Backup Status:\n\n` +
+                    `📚 Books saved: ${bookCount}\n` +
+                    `👶 Child: ${data.children?.[data.currentChild]?.name || 'Not set'}\n` +
+                    `🕐 Last backup: ${lastSync ? new Date(lastSync).toLocaleString() : 'Never'}\n\n` +
+                    `💾 Storage: Browser localStorage (temporary)\n` +
+                    `📍 Location: This device only\n\n` +
+                    `Note: This is a simulated backup stored locally.\n` +
+                    `Real Google cloud sync coming soon!`;
+                alert(message);
+            } else {
+                alert('No cloud backup found. Click "Sync Now" to create one.');
+            }
+        }
+
+        function restoreFromCloudBackup() {
+            const cloudBackup = localStorage.getItem('cloudBackup');
+            if (cloudBackup && confirm('Restore from cloud backup? This will replace your current data.')) {
+                const data = JSON.parse(cloudBackup);
+                appData = data;
+                saveData();
+                updateDashboard();
+                showToast('✅ Data restored from cloud backup!');
+            }
+        }
+
         function updateLastSyncTime() {
             const lastSync = localStorage.getItem('lastCloudSync');
             if (lastSync) {
@@ -6111,6 +6143,8 @@
         window.signInWithGoogle = signInWithGoogle;
         window.signOutGoogle = signOutGoogle;
         window.forceSyncToCloud = forceSyncToCloud;
+        window.viewCloudBackup = viewCloudBackup;
+        window.restoreFromCloudBackup = restoreFromCloudBackup;
         window.showCloudBackupSetup = showCloudBackupSetup;
 
         // Check for updates when app gains focus or comes online
