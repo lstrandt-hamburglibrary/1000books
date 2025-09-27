@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Missing Icons</title>
+</head>
+<body>
+    <h3>Click each to download the missing icons:</h3>
+    <canvas id="icon144" width="144" height="144" style="border: 1px solid #ccc; cursor: pointer;"></canvas>
+    <br>icon-144.png (for Windows)
+    <br><br>
+    <canvas id="icon16" width="16" height="16" style="border: 1px solid #ccc; cursor: pointer; image-rendering: pixelated; width: 64px; height: 64px;"></canvas>
+    <br>favicon-16.png (for browser tabs)
+
+    <script>
+        function drawIcon(canvasId, size, filename) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // For very small icons, just show "1K"
+            if (size <= 32) {
+                ctx.fillStyle = 'white';
+                ctx.font = `bold ${size * 0.5}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('1K', size/2, size/2);
+            } else {
+                // White book shape (simplified)
+                const bookWidth = size * 0.4;
+                const bookHeight = size * 0.5;
+                const bookX = (size - bookWidth) / 2;
+                const bookY = size * 0.2;
+
+                ctx.fillStyle = 'white';
+                ctx.fillRect(bookX, bookY, bookWidth, bookHeight);
+
+                // Book spine
+                ctx.fillStyle = '#5a4a8a';
+                ctx.fillRect(bookX, bookY, size * 0.08, bookHeight);
+
+                // "1000" text
+                ctx.fillStyle = 'white';
+                ctx.font = `bold ${size * 0.12}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText('1000', size/2, size * 0.82);
+            }
+
+            // Make downloadable
+            canvas.onclick = function() {
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL();
+                link.click();
+
+                // Show confirmation
+                const msg = document.createElement('div');
+                msg.innerHTML = `✓ Downloaded ${filename}`;
+                msg.style.color = 'green';
+                canvas.parentElement.appendChild(msg);
+            };
+        }
+
+        drawIcon('icon144', 144, 'icon-144.png');
+        drawIcon('icon16', 16, 'favicon-16.png');
+    </script>
+</body>
+</html>
