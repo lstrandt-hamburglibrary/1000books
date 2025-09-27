@@ -1,5 +1,5 @@
 // Service Worker for 1000 Books Before Kindergarten
-const VERSION = '3.2.6';
+const VERSION = '3.3.0';
 const CACHE_NAME = `1000books-v${VERSION}`;
 const BYPASS_CACHE = true; // Temporary: bypass cache to force updates
 
@@ -103,4 +103,67 @@ self.addEventListener('activate', event => {
       });
     })
   );
+});
+
+// Handle push notifications
+self.addEventListener('push', event => {
+  const options = {
+    body: 'Time for today\'s reading adventure! 📚',
+    icon: './icon-192.png',
+    badge: './icon-96.png',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1
+    },
+    actions: [
+      {
+        action: 'read',
+        title: 'Start Reading',
+        icon: './icon-96.png'
+      },
+      {
+        action: 'later',
+        title: 'Remind Later',
+        icon: './icon-96.png'
+      }
+    ]
+  };
+
+  if (event.data) {
+    const data = event.data.json();
+    options.body = data.body || options.body;
+    options.title = data.title || 'Reading Time!';
+    if (data.tag) options.tag = data.tag;
+    if (data.requireInteraction) options.requireInteraction = true;
+  } else {
+    options.title = 'Reading Time!';
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(options.title, options)
+  );
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+
+  if (event.action === 'read') {
+    // Open the app to add a book
+    event.waitUntil(
+      clients.openWindow('./?page=add-book')
+    );
+  } else if (event.action === 'later') {
+    // Schedule another reminder in 2 hours
+    // Note: This would need backend support for rescheduling
+    event.waitUntil(
+      clients.openWindow('./?snooze=true')
+    );
+  } else {
+    // Default click - open app
+    event.waitUntil(
+      clients.openWindow('./')
+    );
+  }
 });
