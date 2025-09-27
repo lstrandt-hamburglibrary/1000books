@@ -174,8 +174,8 @@ function startButtonSort(level) {
         // Sort by Color
         instructions.textContent = 'Drag buttons to the matching color bin!';
         bins = [
-            { id: 'red', label: 'Red Buttons', color: '#ffcccc' },
-            { id: 'blue', label: 'Blue Buttons', color: '#ccccff' }
+            { id: 'red', label: 'Red Buttons', color: '#ffcccc', icon: '🔴' },
+            { id: 'blue', label: 'Blue Buttons', color: '#ccccff', icon: '🔵' }
         ];
 
         // Create 8 buttons (4 red, 4 blue)
@@ -188,8 +188,8 @@ function startButtonSort(level) {
         // Sort by Size
         instructions.textContent = 'Sort buttons by size - big or small!';
         bins = [
-            { id: 'big', label: 'Big Buttons', color: '#ffe4cc' },
-            { id: 'small', label: 'Small Buttons', color: '#ccffe4' }
+            { id: 'big', label: 'Big Buttons', color: '#ffe4cc', icon: '🟢' },
+            { id: 'small', label: 'Small Buttons', color: '#ccffe4', icon: '🟣' }
         ];
 
         // Create 8 buttons (4 big, 4 small)
@@ -202,9 +202,9 @@ function startButtonSort(level) {
         // Sort by Shape
         instructions.textContent = 'Sort buttons by their shape!';
         bins = [
-            { id: 'circle', label: 'Round', color: '#ffccff' },
-            { id: 'square', label: 'Square', color: '#ffffcc' },
-            { id: 'star', label: 'Star', color: '#ccffff' }
+            { id: 'circle', label: 'Round', color: '#ffccff', icon: '⭕' },
+            { id: 'square', label: 'Square', color: '#ffffcc', icon: '⬜' },
+            { id: 'star', label: 'Star', color: '#ccffff', icon: '⭐' }
         ];
 
         // Create 9 buttons (3 of each shape)
@@ -231,7 +231,7 @@ function startButtonSort(level) {
         binDiv.dataset.binId = bin.id;
         binDiv.style.cssText = `
             min-width: 140px;
-            min-height: 140px;
+            min-height: 160px;
             background: ${bin.color};
             border: 3px dashed #666;
             border-radius: 15px;
@@ -240,13 +240,14 @@ function startButtonSort(level) {
             cursor: pointer;
         `;
         binDiv.innerHTML = `
+            <div style="font-size: 2em; margin-bottom: 5px;">${bin.icon || ''}</div>
             <div style="font-weight: bold; margin-bottom: 10px;">${bin.label}</div>
             <div id="bin-content-${bin.id}" style="
                 display: flex;
                 flex-wrap: wrap;
                 gap: 5px;
                 justify-content: center;
-                min-height: 80px;
+                min-height: 60px;
             "></div>
         `;
 
