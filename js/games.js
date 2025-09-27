@@ -12,6 +12,9 @@ function launchGame(gameName) {
         case 'word-builder':
             launchWordBuilderGame();
             break;
+        case 'letter-match':
+            launchLetterMatchGame();
+            break;
     }
 }
 
@@ -554,6 +557,348 @@ function checkWord() {
     } else {
         result.style.color = 'var(--danger)';
         result.textContent = 'Not quite right. Try again!';
+    }
+}
+
+// Letter Match Game - Match uppercase and lowercase letters
+function launchLetterMatchGame() {
+    const gameHTML = `
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        ">
+            <div class="game-container" style="
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>🔤 Letter Match</h2>
+                    <button onclick="closeGame()" style="
+                        background: var(--danger);
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    ">Close X</button>
+                </div>
+
+                <p style="margin-bottom: 1rem;">Match the uppercase letter with its lowercase friend!</p>
+
+                <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 1rem;
+                    padding: 1rem;
+                    background: var(--bg);
+                    border-radius: 10px;
+                ">
+                    <span>Matches: <strong id="letterMatches">0</strong>/6</span>
+                    <span>Score: <strong id="letterScore">0</strong></span>
+                    <span>Time: <strong id="letterTimer">0</strong>s</span>
+                </div>
+
+                <div style="
+                    display: flex;
+                    gap: 2rem;
+                    justify-content: center;
+                    align-items: start;
+                    padding: 2rem 1rem;
+                    background: linear-gradient(135deg, #fbbf24, #f97316);
+                    border-radius: 15px;
+                    min-height: 400px;
+                ">
+                    <!-- Uppercase letters column -->
+                    <div id="uppercaseColumn" style="
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1rem;
+                    ">
+                        <h3 style="text-align: center; color: white; margin-bottom: 1rem;">Uppercase</h3>
+                        <div id="uppercaseLetters" style="
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.8rem;
+                        ">
+                            <!-- Uppercase letter cards will appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Match indicator area -->
+                    <div style="
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        min-width: 100px;
+                    ">
+                        <div id="matchIndicator" style="
+                            font-size: 3rem;
+                            opacity: 0;
+                            transition: opacity 0.3s;
+                        ">✨</div>
+                    </div>
+
+                    <!-- Lowercase letters column -->
+                    <div id="lowercaseColumn" style="
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1rem;
+                    ">
+                        <h3 style="text-align: center; color: white; margin-bottom: 1rem;">Lowercase</h3>
+                        <div id="lowercaseLetters" style="
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.8rem;
+                        ">
+                            <!-- Lowercase letter cards will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="letterGameComplete" style="
+                    display: none;
+                    text-align: center;
+                    margin-top: 1rem;
+                ">
+                    <h3 style="color: var(--success);">🎉 Fantastic! You matched all the letters!</h3>
+                    <p>Score: <span id="finalLetterScore">0</span> | Time: <span id="finalLetterTime">0</span> seconds</p>
+                    <button onclick="startLetterMatch()" style="
+                        margin-top: 1rem;
+                        padding: 0.75rem 2rem;
+                        background: var(--primary);
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        cursor: pointer;
+                    ">Play Again</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
+    startLetterMatch();
+}
+
+// Start Letter Match Game
+function startLetterMatch() {
+    let selectedUppercase = null;
+    let selectedLowercase = null;
+    let matchesFound = 0;
+    let score = 0;
+    let gameTime = 0;
+    let gameTimer;
+    let attempts = 0;
+
+    // Letter pairs to use (randomly select 6)
+    const allLetterPairs = [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+        'U', 'V', 'W', 'X', 'Y', 'Z'
+    ];
+
+    // Randomly select 6 letters
+    const selectedLetters = [];
+    const tempLetters = [...allLetterPairs];
+    for (let i = 0; i < 6; i++) {
+        const randomIndex = Math.floor(Math.random() * tempLetters.length);
+        selectedLetters.push(tempLetters[randomIndex]);
+        tempLetters.splice(randomIndex, 1);
+    }
+
+    // Reset game
+    document.getElementById('letterMatches').textContent = '0';
+    document.getElementById('letterScore').textContent = '0';
+    document.getElementById('letterTimer').textContent = '0';
+    document.getElementById('letterGameComplete').style.display = 'none';
+
+    // Clear timer if exists
+    if (gameTimer) clearInterval(gameTimer);
+
+    // Start timer
+    gameTimer = setInterval(() => {
+        gameTime++;
+        document.getElementById('letterTimer').textContent = gameTime;
+    }, 1000);
+
+    // Create uppercase letters (shuffled)
+    const uppercaseContainer = document.getElementById('uppercaseLetters');
+    uppercaseContainer.innerHTML = '';
+    const shuffledUppercase = [...selectedLetters].sort(() => Math.random() - 0.5);
+
+    shuffledUppercase.forEach(letter => {
+        const card = createLetterCard(letter, 'uppercase');
+        uppercaseContainer.appendChild(card);
+    });
+
+    // Create lowercase letters (shuffled differently)
+    const lowercaseContainer = document.getElementById('lowercaseLetters');
+    lowercaseContainer.innerHTML = '';
+    const shuffledLowercase = [...selectedLetters].sort(() => Math.random() - 0.5);
+
+    shuffledLowercase.forEach(letter => {
+        const card = createLetterCard(letter.toLowerCase(), 'lowercase');
+        lowercaseContainer.appendChild(card);
+    });
+
+    // Create letter card
+    function createLetterCard(letter, type) {
+        const card = document.createElement('div');
+        card.dataset.letter = letter.toUpperCase();
+        card.dataset.type = type;
+        card.style.cssText = `
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+            color: ${type === 'uppercase' ? '#dc2626' : '#2563eb'};
+        `;
+        card.textContent = letter;
+
+        card.onclick = function() {
+            if (card.classList.contains('matched')) return;
+
+            // Clear previous selections of same type
+            document.querySelectorAll(`.letter-${type}-selected`).forEach(c => {
+                c.classList.remove(`letter-${type}-selected`);
+                c.style.border = '3px solid #ddd';
+                c.style.transform = 'scale(1)';
+                c.style.boxShadow = 'none';
+            });
+
+            // Select this card
+            card.classList.add(`letter-${type}-selected`);
+            card.style.border = `3px solid ${type === 'uppercase' ? '#dc2626' : '#2563eb'}`;
+            card.style.transform = 'scale(1.1)';
+            card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+
+            if (type === 'uppercase') {
+                selectedUppercase = letter;
+            } else {
+                selectedLowercase = letter.toUpperCase();
+            }
+
+            // Check for match if both selected
+            if (selectedUppercase && selectedLowercase) {
+                attempts++;
+                checkLetterMatch();
+            }
+        };
+
+        return card;
+    }
+
+    // Check if letters match
+    function checkLetterMatch() {
+        const matchIndicator = document.getElementById('matchIndicator');
+
+        if (selectedUppercase === selectedLowercase) {
+            // Match found!
+            matchesFound++;
+            score += Math.max(100 - (attempts * 5), 20); // Score decreases with more attempts
+
+            document.getElementById('letterMatches').textContent = matchesFound;
+            document.getElementById('letterScore').textContent = score;
+
+            // Show match indicator
+            matchIndicator.textContent = '✅';
+            matchIndicator.style.opacity = '1';
+
+            // Mark cards as matched
+            document.querySelectorAll('.letter-uppercase-selected, .letter-lowercase-selected').forEach(card => {
+                card.classList.add('matched');
+                card.style.background = '#86efac';
+                card.style.border = '3px solid #22c55e';
+                card.style.transform = 'scale(0.9)';
+                card.style.opacity = '0.7';
+                card.style.cursor = 'default';
+            });
+
+            // Play success animation
+            setTimeout(() => {
+                matchIndicator.style.opacity = '0';
+            }, 1000);
+
+            // Check if game complete
+            if (matchesFound === 6) {
+                clearInterval(gameTimer);
+                document.getElementById('finalLetterScore').textContent = score;
+                document.getElementById('finalLetterTime').textContent = gameTime;
+
+                setTimeout(() => {
+                    document.getElementById('letterGameComplete').style.display = 'block';
+                    checkGameAchievement('letter-match', score);
+                }, 500);
+            }
+        } else {
+            // No match
+            matchIndicator.textContent = '❌';
+            matchIndicator.style.opacity = '1';
+
+            // Shake animation for wrong match
+            document.querySelectorAll('.letter-uppercase-selected, .letter-lowercase-selected').forEach(card => {
+                card.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 500);
+            });
+
+            setTimeout(() => {
+                matchIndicator.style.opacity = '0';
+            }, 1000);
+        }
+
+        // Reset selections
+        setTimeout(() => {
+            selectedUppercase = null;
+            selectedLowercase = null;
+
+            document.querySelectorAll('.letter-uppercase-selected, .letter-lowercase-selected').forEach(card => {
+                if (!card.classList.contains('matched')) {
+                    card.classList.remove('letter-uppercase-selected', 'letter-lowercase-selected');
+                    card.style.border = '3px solid #ddd';
+                    card.style.transform = 'scale(1)';
+                    card.style.boxShadow = 'none';
+                }
+            });
+        }, 800);
+    }
+
+    // Add shake animation if not exists
+    if (!document.getElementById('letterMatchAnimations')) {
+        const style = document.createElement('style');
+        style.id = 'letterMatchAnimations';
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0) scale(1.1); }
+                25% { transform: translateX(-10px) scale(1.1); }
+                75% { transform: translateX(10px) scale(1.1); }
+            }
+        `;
+        document.head.appendChild(style);
     }
 }
 

@@ -4182,20 +4182,28 @@
                     action: () => startDogParkGame()
                 },
                 {
+                    id: 'peteButtons',
+                    name: "Pete's Button Hunt",
+                    icon: '🔘',
+                    requirement: 'Read 15 books',
+                    unlocked: unlockedGames.peteButtons,
+                    action: () => launchGame('pete-buttons')
+                },
+                {
                     id: 'letterMatch',
                     name: 'Letter Match',
                     icon: '🔤',
                     requirement: 'Read 25 books',
                     unlocked: unlockedGames.letterMatch,
-                    action: () => showToast('Letter Match game coming soon!')
+                    action: () => launchGame('letter-match')
                 },
                 {
                     id: 'storyTime',
-                    name: 'Story Builder',
+                    name: 'Word Builder',
                     icon: '📝',
                     requirement: 'Read 40 books',
                     unlocked: unlockedGames.storyBuilder,
-                    action: () => showToast('Story Builder game coming soon!')
+                    action: () => launchGame('word-builder')
                 },
                 {
                     id: 'slidingPuzzle',
@@ -4223,11 +4231,11 @@
                 },
                 {
                     id: 'seasonSort',
-                    name: 'Season Sorter',
-                    icon: '🍂',
+                    name: 'Story Match',
+                    icon: '📚',
                     requirement: 'Read 150 books',
                     unlocked: unlockedGames.seasonSort,
-                    action: () => showToast('Season Sorter game coming soon!')
+                    action: () => launchGame('story-match')
                 }
             ];
 
@@ -4245,12 +4253,14 @@
             // Store game actions globally
             window.gameActions = {
                 dogPark: () => startDogParkGame(),
+                peteButtons: () => launchGame('pete-buttons'),
                 snowflake: () => startSnowflakeGame(),
                 dragonMaze: () => startDragonMazeGame(),
                 slidingPuzzle: () => startSlidingPuzzleGame(),
-                letterMatch: () => showToast('Letter Match game coming soon!'),
-                storyBuilder: () => showToast('Story Builder game coming soon!'),
-                seasonSort: () => showToast('Season Sorter game coming soon!')
+                letterMatch: () => launchGame('letter-match'),
+                storyTime: () => launchGame('word-builder'),
+                storyBuilder: () => launchGame('word-builder'),
+                seasonSort: () => launchGame('story-match')
             };
         }
 
@@ -6314,6 +6324,7 @@
         });
     </script>
     <script src="js/bookSuggestions.js"></script>
+    <script src="js/games.js"></script>
 
     <!-- Install Prompt -->
     <div id="installPrompt" class="install-prompt">
