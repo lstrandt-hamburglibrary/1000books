@@ -3097,12 +3097,7 @@
                 }
             }
 
-            // Reset form
-            document.getElementById('addBookForm').reset();
-            setTodaysDate();
-            selectedRating = '';
-            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
-
+            // Show success first
             showToast('Book added successfully! 📚');
             updateDashboard();
 
@@ -3114,6 +3109,17 @@
                     showToast(`🎉 Milestone reached: ${milestone.name}! ${milestone.emoji}`);
                 }, 1000);
             }
+
+            // Show confirmation dialog after a brief delay
+            setTimeout(() => {
+                showAddBookConfirmation();
+            }, 500);
+
+            // Reset form
+            document.getElementById('addBookForm').reset();
+            setTodaysDate();
+            selectedRating = '';
+            document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
         }
 
         // Display Library
@@ -5894,6 +5900,51 @@
                 }, 3000);
             }
         }
+    </script>
+
+    <!-- Add Book Confirmation Dialog -->
+    <div id="addBookConfirmation" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; padding: 25px; max-width: 90%; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <h3 style="margin: 0 0 15px 0; color: #333;">📚 Book Added!</h3>
+            <p style="margin: 0 0 20px 0; color: #666;">Would you like to add another book?</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="addAnotherBook()" style="flex: 1; padding: 12px 20px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                    ➕ Add Another
+                </button>
+                <button onclick="returnToHome()" style="flex: 1; padding: 12px 20px; background: #6c757d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                    🏠 Return Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show add book confirmation dialog
+        function showAddBookConfirmation() {
+            const dialog = document.getElementById('addBookConfirmation');
+            dialog.style.display = 'flex';
+        }
+
+        // Add another book
+        function addAnotherBook() {
+            const dialog = document.getElementById('addBookConfirmation');
+            dialog.style.display = 'none';
+            // Stay on the add book page, form is already reset
+            showPage('add', document.querySelector('.nav-tab'));
+        }
+
+        // Return to home dashboard
+        function returnToHome() {
+            const dialog = document.getElementById('addBookConfirmation');
+            dialog.style.display = 'none';
+            // Go to dashboard
+            showPage('dashboard', document.querySelector('.nav-tab'));
+        }
+
+        // Make functions globally accessible
+        window.showAddBookConfirmation = showAddBookConfirmation;
+        window.addAnotherBook = addAnotherBook;
+        window.returnToHome = returnToHome;
     </script>
 </body>
 </html>
