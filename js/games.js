@@ -402,7 +402,43 @@ function launchWordBuilderGame() {
                     ">Close ✕</button>
                 </div>
 
-                <p style="margin-bottom: 1rem;">Build the word by clicking the letters in order!</p>
+                <!-- Level Selection -->
+                <div id="levelSelection" style="
+                    margin-bottom: 1rem;
+                    padding: 1rem;
+                    background: #f8f9fa;
+                    border-radius: 10px;
+                ">
+                    <div style="text-align: center; margin-bottom: 0.5rem; font-weight: bold;">Choose Difficulty:</div>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="selectWordBuilderLevel(1)" style="
+                            padding: 0.5rem 1rem;
+                            background: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Level 1: Build Word</button>
+                        <button onclick="selectWordBuilderLevel(2)" style="
+                            padding: 0.5rem 1rem;
+                            background: #fbbf24;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Level 2: Fill 1 Letter</button>
+                        <button onclick="selectWordBuilderLevel(3)" style="
+                            padding: 0.5rem 1rem;
+                            background: #dc3545;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Level 3: Fill 2 Letters</button>
+                    </div>
+                </div>
+
+                <p id="gameInstructions" style="margin-bottom: 1rem; text-align: center;">Select a level to begin!</p>
 
                 <div style="
                     padding: 1rem;
@@ -417,7 +453,7 @@ function launchWordBuilderGame() {
                         text-align: center;
                         color: #667eea;
                         letter-spacing: 0.5rem;
-                    ">CAT</div>
+                    ">---</div>
                 </div>
 
                 <div id="currentWord" style="
@@ -462,7 +498,15 @@ function launchWordBuilderGame() {
                         border: none;
                         border-radius: 10px;
                         cursor: pointer;
-                    ">Check Word</button>
+                    ">Check</button>
+                    <button onclick="newWordForLevel()" style="
+                        padding: 0.75rem 2rem;
+                        background: #667eea;
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        cursor: pointer;
+                    ">New Word</button>
                 </div>
 
                 <div id="wordResult" style="
@@ -476,29 +520,126 @@ function launchWordBuilderGame() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', gameHTML);
-    startWordBuilder();
 }
 
 // Start Word Builder Game
 let currentWordBuilt = '';
 let targetWordForGame = '';
+let currentWordBuilderLevel = 0;
+let missingLetterPositions = [];
+
+function selectWordBuilderLevel(level) {
+    currentWordBuilderLevel = level;
+    const instructions = document.getElementById('gameInstructions');
+
+    switch(level) {
+        case 1:
+            instructions.textContent = 'Build the word by clicking letters in order!';
+            break;
+        case 2:
+            instructions.textContent = 'Fill in the missing letter to complete the word!';
+            break;
+        case 3:
+            instructions.textContent = 'Fill in the TWO missing letters to complete the word!';
+            break;
+    }
+
+    startWordBuilder();
+}
+
+function newWordForLevel() {
+    if (currentWordBuilderLevel === 0) {
+        alert('Please select a level first!');
+        return;
+    }
+    startWordBuilder();
+}
 
 function startWordBuilder() {
-    const simpleWords = ['CAT', 'DOG', 'SUN', 'BED', 'HAT', 'BAT', 'RUN', 'HOP', 'PIG', 'BUG'];
-    targetWordForGame = simpleWords[Math.floor(Math.random() * simpleWords.length)];
+    if (currentWordBuilderLevel === 0) return;
+
+    // Different word sets for different levels
+    let wordSet;
+    if (currentWordBuilderLevel === 1 || currentWordBuilderLevel === 2) {
+        wordSet = ['CAT', 'DOG', 'SUN', 'BED', 'HAT', 'BAT', 'RUN', 'HOP', 'PIG', 'BUG'];
+    } else {
+        // Level 3 - 4 letter words
+        wordSet = ['BOOK', 'JUMP', 'FISH', 'BIRD', 'TREE', 'STAR', 'MOON', 'FROG', 'DUCK', 'SHIP'];
+    }
+
+    targetWordForGame = wordSet[Math.floor(Math.random() * wordSet.length)];
     currentWordBuilt = '';
+    missingLetterPositions = [];
 
-    document.getElementById('targetWord').textContent = targetWordForGame;
-    document.getElementById('currentWord').textContent = '';
+    // Setup based on level
+    if (currentWordBuilderLevel === 1) {
+        // Level 1: Build entire word
+        document.getElementById('targetWord').textContent = targetWordForGame;
+        document.getElementById('currentWord').textContent = '';
+        createLetterButtons(targetWordForGame);
+
+    } else if (currentWordBuilderLevel === 2) {
+        // Level 2: One missing letter
+        const missingPos = Math.floor(Math.random() * targetWordForGame.length);
+        missingLetterPositions = [missingPos];
+
+        let displayWord = '';
+        for (let i = 0; i < targetWordForGame.length; i++) {
+            if (i === missingPos) {
+                displayWord += '_';
+                currentWordBuilt += '_';
+            } else {
+                displayWord += targetWordForGame[i];
+                currentWordBuilt += targetWordForGame[i];
+            }
+        }
+
+        document.getElementById('targetWord').textContent = displayWord;
+        document.getElementById('currentWord').textContent = currentWordBuilt;
+        createLetterButtons(targetWordForGame[missingPos]);
+
+    } else if (currentWordBuilderLevel === 3) {
+        // Level 3: Two missing letters in 4-letter word
+        const positions = [0, 1, 2, 3];
+        // Randomly select 2 positions to be missing
+        for (let i = 0; i < 2; i++) {
+            const idx = Math.floor(Math.random() * positions.length);
+            missingLetterPositions.push(positions.splice(idx, 1)[0]);
+        }
+        missingLetterPositions.sort();
+
+        let displayWord = '';
+        let missingLetters = '';
+        for (let i = 0; i < targetWordForGame.length; i++) {
+            if (missingLetterPositions.includes(i)) {
+                displayWord += '_';
+                currentWordBuilt += '_';
+                missingLetters += targetWordForGame[i];
+            } else {
+                displayWord += targetWordForGame[i];
+                currentWordBuilt += targetWordForGame[i];
+            }
+        }
+
+        document.getElementById('targetWord').textContent = displayWord;
+        document.getElementById('currentWord').textContent = currentWordBuilt;
+        createLetterButtons(missingLetters);
+    }
+
     document.getElementById('wordResult').textContent = '';
+}
 
-    // Create letter buttons (target word + some random letters)
-    const letters = targetWordForGame.split('');
-    const extraLetters = ['A', 'E', 'I', 'O', 'U', 'M', 'N', 'R', 'S', 'T'];
+function createLetterButtons(neededLetters) {
+    const letterButtons = document.getElementById('letterButtons');
+    letterButtons.innerHTML = '';
+
+    const letters = neededLetters.split('');
+    const extraLetters = ['A', 'E', 'I', 'O', 'U', 'M', 'N', 'R', 'S', 'T', 'L', 'B', 'C', 'D'];
     const allLetters = [...letters];
 
-    // Add some random letters
-    for (let i = 0; i < 5; i++) {
+    // Add random letters based on level
+    const extraCount = currentWordBuilderLevel === 1 ? 5 : currentWordBuilderLevel === 2 ? 7 : 6;
+    for (let i = 0; i < extraCount; i++) {
         allLetters.push(extraLetters[Math.floor(Math.random() * extraLetters.length)]);
     }
 
@@ -507,10 +648,6 @@ function startWordBuilder() {
         const j = Math.floor(Math.random() * (i + 1));
         [allLetters[i], allLetters[j]] = [allLetters[j], allLetters[i]];
     }
-
-    // Create buttons
-    const letterButtons = document.getElementById('letterButtons');
-    letterButtons.innerHTML = '';
 
     allLetters.forEach(letter => {
         const btn = document.createElement('button');
@@ -529,7 +666,17 @@ function startWordBuilder() {
         `;
 
         btn.onclick = function() {
-            currentWordBuilt += letter;
+            if (currentWordBuilderLevel === 1) {
+                // Level 1: Just add to the word
+                currentWordBuilt += letter;
+            } else {
+                // Levels 2 & 3: Fill in the blanks
+                const firstBlank = currentWordBuilt.indexOf('_');
+                if (firstBlank !== -1) {
+                    currentWordBuilt = currentWordBuilt.substring(0, firstBlank) + letter + currentWordBuilt.substring(firstBlank + 1);
+                }
+            }
+
             document.getElementById('currentWord').textContent = currentWordBuilt;
             btn.style.transform = 'scale(0.9)';
             setTimeout(() => {
@@ -542,8 +689,23 @@ function startWordBuilder() {
 }
 
 function clearWord() {
-    currentWordBuilt = '';
-    document.getElementById('currentWord').textContent = '';
+    if (currentWordBuilderLevel === 0) return;
+
+    if (currentWordBuilderLevel === 1) {
+        currentWordBuilt = '';
+    } else {
+        // For levels 2 & 3, reset to original state with blanks
+        currentWordBuilt = '';
+        for (let i = 0; i < targetWordForGame.length; i++) {
+            if (missingLetterPositions.includes(i)) {
+                currentWordBuilt += '_';
+            } else {
+                currentWordBuilt += targetWordForGame[i];
+            }
+        }
+    }
+
+    document.getElementById('currentWord').textContent = currentWordBuilt;
     document.getElementById('wordResult').textContent = '';
 }
 
@@ -552,14 +714,18 @@ function checkWord() {
     if (currentWordBuilt === targetWordForGame) {
         result.style.color = '#28a745';
         result.textContent = '🎉 Correct! Great job!';
-        checkGameAchievement('word-builder', 1);
+        checkGameAchievement('word-builder', currentWordBuilderLevel);
 
         setTimeout(() => {
             startWordBuilder();
         }, 2000);
     } else {
         result.style.color = '#dc3545';
-        result.textContent = 'Not quite right. Try again!';
+        if (currentWordBuilt.includes('_')) {
+            result.textContent = 'Please fill in all the blanks!';
+        } else {
+            result.textContent = 'Not quite right. Try again!';
+        }
     }
 }
 
