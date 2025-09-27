@@ -3503,67 +3503,145 @@
             // Calculate total books for proper numbering
             let bookNumber = 0;
 
-            // Display as a compact table-like list with grouped books
-            container.innerHTML = `
-                <div style="width: 100%; background: white; border-radius: 10px; overflow: hidden;">
-                    <div style="display: table; width: 100%; border-collapse: collapse;">
+            // Check if we're in portrait mode on mobile/tablet
+            const isPortrait = window.innerWidth <= 768 || (window.matchMedia && window.matchMedia("(orientation: portrait)").matches);
+
+            if (isPortrait) {
+                // Compact mobile/portrait view
+                container.innerHTML = `
+                    <div style="width: 100%; background: white; border-radius: 10px; overflow: hidden;">
                         ${sortedGroups.map(group => {
                             const displayNumber = bookNumber + 1;
                             bookNumber += group.count;
                             return `
                             <div style="
-                                display: table-row;
+                                display: flex;
+                                align-items: center;
+                                padding: 8px 10px;
+                                border-bottom: 1px solid #e9ecef;
                                 transition: background 0.2s;
                             " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
                                 <div style="
-                                    display: table-cell;
-                                    padding: 12px 15px;
-                                    border-bottom: 1px solid #e9ecef;
-                                    width: 60px;
+                                    min-width: 30px;
                                     color: #adb5bd;
-                                    font-size: 0.85em;
-                                    vertical-align: middle;
+                                    font-size: 11px;
+                                    text-align: center;
                                 ">${displayNumber}${group.count > 1 ? `-${bookNumber}` : ''}</div>
                                 <div style="
-                                    display: table-cell;
-                                    padding: 12px 15px;
-                                    border-bottom: 1px solid #e9ecef;
-                                    vertical-align: middle;
+                                    flex: 1;
+                                    padding: 0 8px;
+                                    min-width: 0;
                                 ">
-                                    <span style="font-weight: 600; color: #495057;">
-                                        ${group.title} ${group.count > 1 ? `<span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">${group.count}</span>` : ''} ${group.isFavorite ? '⭐' : ''}
-                                    </span>
-                                    ${group.author ? ` <span style="color: #6c757d; font-size: 0.9em;">— ${group.author}</span>` : ''}
-                                    <button onclick="deleteBook('${group.bookIds[group.bookIds.length - 1].id}')" style="
-                                        float: right;
-                                        padding: 2px 8px;
-                                        background: #dc3545;
-                                        color: white;
-                                        border: none;
-                                        border-radius: 5px;
-                                        font-size: 0.8em;
-                                        cursor: pointer;
-                                        margin-left: 10px;
-                                    " title="Remove most recent">🗑️ Remove</button>
+                                    <div style="
+                                        font-weight: 600;
+                                        color: #495057;
+                                        font-size: 14px;
+                                        white-space: nowrap;
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                    ">
+                                        ${group.title}
+                                        ${group.count > 1 ? `<span style="background: #007bff; color: white; padding: 1px 5px; border-radius: 10px; font-size: 10px; margin-left: 4px;">${group.count}</span>` : ''}
+                                        ${group.isFavorite ? '⭐' : ''}
+                                    </div>
+                                    ${group.author ? `<div style="color: #6c757d; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${group.author}</div>` : ''}
                                 </div>
                                 <div style="
-                                    display: table-cell;
-                                    padding: 12px 15px;
-                                    border-bottom: 1px solid #e9ecef;
-                                    color: #adb5bd;
-                                    font-size: 0.85em;
-                                    text-align: right;
-                                    width: 180px;
-                                    vertical-align: middle;
-                                ">${group.count > 1 ?
-                                    `<span title="${group.dates.map(d => new Date(d).toLocaleDateString()).join(', ')}">First: ${new Date(Math.min(...group.dates.map(d => new Date(d)))).toLocaleDateString()}</span>` :
-                                    new Date(group.dates[0]).toLocaleDateString()
-                                }</div>
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: flex-end;
+                                    gap: 3px;
+                                ">
+                                    <div style="
+                                        color: #adb5bd;
+                                        font-size: 10px;
+                                        white-space: nowrap;
+                                    ">
+                                        ${group.count > 1 ?
+                                            `${group.count}x` :
+                                            new Date(group.dates[0]).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})
+                                        }
+                                    </div>
+                                    <button onclick="deleteBook('${group.bookIds[group.bookIds.length - 1].id}')" style="
+                                        background: #dc3545;
+                                        color: white;
+                                        padding: 3px 6px;
+                                        border: none;
+                                        border-radius: 4px;
+                                        font-size: 10px;
+                                        cursor: pointer;
+                                        white-space: nowrap;
+                                    " title="Remove">🗑️</button>
+                                </div>
                             </div>
-                        `}).join('')}
+                            `;
+                        }).join('')}
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                // Desktop/landscape view - keep existing layout
+                container.innerHTML = `
+                    <div style="width: 100%; background: white; border-radius: 10px; overflow: hidden;">
+                        <div style="display: table; width: 100%; border-collapse: collapse;">
+                            ${sortedGroups.map(group => {
+                                const displayNumber = bookNumber + 1;
+                                bookNumber += group.count;
+                                return `
+                                <div style="
+                                    display: table-row;
+                                    transition: background 0.2s;
+                                " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                                    <div style="
+                                        display: table-cell;
+                                        padding: 12px 15px;
+                                        border-bottom: 1px solid #e9ecef;
+                                        width: 60px;
+                                        color: #adb5bd;
+                                        font-size: 0.85em;
+                                        vertical-align: middle;
+                                    ">${displayNumber}${group.count > 1 ? `-${bookNumber}` : ''}</div>
+                                    <div style="
+                                        display: table-cell;
+                                        padding: 12px 15px;
+                                        border-bottom: 1px solid #e9ecef;
+                                        vertical-align: middle;
+                                    ">
+                                        <span style="font-weight: 600; color: #495057;">
+                                            ${group.title} ${group.count > 1 ? `<span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">${group.count}</span>` : ''} ${group.isFavorite ? '⭐' : ''}
+                                        </span>
+                                        ${group.author ? ` <span style="color: #6c757d; font-size: 0.9em;">— ${group.author}</span>` : ''}
+                                        <button onclick="deleteBook('${group.bookIds[group.bookIds.length - 1].id}')" style="
+                                            float: right;
+                                            padding: 2px 4px;
+                                            background: #dc3545;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 4px;
+                                            font-size: 0.75em;
+                                            cursor: pointer;
+                                            margin-left: 10px;
+                                        " title="Remove most recent">🗑️</button>
+                                    </div>
+                                    <div style="
+                                        display: table-cell;
+                                        padding: 12px 15px;
+                                        border-bottom: 1px solid #e9ecef;
+                                        color: #adb5bd;
+                                        font-size: 0.85em;
+                                        text-align: right;
+                                        width: 180px;
+                                        vertical-align: middle;
+                                    ">${group.count > 1 ?
+                                        `<span title="${group.dates.map(d => new Date(d).toLocaleDateString()).join(', ')}">First: ${new Date(Math.min(...group.dates.map(d => new Date(d)))).toLocaleDateString()}</span>` :
+                                        new Date(group.dates[0]).toLocaleDateString()
+                                    }</div>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         // Delete a book from library
@@ -4005,11 +4083,7 @@
                 categoryIndex++;
             }
 
-            // Auto-expand first category
-            const firstCategory = container.querySelector('.suggestion-category');
-            if (firstCategory) {
-                firstCategory.classList.remove('collapsed');
-            }
+            // All categories start collapsed - removed auto-expand behavior
 
         }
 
