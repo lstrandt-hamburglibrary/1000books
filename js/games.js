@@ -45,13 +45,14 @@ function launchPeteButtonGame() {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>🔘 Pete's Button Hunt</h2>
                     <button onclick="closeGame()" style="
-                        background: var(--danger);
+                        background: #dc3545;
                         color: white;
                         border: none;
                         padding: 0.5rem 1rem;
                         border-radius: 8px;
                         cursor: pointer;
-                    ">Close X</button>
+                        font-weight: bold;
+                    ">Close ✕</button>
                 </div>
 
                 <p style="margin-bottom: 1rem;">Help Pete find all 4 of his groovy buttons! Click on them when you see them.</p>
@@ -61,7 +62,7 @@ function launchPeteButtonGame() {
                     justify-content: space-between;
                     margin-bottom: 1rem;
                     padding: 1rem;
-                    background: var(--bg);
+                    background: #f8f9fa;
                     border-radius: 10px;
                 ">
                     <span>Buttons Found: <strong id="buttonsFound">0</strong>/4</span>
@@ -83,12 +84,12 @@ function launchPeteButtonGame() {
                     text-align: center;
                     margin-top: 1rem;
                 ">
-                    <h3 style="color: var(--success);">🎉 Groovy! You found all the buttons!</h3>
+                    <h3 style="color: #28a745;">🎉 Groovy! You found all the buttons!</h3>
                     <p>Time: <span id="finalTime">0</span> seconds</p>
                     <button onclick="startPeteGame()" style="
                         margin-top: 1rem;
                         padding: 0.75rem 2rem;
-                        background: var(--primary);
+                        background: #667eea;
                         color: white;
                         border: none;
                         border-radius: 10px;
@@ -209,13 +210,14 @@ function launchStoryMatchGame() {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>📚 Story Match</h2>
                     <button onclick="closeGame()" style="
-                        background: var(--danger);
+                        background: #dc3545;
                         color: white;
                         border: none;
                         padding: 0.5rem 1rem;
                         border-radius: 8px;
                         cursor: pointer;
-                    ">Close X</button>
+                        font-weight: bold;
+                    ">Close ✕</button>
                 </div>
 
                 <p style="margin-bottom: 1rem;">Match the book characters! Find all the pairs.</p>
@@ -225,7 +227,7 @@ function launchStoryMatchGame() {
                     justify-content: space-between;
                     margin-bottom: 1rem;
                     padding: 1rem;
-                    background: var(--bg);
+                    background: #f8f9fa;
                     border-radius: 10px;
                 ">
                     <span>Pairs Found: <strong id="pairsFound">0</strong>/6</span>
@@ -248,12 +250,12 @@ function launchStoryMatchGame() {
                     text-align: center;
                     margin-top: 1rem;
                 ">
-                    <h3 style="color: var(--success);">🎉 Great Job! You matched them all!</h3>
+                    <h3 style="color: #28a745;">🎉 Great Job! You matched them all!</h3>
                     <p>Completed in <span id="finalMoves">0</span> moves</p>
                     <button onclick="startStoryMatch()" style="
                         margin-top: 1rem;
                         padding: 0.75rem 2rem;
-                        background: var(--primary);
+                        background: #667eea;
                         color: white;
                         border: none;
                         border-radius: 10px;
@@ -390,20 +392,21 @@ function launchWordBuilderGame() {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>🔤 Word Builder</h2>
                     <button onclick="closeGame()" style="
-                        background: var(--danger);
+                        background: #dc3545;
                         color: white;
                         border: none;
                         padding: 0.5rem 1rem;
                         border-radius: 8px;
                         cursor: pointer;
-                    ">Close X</button>
+                        font-weight: bold;
+                    ">Close ✕</button>
                 </div>
 
                 <p style="margin-bottom: 1rem;">Build the word by clicking the letters in order!</p>
 
                 <div style="
                     padding: 1rem;
-                    background: var(--bg);
+                    background: #f8f9fa;
                     border-radius: 10px;
                     margin-bottom: 1rem;
                 ">
@@ -412,7 +415,7 @@ function launchWordBuilderGame() {
                         font-size: 2rem;
                         font-weight: bold;
                         text-align: center;
-                        color: var(--primary);
+                        color: #667eea;
                         letter-spacing: 0.5rem;
                     ">CAT</div>
                 </div>
@@ -421,7 +424,7 @@ function launchWordBuilderGame() {
                     min-height: 60px;
                     padding: 1rem;
                     background: white;
-                    border: 3px dashed var(--primary);
+                    border: 3px dashed #667eea;
                     border-radius: 10px;
                     margin-bottom: 1rem;
                     font-size: 2rem;
@@ -446,7 +449,7 @@ function launchWordBuilderGame() {
                 ">
                     <button onclick="clearWord()" style="
                         padding: 0.75rem 2rem;
-                        background: var(--danger);
+                        background: #dc3545;
                         color: white;
                         border: none;
                         border-radius: 10px;
@@ -454,7 +457,7 @@ function launchWordBuilderGame() {
                     ">Clear</button>
                     <button onclick="checkWord()" style="
                         padding: 0.75rem 2rem;
-                        background: var(--success);
+                        background: #28a745;
                         color: white;
                         border: none;
                         border-radius: 10px;
@@ -517,7 +520,7 @@ function startWordBuilder() {
             height: 60px;
             font-size: 1.5rem;
             font-weight: bold;
-            background: var(--primary);
+            background: #667eea;
             color: white;
             border: none;
             border-radius: 10px;
@@ -547,7 +550,7 @@ function clearWord() {
 function checkWord() {
     const result = document.getElementById('wordResult');
     if (currentWordBuilt === targetWordForGame) {
-        result.style.color = 'var(--success)';
+        result.style.color = '#28a745';
         result.textContent = '🎉 Correct! Great job!';
         checkGameAchievement('word-builder', 1);
 
@@ -555,7 +558,7 @@ function checkWord() {
             startWordBuilder();
         }, 2000);
     } else {
-        result.style.color = 'var(--danger)';
+        result.style.color = '#dc3545';
         result.textContent = 'Not quite right. Try again!';
     }
 }
@@ -587,13 +590,14 @@ function launchLetterMatchGame() {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>🔤 Letter Match</h2>
                     <button onclick="closeGame()" style="
-                        background: var(--danger);
+                        background: #dc3545;
                         color: white;
                         border: none;
                         padding: 0.5rem 1rem;
                         border-radius: 8px;
                         cursor: pointer;
-                    ">Close X</button>
+                        font-weight: bold;
+                    ">Close ✕</button>
                 </div>
 
                 <p style="margin-bottom: 1rem;">Match the uppercase letter with its lowercase friend!</p>
@@ -603,7 +607,7 @@ function launchLetterMatchGame() {
                     justify-content: space-between;
                     margin-bottom: 1rem;
                     padding: 1rem;
-                    background: var(--bg);
+                    background: #f8f9fa;
                     border-radius: 10px;
                 ">
                     <span>Matches: <strong id="letterMatches">0</strong>/6</span>
@@ -611,7 +615,8 @@ function launchLetterMatchGame() {
                     <span>Time: <strong id="letterTimer">0</strong>s</span>
                 </div>
 
-                <div style="
+                <div id="gameBoard" style="
+                    position: relative;
                     display: flex;
                     gap: 2rem;
                     justify-content: center;
@@ -621,11 +626,24 @@ function launchLetterMatchGame() {
                     border-radius: 15px;
                     min-height: 400px;
                 ">
+                    <!-- SVG Canvas for drawing lines -->
+                    <svg id="connectionCanvas" style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        pointer-events: none;
+                        z-index: 1;
+                    ">
+                    </svg>
+
                     <!-- Uppercase letters column -->
                     <div id="uppercaseColumn" style="
                         display: flex;
                         flex-direction: column;
                         gap: 1rem;
+                        z-index: 2;
                     ">
                         <h3 style="text-align: center; color: white; margin-bottom: 1rem;">Uppercase</h3>
                         <div id="uppercaseLetters" style="
@@ -644,6 +662,7 @@ function launchLetterMatchGame() {
                         justify-content: center;
                         align-items: center;
                         min-width: 100px;
+                        z-index: 2;
                     ">
                         <div id="matchIndicator" style="
                             font-size: 3rem;
@@ -657,6 +676,7 @@ function launchLetterMatchGame() {
                         display: flex;
                         flex-direction: column;
                         gap: 1rem;
+                        z-index: 2;
                     ">
                         <h3 style="text-align: center; color: white; margin-bottom: 1rem;">Lowercase</h3>
                         <div id="lowercaseLetters" style="
@@ -674,12 +694,12 @@ function launchLetterMatchGame() {
                     text-align: center;
                     margin-top: 1rem;
                 ">
-                    <h3 style="color: var(--success);">🎉 Fantastic! You matched all the letters!</h3>
+                    <h3 style="color: #28a745;">🎉 Fantastic! You matched all the letters!</h3>
                     <p>Score: <span id="finalLetterScore">0</span> | Time: <span id="finalLetterTime">0</span> seconds</p>
                     <button onclick="startLetterMatch()" style="
                         margin-top: 1rem;
                         padding: 0.75rem 2rem;
-                        background: var(--primary);
+                        background: #667eea;
                         color: white;
                         border: none;
                         border-radius: 10px;
@@ -811,11 +831,84 @@ function startLetterMatch() {
         return card;
     }
 
+    // Draw line between selected letters
+    function drawConnectionLine(isCorrect) {
+        const uppercaseCard = document.querySelector('.letter-uppercase-selected');
+        const lowercaseCard = document.querySelector('.letter-lowercase-selected');
+
+        if (!uppercaseCard || !lowercaseCard) return;
+
+        const svg = document.getElementById('connectionCanvas');
+        const gameBoard = document.getElementById('gameBoard');
+
+        // Get positions relative to game board
+        const boardRect = gameBoard.getBoundingClientRect();
+        const upperRect = uppercaseCard.getBoundingClientRect();
+        const lowerRect = lowercaseCard.getBoundingClientRect();
+
+        // Calculate line coordinates
+        const x1 = upperRect.right - boardRect.left;
+        const y1 = upperRect.top + (upperRect.height / 2) - boardRect.top;
+        const x2 = lowerRect.left - boardRect.left;
+        const y2 = lowerRect.top + (lowerRect.height / 2) - boardRect.top;
+
+        // Create animated line
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x1);
+        line.setAttribute('y2', y1);
+        line.setAttribute('stroke', isCorrect ? '#22c55e' : '#dc3545');
+        line.setAttribute('stroke-width', '4');
+        line.setAttribute('stroke-linecap', 'round');
+        line.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))';
+
+        svg.appendChild(line);
+
+        // Animate the line drawing
+        let progress = 0;
+        const animationSpeed = 20;
+        const animationSteps = 15;
+
+        const animateLine = setInterval(() => {
+            progress += 1 / animationSteps;
+            if (progress >= 1) {
+                progress = 1;
+                clearInterval(animateLine);
+
+                // Keep the line for a moment then fade/remove
+                if (isCorrect) {
+                    // For correct matches, keep the line with reduced opacity
+                    setTimeout(() => {
+                        line.style.opacity = '0.3';
+                        line.setAttribute('stroke', '#fbbf24');
+                    }, 500);
+                } else {
+                    // For incorrect, fade out and remove
+                    setTimeout(() => {
+                        line.style.transition = 'opacity 0.3s';
+                        line.style.opacity = '0';
+                        setTimeout(() => line.remove(), 300);
+                    }, 500);
+                }
+            }
+
+            const currentX2 = x1 + (x2 - x1) * progress;
+            const currentY2 = y1 + (y2 - y1) * progress;
+            line.setAttribute('x2', currentX2);
+            line.setAttribute('y2', currentY2);
+        }, animationSpeed);
+    }
+
     // Check if letters match
     function checkLetterMatch() {
         const matchIndicator = document.getElementById('matchIndicator');
+        const isCorrect = selectedUppercase === selectedLowercase;
 
-        if (selectedUppercase === selectedLowercase) {
+        // Draw connection line
+        drawConnectionLine(isCorrect);
+
+        if (isCorrect) {
             // Match found!
             matchesFound++;
             score += Math.max(100 - (attempts * 5), 20); // Score decreases with more attempts
@@ -823,9 +916,10 @@ function startLetterMatch() {
             document.getElementById('letterMatches').textContent = matchesFound;
             document.getElementById('letterScore').textContent = score;
 
-            // Show match indicator
+            // Show match indicator with celebration
             matchIndicator.textContent = '✅';
             matchIndicator.style.opacity = '1';
+            matchIndicator.style.animation = 'celebrate 0.5s ease';
 
             // Mark cards as matched
             document.querySelectorAll('.letter-uppercase-selected, .letter-lowercase-selected').forEach(card => {
@@ -835,11 +929,13 @@ function startLetterMatch() {
                 card.style.transform = 'scale(0.9)';
                 card.style.opacity = '0.7';
                 card.style.cursor = 'default';
+                card.style.animation = 'correctMatch 0.5s ease';
             });
 
             // Play success animation
             setTimeout(() => {
                 matchIndicator.style.opacity = '0';
+                matchIndicator.style.animation = '';
             }, 1000);
 
             // Check if game complete
@@ -884,7 +980,7 @@ function startLetterMatch() {
                     card.style.boxShadow = 'none';
                 }
             });
-        }, 800);
+        }, isCorrect ? 600 : 800);
     }
 
     // Add shake animation if not exists
@@ -896,6 +992,16 @@ function startLetterMatch() {
                 0%, 100% { transform: translateX(0) scale(1.1); }
                 25% { transform: translateX(-10px) scale(1.1); }
                 75% { transform: translateX(10px) scale(1.1); }
+            }
+            @keyframes celebrate {
+                0% { transform: scale(1) rotate(0deg); }
+                50% { transform: scale(1.3) rotate(180deg); }
+                100% { transform: scale(1) rotate(360deg); }
+            }
+            @keyframes correctMatch {
+                0% { transform: scale(1.1); }
+                50% { transform: scale(1.2) rotate(5deg); }
+                100% { transform: scale(0.9) rotate(0deg); }
             }
         `;
         document.head.appendChild(style);
