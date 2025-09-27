@@ -1363,8 +1363,8 @@
         <!-- Header -->
         <div class="app-header">
             <h1>📚 1000 Books Before Kindergarten</h1>
-            <button id="permanentInstallBtn" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; display: none; z-index: 10;" onclick="triggerInstall()">
-                📲 Install
+            <button id="permanentInstallBtn" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; display: none; z-index: 10; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.2);" onclick="triggerInstall()">
+                📲 Install App
             </button>
             <div class="child-selector">
                 <select id="childSelect" onchange="switchChild(this.value)">
@@ -5651,8 +5651,14 @@
 
         // Show install button if not installed
         window.addEventListener('load', () => {
-            if (!isStandalone() && permanentInstallBtn) {
-                permanentInstallBtn.style.display = 'block';
+            if (permanentInstallBtn) {
+                // Always show the button unless in standalone mode
+                if (!isStandalone()) {
+                    permanentInstallBtn.style.display = 'block';
+                    console.log('Install button shown - app not in standalone mode');
+                } else {
+                    console.log('Install button hidden - app is in standalone mode');
+                }
             }
         });
 
