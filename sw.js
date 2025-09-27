@@ -1,14 +1,15 @@
-// Service Worker for BookWorm Journey
-const VERSION = '1.0.1';
-const CACHE_NAME = `bookworm-v${VERSION}`;
+// Service Worker for 1000 Books Before Kindergarten
+const VERSION = '1.0.2';
+const CACHE_NAME = `1000books-v${VERSION}`;
 
 const urlsToCache = [
-  './',
-  './index.html',
-  './js/bookSuggestions.js',
-  './manifest.json',
-  './icon-192.svg',
-  './icon-512.svg'
+  '/',
+  '/index.html',
+  '/js/bookSuggestions.js',
+  '/manifest.json',
+  '/icon-192.svg',
+  '/icon-512.svg',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'
 ];
 
 // Install service worker
@@ -31,7 +32,32 @@ self.addEventListener('fetch', event => {
     caches.match(event.request)
       .then(response => {
         // Return cached version or fetch new
-        return response || fetch(event.request);
+        if (response) {
+          return response;
+        }
+
+        // Clone the request because it can only be used once
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest).then(response => {
+          // Don't cache non-successful responses
+          if (!response || response.status !== 200 || response.type === 'error') {
+            return response;
+          }
+
+          // Clone the response because it can only be used once
+          const responseToCache = response.clone();
+
+          // Cache the new resource
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+
+          return response;
+        }).catch(() => {
+          // Return offline fallback if available
+          return caches.match('/index.html');
+        });
       })
   );
 });
