@@ -1016,25 +1016,15 @@ function closeMiniGame() {
     }
 }
 
-// Keep closeGame as alias for compatibility but call the main one if it exists
-function closeGame() {
-    // Try to close mini-game modal first
-    const modal = document.getElementById('gameModal');
-    if (modal) {
-        modal.remove();
-        return;
-    }
-
-    // Otherwise, call the main closeGame if it exists (for built-in games)
-    if (window.originalCloseGame) {
-        window.originalCloseGame(arguments[0]);
-    }
-}
+// Don't override the main closeGame function - remove this entirely
+// The main app already has closeGame defined for built-in games
 
 // Check game achievements
 function checkGameAchievement(game, score) {
     // Could add game-specific badges here
-    showToast(`Great job playing ${game}! 🎮`);
+    if (typeof showToast === 'function') {
+        showToast(`Great job playing ${game}! 🎮`);
+    }
 }
 
 // Empty data.js file (functionality is built into main app.js)
