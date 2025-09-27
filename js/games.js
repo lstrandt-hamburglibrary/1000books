@@ -618,13 +618,14 @@ function launchLetterMatchGame() {
                 <div id="gameBoard" style="
                     position: relative;
                     display: flex;
-                    gap: 2rem;
+                    gap: 1rem;
                     justify-content: center;
                     align-items: start;
-                    padding: 2rem 1rem;
+                    padding: 1rem 0.5rem;
                     background: linear-gradient(135deg, #fbbf24, #f97316);
                     border-radius: 15px;
                     min-height: 400px;
+                    overflow-x: auto;
                 ">
                     <!-- SVG Canvas for drawing lines -->
                     <svg id="connectionCanvas" style="
@@ -642,10 +643,11 @@ function launchLetterMatchGame() {
                     <div id="uppercaseColumn" style="
                         display: flex;
                         flex-direction: column;
-                        gap: 1rem;
+                        gap: 0.5rem;
                         z-index: 2;
+                        min-width: fit-content;
                     ">
-                        <h3 style="text-align: center; color: white; margin-bottom: 1rem;">Uppercase</h3>
+                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: 1rem;">Uppercase</h3>
                         <div id="uppercaseLetters" style="
                             display: flex;
                             flex-direction: column;
@@ -675,10 +677,11 @@ function launchLetterMatchGame() {
                     <div id="lowercaseColumn" style="
                         display: flex;
                         flex-direction: column;
-                        gap: 1rem;
+                        gap: 0.5rem;
                         z-index: 2;
+                        min-width: fit-content;
                     ">
-                        <h3 style="text-align: center; color: white; margin-bottom: 1rem;">Lowercase</h3>
+                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: 1rem;">Lowercase</h3>
                         <div id="lowercaseLetters" style="
                             display: flex;
                             flex-direction: column;
@@ -780,16 +783,20 @@ function startLetterMatch() {
         const card = document.createElement('div');
         card.dataset.letter = letter.toUpperCase();
         card.dataset.type = type;
+        const isMobile = window.innerWidth <= 768;
+        const cardSize = isMobile ? '60px' : '80px';
+        const fontSize = isMobile ? '1.8rem' : '2.5rem';
+
         card.style.cssText = `
-            width: 80px;
-            height: 80px;
+            width: ${cardSize};
+            height: ${cardSize};
             background: white;
             border: 3px solid #ddd;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: ${fontSize};
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
