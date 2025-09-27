@@ -5667,7 +5667,19 @@
                 if (isIOS()) {
                     alert('To install on iOS:\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"');
                 } else {
-                    alert('To install:\n1. Look for the install icon in your browser\'s address bar\n2. Or use the browser menu → "Install app"');
+                    // Show detailed instructions for manual install
+                    const instructions = `To install this app on Chrome:\n\n` +
+                        `Option 1: Look in the address bar\n` +
+                        `• Check the right side of the address bar for an install icon (⊕ or computer icon)\n\n` +
+                        `Option 2: Use Chrome Menu\n` +
+                        `1. Click the 3 dots menu (⋮) in top-right\n` +
+                        `2. Look for "Install 1000 Books..." or\n` +
+                        `3. Go to "More tools" → "Create shortcut"\n` +
+                        `4. Check "Open as window"\n\n` +
+                        `If you don't see these options, the app may already be installed,\n` +
+                        `or try refreshing the page (Ctrl+R).`;
+
+                    alert(instructions);
                 }
                 return;
             }
