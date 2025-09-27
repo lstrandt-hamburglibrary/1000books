@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+</head>
+<body>
+    <h2>App Icon Generator - Click each size to download</h2>
+
+    <canvas id="icon512" width="512" height="512" style="border: 1px solid #ccc; cursor: pointer;"></canvas>
+    <br>512x512 (Android/Desktop)
+    <br><br>
+
+    <canvas id="icon192" width="192" height="192" style="border: 1px solid #ccc; cursor: pointer;"></canvas>
+    <br>192x192 (Android/PWA)
+    <br><br>
+
+    <canvas id="icon180" width="180" height="180" style="border: 1px solid #ccc; cursor: pointer;"></canvas>
+    <br>180x180 (iPhone/iPad)
+    <br><br>
+
+    <canvas id="icon144" width="144" height="144" style="border: 1px solid #ccc; cursor: pointer;"></canvas>
+    <br>144x144 (Windows)
+    <br><br>
+
+    <script>
+        function createIcon(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // White circle background for book
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw book emoji
+            ctx.font = `${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('📚', size/2, size/2);
+
+            // Add "1000" text at bottom
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.12}px Arial`;
+            ctx.fillText('1000 BOOKS', size/2, size * 0.85);
+
+            // Make downloadable
+            canvas.onclick = function() {
+                const link = document.createElement('a');
+                link.download = `icon-${size}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+        }
+
+        // Create all icon sizes
+        createIcon('icon512', 512);
+        createIcon('icon192', 192);
+        createIcon('icon180', 180);
+        createIcon('icon144', 144);
+    </script>
+</body>
+</html>
