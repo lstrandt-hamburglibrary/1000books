@@ -44,7 +44,7 @@ function launchPeteButtonGame() {
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>🔘 Pete's Button Hunt</h2>
-                    <button onclick="closeGame()" style="
+                    <button onclick="closeMiniGame()" style="
                         background: #dc3545;
                         color: white;
                         border: none;
@@ -209,7 +209,7 @@ function launchStoryMatchGame() {
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>📚 Story Match</h2>
-                    <button onclick="closeGame()" style="
+                    <button onclick="closeMiniGame()" style="
                         background: #dc3545;
                         color: white;
                         border: none;
@@ -391,7 +391,7 @@ function launchWordBuilderGame() {
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>🔤 Word Builder</h2>
-                    <button onclick="closeGame()" style="
+                    <button onclick="closeMiniGame()" style="
                         background: #dc3545;
                         color: white;
                         border: none;
@@ -589,7 +589,7 @@ function launchLetterMatchGame() {
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>🔤 Letter Match</h2>
-                    <button onclick="closeGame()" style="
+                    <button onclick="closeMiniGame()" style="
                         background: #dc3545;
                         color: white;
                         border: none;
@@ -1008,11 +1008,26 @@ function startLetterMatch() {
     }
 }
 
-// Close game modal
-function closeGame() {
+// Close game modal for mini-games
+function closeMiniGame() {
     const modal = document.getElementById('gameModal');
     if (modal) {
         modal.remove();
+    }
+}
+
+// Keep closeGame as alias for compatibility but call the main one if it exists
+function closeGame() {
+    // Try to close mini-game modal first
+    const modal = document.getElementById('gameModal');
+    if (modal) {
+        modal.remove();
+        return;
+    }
+
+    // Otherwise, call the main closeGame if it exists (for built-in games)
+    if (window.originalCloseGame) {
+        window.originalCloseGame(arguments[0]);
     }
 }
 
