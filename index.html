@@ -1405,7 +1405,7 @@
 
     <div class="app-container">
         <!-- Cloud Backup Status Bar -->
-        <div id="cloudStatus" style="background: #fff3cd; padding: 8px; text-align: center; border-bottom: 1px solid #ffc107; display: none;">
+        <div id="cloudStatus" style="background: #fff3cd; padding: 8px; text-align: center; border-bottom: 1px solid #ffc107; display: block;">
             <small style="color: #856404;">
                 <span id="cloudStatusText">📱 Data is saved locally only. Enable cloud backup to protect your progress.</span>
                 <button onclick="showCloudBackupSetup()" style="margin-left: 10px; padding: 2px 10px; background: #ffc107; border: none; border-radius: 3px; color: #333; cursor: pointer;">Enable Backup</button>
@@ -1416,9 +1416,9 @@
         <div class="app-header">
             <h1>📚 1000 Books Before Kindergarten</h1>
             <!-- Cloud Sync Status Indicator -->
-            <div id="cloudSyncIndicator" style="position: absolute; top: 10px; left: 10px; display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 0.85rem;">
+            <div id="cloudSyncIndicator" style="position: absolute; top: 10px; left: 10px; display: none; align-items: center; gap: 8px; background: white; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border: 2px solid #4285f4;">
                 <span id="cloudSyncIcon">☁️</span>
-                <span id="cloudSyncText" style="color: white;">Cloud backup active</span>
+                <span id="cloudSyncText" style="color: #4285f4; font-weight: 600;">Cloud backup active</span>
             </div>
             <button id="permanentInstallBtn" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; display: none; z-index: 10; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.2);" onclick="triggerInstall()">
                 📲 Install App
@@ -5964,9 +5964,8 @@
                 isCloudEnabled = true;
                 updateLastSyncTime();
             } else {
-                // Show reminder for iOS users
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                if (isIOS && !localStorage.getItem('cloudReminderDismissed')) {
+                // Show reminder for all users who haven't enabled backup
+                if (!localStorage.getItem('cloudReminderDismissed')) {
                     document.getElementById('cloudStatus').style.display = 'block';
                 }
             }
@@ -6023,8 +6022,10 @@
                 // Show "Backing up..." message
                 syncIcon.textContent = '⏳';
                 syncText.textContent = 'Backing up...';
+                syncText.style.color = '#ff9800';
                 syncIcon.style.animation = 'spin 1s linear infinite';
-                indicator.style.background = 'rgba(76, 175, 80, 0.3)';
+                indicator.style.background = '#fff3cd';
+                indicator.style.borderColor = '#ff9800';
 
                 // Simulate sync delay for visual feedback
                 setTimeout(() => {
@@ -6042,13 +6043,18 @@
                     // Show success
                     syncIcon.textContent = '✅';
                     syncText.textContent = 'Backed up to cloud';
+                    syncText.style.color = '#4caf50';
                     syncIcon.style.animation = 'none';
-                    indicator.style.background = 'rgba(255,255,255,0.2)';
+                    indicator.style.background = '#e8f5e9';
+                    indicator.style.borderColor = '#4caf50';
 
                     // Reset to normal after 2 seconds
                     setTimeout(() => {
                         syncIcon.textContent = '☁️';
                         syncText.textContent = 'Cloud backup active';
+                        syncText.style.color = '#4285f4';
+                        indicator.style.background = 'white';
+                        indicator.style.borderColor = '#4285f4';
                     }, 2000);
                 }, 500);
             } else {
