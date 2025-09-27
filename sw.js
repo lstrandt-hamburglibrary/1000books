@@ -1,5 +1,5 @@
 // Service Worker for 1000 Books Before Kindergarten
-const VERSION = '3.0.0';
+const VERSION = '3.0.1';
 const CACHE_NAME = `1000books-v${VERSION}`;
 const BYPASS_CACHE = true; // Temporary: bypass cache to force updates
 
