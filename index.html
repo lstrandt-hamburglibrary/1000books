@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1000 Books Before Kindergarten - Hamburg Township Library</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json?v=2.1">
     <meta name="theme-color" content="#667eea">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="1000 Books">
+    <!-- Force iOS to check for updates -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <!-- Favicons for browsers -->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -22,8 +26,8 @@
     <link rel="apple-touch-icon" sizes="72x72" href="icon-72.png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Sign-In -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- App Version for automatic updates -->
+    <script>window.APP_VERSION = '2.1.0';</script>
     <style>
         * {
             margin: 0;
@@ -1839,9 +1843,13 @@
 
     <script>
         // App Version - UPDATE THIS WHEN YOU MAKE CHANGES!
-        const APP_VERSION = '2.1.0';
+        const APP_VERSION = window.APP_VERSION || '2.1.0';
         let lastVersionCheck = 0;
         let updateAvailable = false;
+
+        // Detect iOS PWA
+        const isIOSPWA = window.navigator.standalone === true;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         // App State
         let appData = {
@@ -2427,7 +2435,7 @@
                 if (response.ok) {
                     const html = await response.text();
                     // Look for version string in the HTML
-                    const versionMatch = html.match(/const APP_VERSION = ['"]([^'"]+)['"]/);
+                    const versionMatch = html.match(/window\.APP_VERSION = ['"]([^'"]+)['"]/);
 
                     if (versionMatch && versionMatch[1]) {
                         const remoteVersion = versionMatch[1];
@@ -2435,7 +2443,21 @@
                         if (remoteVersion !== APP_VERSION) {
                             console.log(`New version available: ${remoteVersion} (current: ${APP_VERSION})`);
                             updateAvailable = true;
-                            showUpdateNotification();
+
+                            // For iOS PWA, show more prominent update message
+                            if (isIOSPWA) {
+                                // Show persistent banner for iOS PWA users
+                                const banner = document.createElement('div');
+                                banner.innerHTML = `
+                                    <div style="position: fixed; top: 0; left: 0; right: 0; background: #ff9800; color: white; padding: 15px; text-align: center; z-index: 10000; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                                        <strong>Update Available!</strong> Please close and reopen the app to get the latest version.
+                                        <button onclick="window.location.reload(true)" style="margin-left: 10px; padding: 5px 15px; background: white; color: #ff9800; border: none; border-radius: 5px; font-weight: bold;">Update Now</button>
+                                    </div>
+                                `;
+                                document.body.appendChild(banner);
+                            } else {
+                                showUpdateNotification();
+                            }
                         }
                     }
                 }

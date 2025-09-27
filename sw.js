@@ -1,6 +1,7 @@
 // Service Worker for 1000 Books Before Kindergarten
-const VERSION = '1.0.2';
+const VERSION = '2.1.0';
 const CACHE_NAME = `1000books-v${VERSION}`;
+const BYPASS_CACHE = true; // Temporary: bypass cache to force updates
 
 const urlsToCache = [
   './',
@@ -28,11 +29,22 @@ self.addEventListener('install', event => {
 
 // Fetch from cache when offline
 self.addEventListener('fetch', event => {
+  // For HTML files, always fetch fresh to check for updates
+  if (event.request.url.includes('.html') || event.request.url.endsWith('/')) {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        // Only use cache as fallback when offline
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
         // Return cached version or fetch new
-        if (response) {
+        if (response && !BYPASS_CACHE) {
           return response;
         }
 
