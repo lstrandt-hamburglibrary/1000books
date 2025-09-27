@@ -1807,14 +1807,21 @@
                                 <span style="margin-right: 10px;">🔐</span>Enable Cloud Backup Now
                             </button>
                             <p style="color: #666; font-size: 0.85em; margin-top: 10px;">Your data will sync across all devices</p>
-                            <button onclick="console.log('localStorage:', localStorage); alert('Check browser console for debug info');" style="margin-top: 10px; padding: 5px 10px; background: #ccc; color: #333; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">Debug Info</button>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                                <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">Or use simple backup:</p>
+                                <div style="display: flex; gap: 10px;">
+                                    <button onclick="emailBackup()" style="flex: 1; padding: 8px; background: #9c27b0; color: white; border: none; border-radius: 5px;">📧 Email Backup</button>
+                                    <button onclick="autoSaveBackup()" style="flex: 1; padding: 8px; background: #ff9800; color: white; border: none; border-radius: 5px;">💾 Download File</button>
+                                </div>
+                            </div>
                         </div>
                         <div id="googleSignedIn" style="display: none;">
                             <p style="color: #2e7d32;">✅ Cloud backup enabled</p>
                             <p style="color: #666; font-size: 0.9em;">Signed in as: <strong id="cloudUserEmail"></strong></p>
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
                                 <button onclick="forceSyncToCloud()" style="flex: 1; padding: 8px; background: #4caf50; color: white; border: none; border-radius: 5px;">🔄 Sync Now</button>
-                                <button onclick="viewCloudBackup()" style="flex: 1; padding: 8px; background: #2196f3; color: white; border: none; border-radius: 5px;">👁️ View Backup</button>
+                                <button onclick="emailBackup()" style="flex: 1; padding: 8px; background: #9c27b0; color: white; border: none; border-radius: 5px;">📧 Email</button>
+                                <button onclick="viewCloudBackup()" style="flex: 1; padding: 8px; background: #2196f3; color: white; border: none; border-radius: 5px;">👁️ View</button>
                                 <button onclick="signOutGoogle()" style="flex: 1; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 5px;">Sign Out</button>
                             </div>
                             <small style="color: #666; display: block; margin-top: 10px;">Last synced: <span id="lastCloudSync">Never</span></small>
@@ -6116,6 +6123,55 @@
             }
         }
 
+        function emailBackup() {
+            const data = JSON.stringify(appData, null, 2);
+            const childName = appData.children[appData.currentChild]?.name || 'Child';
+            const bookCount = appData.children[appData.currentChild]?.books?.length || 0;
+            const date = new Date().toLocaleDateString();
+
+            const subject = `1000 Books Backup - ${childName} - ${date}`;
+            const body = `Here's your 1000 Books Before Kindergarten backup!\n\n` +
+                `Child: ${childName}\n` +
+                `Books Read: ${bookCount}\n` +
+                `Date: ${date}\n\n` +
+                `BACKUP DATA (Save this):\n` +
+                `${data}\n\n` +
+                `To restore: Go to Settings > Import Data and paste the backup data above.`;
+
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            // Try to open email client
+            window.location.href = mailtoLink;
+
+            // Also offer to copy to clipboard
+            setTimeout(() => {
+                if (confirm('Email opened! Also copy backup to clipboard?')) {
+                    navigator.clipboard.writeText(data).then(() => {
+                        showToast('📋 Backup copied! Paste it somewhere safe.');
+                    });
+                }
+            }, 500);
+        }
+
+        function autoSaveBackup() {
+            // Create a backup file that auto-downloads
+            const data = JSON.stringify(appData, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const date = new Date().toISOString().split('T')[0];
+            const childName = appData.children[appData.currentChild]?.name || 'Child';
+
+            a.href = url;
+            a.download = `1000books-${childName}-${date}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('💾 Backup saved to Downloads! If you have cloud sync on that folder, it will sync automatically.');
+        }
+
         function updateLastSyncTime() {
             const lastSync = localStorage.getItem('lastCloudSync');
             if (lastSync) {
@@ -6145,6 +6201,8 @@
         window.forceSyncToCloud = forceSyncToCloud;
         window.viewCloudBackup = viewCloudBackup;
         window.restoreFromCloudBackup = restoreFromCloudBackup;
+        window.emailBackup = emailBackup;
+        window.autoSaveBackup = autoSaveBackup;
         window.showCloudBackupSetup = showCloudBackupSetup;
 
         // Check for updates when app gains focus or comes online
