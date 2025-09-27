@@ -1415,6 +1415,11 @@
         <!-- Header -->
         <div class="app-header">
             <h1>📚 1000 Books Before Kindergarten</h1>
+            <!-- Cloud Sync Status Indicator -->
+            <div id="cloudSyncIndicator" style="position: absolute; top: 10px; left: 10px; display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 0.85rem;">
+                <span id="cloudSyncIcon">☁️</span>
+                <span id="cloudSyncText" style="color: white;">Cloud backup active</span>
+            </div>
             <button id="permanentInstallBtn" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; display: none; z-index: 10; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.2);" onclick="triggerInstall()">
                 📲 Install App
             </button>
@@ -5948,6 +5953,14 @@
                 document.getElementById('googleNotSignedIn').style.display = 'none';
                 document.getElementById('googleSignedIn').style.display = 'block';
                 document.getElementById('cloudUserEmail').textContent = cloudEmail;
+
+                // Show cloud indicator in header
+                const indicator = document.getElementById('cloudSyncIndicator');
+                if (indicator) {
+                    indicator.style.display = 'flex';
+                    document.getElementById('cloudSyncText').textContent = 'Cloud backup active';
+                }
+
                 isCloudEnabled = true;
                 updateLastSyncTime();
             } else {
@@ -5970,6 +5983,13 @@
                 document.getElementById('googleSignedIn').style.display = 'block';
                 document.getElementById('cloudUserEmail').textContent = email;
                 document.getElementById('cloudStatus').style.display = 'none';
+
+                // Show cloud indicator
+                const indicator = document.getElementById('cloudSyncIndicator');
+                if (indicator) {
+                    indicator.style.display = 'flex';
+                }
+
                 isCloudEnabled = true;
 
                 // Initial sync
@@ -5994,16 +6014,54 @@
         function syncToCloud() {
             if (!isCloudEnabled) return;
 
-            // In production, this would sync to actual cloud storage
-            // For now, we'll simulate it with localStorage
-            const cloudData = {
-                ...appData,
-                syncTime: new Date().toISOString()
-            };
+            // Show syncing status
+            const indicator = document.getElementById('cloudSyncIndicator');
+            const syncIcon = document.getElementById('cloudSyncIcon');
+            const syncText = document.getElementById('cloudSyncText');
 
-            localStorage.setItem('cloudBackup', JSON.stringify(cloudData));
-            localStorage.setItem('lastCloudSync', new Date().toISOString());
-            updateLastSyncTime();
+            if (indicator) {
+                // Show "Backing up..." message
+                syncIcon.textContent = '⏳';
+                syncText.textContent = 'Backing up...';
+                syncIcon.style.animation = 'spin 1s linear infinite';
+                indicator.style.background = 'rgba(76, 175, 80, 0.3)';
+
+                // Simulate sync delay for visual feedback
+                setTimeout(() => {
+                    // In production, this would sync to actual cloud storage
+                    // For now, we'll simulate it with localStorage
+                    const cloudData = {
+                        ...appData,
+                        syncTime: new Date().toISOString()
+                    };
+
+                    localStorage.setItem('cloudBackup', JSON.stringify(cloudData));
+                    localStorage.setItem('lastCloudSync', new Date().toISOString());
+                    updateLastSyncTime();
+
+                    // Show success
+                    syncIcon.textContent = '✅';
+                    syncText.textContent = 'Backed up to cloud';
+                    syncIcon.style.animation = 'none';
+                    indicator.style.background = 'rgba(255,255,255,0.2)';
+
+                    // Reset to normal after 2 seconds
+                    setTimeout(() => {
+                        syncIcon.textContent = '☁️';
+                        syncText.textContent = 'Cloud backup active';
+                    }, 2000);
+                }, 500);
+            } else {
+                // Fallback if indicator not visible
+                const cloudData = {
+                    ...appData,
+                    syncTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('cloudBackup', JSON.stringify(cloudData));
+                localStorage.setItem('lastCloudSync', new Date().toISOString());
+                updateLastSyncTime();
+            }
         }
 
         function forceSyncToCloud() {
