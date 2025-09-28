@@ -303,20 +303,20 @@ function createSortableButton(config, index) {
         // Add shine effect and button holes for circles
         button.innerHTML = `
             <div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 30%; height: 30%; background: radial-gradient(circle, rgba(255,255,255,0.7), transparent); border-radius: 50%;"></div>
-            <div style="position: absolute; top: 30%; left: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
-            <div style="position: absolute; top: 30%; right: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
-            <div style="position: absolute; bottom: 30%; left: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
-            <div style="position: absolute; bottom: 30%; right: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 30%; left: 35%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 30%; right: 35%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 30%; left: 35%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 30%; right: 35%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
         `;
     } else if (config.shape === 'square') {
         baseStyle += 'border-radius: 8px;';
         // Add shine effect and button holes for squares
         button.innerHTML = `
             <div style="position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 40%; height: 25%; background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent); border-radius: 4px;"></div>
-            <div style="position: absolute; top: 25%; left: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
-            <div style="position: absolute; top: 25%; right: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
-            <div style="position: absolute; bottom: 25%; left: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
-            <div style="position: absolute; bottom: 25%; right: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 25%; left: 25%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 25%; right: 25%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 25%; left: 25%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 25%; right: 25%; width: 5px; height: 5px; background: rgba(0,0,0,0.6); border-radius: 50%;"></div>
         `;
     } else if (config.shape === 'star') {
         button.innerHTML = '⭐';
