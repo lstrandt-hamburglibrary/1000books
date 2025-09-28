@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '3.8.2';</script>
+    <script>window.APP_VERSION = '3.8.3';</script>
     <style>
         * {
             margin: 0;
@@ -1884,22 +1884,25 @@
                     <button class="game-close-btn" onclick="closeGame('drawingPad')">✕</button>
                 </div>
                 <div class="drawing-controls" style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin: 10px;">
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;">
-                        <!-- Color Palette -->
-                        <div style="display: flex; gap: 5px;">
-                            <button class="color-btn" onclick="setDrawColor('#000000')" style="width: 30px; height: 30px; background: #000000; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Black"></button>
-                            <button class="color-btn" onclick="setDrawColor('#FF0000')" style="width: 30px; height: 30px; background: #FF0000; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Red"></button>
-                            <button class="color-btn" onclick="setDrawColor('#00FF00')" style="width: 30px; height: 30px; background: #00FF00; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Green"></button>
-                            <button class="color-btn" onclick="setDrawColor('#0000FF')" style="width: 30px; height: 30px; background: #0000FF; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Blue"></button>
-                            <button class="color-btn" onclick="setDrawColor('#FFFF00')" style="width: 30px; height: 30px; background: #FFFF00; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Yellow"></button>
-                            <button class="color-btn" onclick="setDrawColor('#FF00FF')" style="width: 30px; height: 30px; background: #FF00FF; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Magenta"></button>
-                            <button class="color-btn" onclick="setDrawColor('#00FFFF')" style="width: 30px; height: 30px; background: #00FFFF; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Cyan"></button>
-                            <button class="color-btn" onclick="setDrawColor('#FFA500')" style="width: 30px; height: 30px; background: #FFA500; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Orange"></button>
-                            <button class="color-btn" onclick="setDrawColor('#800080')" style="width: 30px; height: 30px; background: #800080; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Purple"></button>
-                            <button class="color-btn" onclick="setDrawColor('#FFC0CB')" style="width: 30px; height: 30px; background: #FFC0CB; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Pink"></button>
-                            <button class="color-btn" onclick="setDrawColor('#8B4513')" style="width: 30px; height: 30px; background: #8B4513; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Brown"></button>
-                            <button class="color-btn" onclick="setDrawColor('#FFFFFF')" style="width: 30px; height: 30px; background: #FFFFFF; border: 2px solid #333; border-radius: 5px; cursor: pointer;" title="Eraser"></button>
+                    <!-- Color Palette in grid layout -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; max-width: 240px; margin: 0 auto;">
+                            <button class="color-btn" onclick="setDrawColor('#000000')" style="width: 35px; height: 35px; background: #000000; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Black"></button>
+                            <button class="color-btn" onclick="setDrawColor('#FF0000')" style="width: 35px; height: 35px; background: #FF0000; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Red"></button>
+                            <button class="color-btn" onclick="setDrawColor('#00FF00')" style="width: 35px; height: 35px; background: #00FF00; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Green"></button>
+                            <button class="color-btn" onclick="setDrawColor('#0000FF')" style="width: 35px; height: 35px; background: #0000FF; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Blue"></button>
+                            <button class="color-btn" onclick="setDrawColor('#FFFF00')" style="width: 35px; height: 35px; background: #FFFF00; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Yellow"></button>
+                            <button class="color-btn" onclick="setDrawColor('#FF00FF')" style="width: 35px; height: 35px; background: #FF00FF; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Magenta"></button>
+                            <button class="color-btn" onclick="setDrawColor('#00FFFF')" style="width: 35px; height: 35px; background: #00FFFF; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Cyan"></button>
+                            <button class="color-btn" onclick="setDrawColor('#FFA500')" style="width: 35px; height: 35px; background: #FFA500; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Orange"></button>
+                            <button class="color-btn" onclick="setDrawColor('#800080')" style="width: 35px; height: 35px; background: #800080; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Purple"></button>
+                            <button class="color-btn" onclick="setDrawColor('#FFC0CB')" style="width: 35px; height: 35px; background: #FFC0CB; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Pink"></button>
+                            <button class="color-btn" onclick="setDrawColor('#8B4513')" style="width: 35px; height: 35px; background: #8B4513; border: 2px solid #ccc; border-radius: 5px; cursor: pointer;" title="Brown"></button>
+                            <button class="color-btn" onclick="setDrawColor('#FFFFFF')" style="width: 35px; height: 35px; background: #FFFFFF; border: 2px solid #333; border-radius: 5px; cursor: pointer;" title="Eraser"></button>
                         </div>
+                    </div>
+                    <!-- Controls row -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;">
                         <!-- Brush Sizes -->
                         <div style="display: flex; gap: 5px; align-items: center;">
                             <span style="font-size: 0.9em;">Size:</span>
@@ -6488,7 +6491,7 @@
                     <div style="position: relative; background: white; border: 2px solid #ccc; border-radius: 8px; padding: 5px;">
                         <img src="${drawing.image}" style="width: 100%; height: auto; border-radius: 5px;" alt="${drawing.title}">
                         <p style="margin: 5px 0; font-size: 0.8em; text-align: center;">${drawing.title}</p>
-                        <button onclick="deleteDrawing(${drawing.id})" style="position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">✕</button>
+                        <button onclick="deleteDrawing(${drawing.id})" style="position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; min-width: 25px; min-height: 25px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; line-height: 1;">✕</button>
                     </div>
                 `).join('');
             } else {
