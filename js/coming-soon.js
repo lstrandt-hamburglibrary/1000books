@@ -160,39 +160,6 @@ const comingSoonFeatures = {
                 status: "planned"
             }
         ]
-    },
-    analytics: {
-        title: "📊 Analytics & Insights",
-        features: [
-            {
-                name: "Stats Dashboard",
-                icon: "📈",
-                description: "Detailed reading statistics",
-                priority: "high",
-                status: "planned"
-            },
-            {
-                name: "Milestone Predictions",
-                icon: "🎯",
-                description: "Predict when you'll reach 1000 books",
-                priority: "medium",
-                status: "planned"
-            },
-            {
-                name: "Reading Patterns",
-                icon: "📊",
-                description: "Analyze reading habits and trends",
-                priority: "medium",
-                status: "planned"
-            },
-            {
-                name: "Visual Reports",
-                icon: "📉",
-                description: "Charts and graphs of progress",
-                priority: "medium",
-                status: "planned"
-            }
-        ]
     }
 };
 
