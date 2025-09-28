@@ -3,7 +3,6 @@
 ## ✅ Features That Work on GitHub Pages
 
 ### Reading & Book Management
-- ✅ **Book cover scanner** - Use camera to scan ISBN barcodes (using free ISBN APIs)
 - ✅ **Reading timer** - Track actual reading time per session in localStorage
 - ✅ **Book series tracking** - Group books in series together locally
 - ✅ **Favorite books list** - Mark and easily re-access beloved books
@@ -51,10 +50,9 @@
 ## 🎯 Implementation Priority (GitHub Pages Compatible Only)
 
 ### High Priority
-1. **Book scanner** - Major time saver
-2. **Stats dashboard** - Parents love data
-3. **Progress reports** - Shareable achievements
-4. **Book search** - Find books quickly
+1. **Stats dashboard** - Parents love data
+2. **Progress reports** - Shareable achievements
+3. **Book search** - Find books quickly
 
 ### Medium Priority
 1. **Educational games** - All 5 games are buildable

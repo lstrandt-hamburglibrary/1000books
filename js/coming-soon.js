@@ -8,14 +8,6 @@ const comingSoonFeatures = {
         title: "📚 Reading & Book Management",
         features: [
             {
-                name: "Book Scanner",
-                icon: "📷",
-                description: "Scan ISBN barcodes using camera",
-                priority: "high",
-                status: "planned",
-                note: "Uses device camera + free ISBN API"
-            },
-            {
                 name: "Reading Timer",
                 icon: "⏱️",
                 description: "Track reading time for each session",
@@ -330,32 +322,7 @@ function addComingSoonToDashboard() {
 
 // Add placeholders to add book page
 function addBookPagePlaceholders() {
-    const addBookForm = document.querySelector('#add-book form');
-    if (addBookForm) {
-        const scannerPlaceholder = document.createElement('div');
-        scannerPlaceholder.innerHTML = `
-            <div style="
-                margin-bottom: 20px;
-                padding: 20px;
-                background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-                border-radius: 10px;
-                text-align: center;
-                border: 2px dashed #999;
-            ">
-                <div style="font-size: 2rem; margin-bottom: 10px;">📷</div>
-                <h4>Barcode Scanner Coming Soon!</h4>
-                <p style="color: #666; font-size: 0.9rem;">
-                    Soon you'll be able to scan book barcodes to add them instantly
-                </p>
-                <button class="submit-btn" disabled style="
-                    background: #ccc;
-                    cursor: not-allowed;
-                    opacity: 0.5;
-                ">Scanner Not Available Yet</button>
-            </div>
-        `;
-        addBookForm.parentElement.insertBefore(scannerPlaceholder, addBookForm);
-    }
+    // Placeholder function - scanner removed
 }
 
 // Initialize coming soon features
