@@ -1551,6 +1551,10 @@
             <button id="permanentInstallBtn" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; display: none; z-index: 10; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.2);" onclick="triggerInstall()">
                 📲 Install App
             </button>
+            <!-- Debug indicator for iOS -->
+            <div id="debugMode" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 10px; font-size: 0.7rem; display: none; z-index: 10;">
+                Mode: <span id="modeText">checking...</span>
+            </div>
             <div class="child-selector">
                 <select id="childSelect" onchange="switchChild(this.value)">
                     <option value="">Select Child</option>
@@ -6662,29 +6666,55 @@
         window.addEventListener('load', () => {
             // Wait a bit for iOS to set up properly
             setTimeout(() => {
-                const standalone = isStandalone();
-                console.log('=== Final standalone check ===');
-                console.log('Result:', standalone);
+                const debugMode = document.getElementById('debugMode');
+                const modeText = document.getElementById('modeText');
 
-                if (permanentInstallBtn) {
-                    if (!standalone) {
-                        // Additional check for iOS - if navigator.standalone exists and is not false
-                        if (isIOS() && 'standalone' in window.navigator && window.navigator.standalone === false) {
-                            permanentInstallBtn.style.display = 'block';
-                            console.log('Install button shown - iOS browser mode');
-                        } else if (!isIOS()) {
-                            permanentInstallBtn.style.display = 'block';
-                            console.log('Install button shown - not iOS, not standalone');
-                        } else {
-                            // iOS but navigator.standalone is undefined or true
-                            permanentInstallBtn.style.display = 'none';
-                            console.log('Install button hidden - iOS PWA mode (navigator.standalone not false)');
-                        }
+                // Simple iOS PWA detection
+                let isInPWAMode = false;
+                let modeString = 'Browser';
+
+                if (isIOS()) {
+                    // On iOS, if navigator.standalone is true or undefined (not false), assume PWA
+                    if (window.navigator.standalone === true) {
+                        isInPWAMode = true;
+                        modeString = 'iOS PWA (standalone=true)';
+                    } else if (window.navigator.standalone === false) {
+                        isInPWAMode = false;
+                        modeString = 'iOS Safari';
                     } else {
+                        // undefined or null - assume PWA on iOS
+                        isInPWAMode = true;
+                        modeString = 'iOS PWA (no standalone)';
+                    }
+
+                    // Show debug info on iOS for 5 seconds
+                    if (debugMode && modeText) {
+                        modeText.textContent = modeString;
+                        debugMode.style.display = 'block';
+                        setTimeout(() => {
+                            debugMode.style.display = 'none';
+                        }, 5000);
+                    }
+                } else {
+                    // Not iOS - use standard detection
+                    isInPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
+                                  window.matchMedia('(display-mode: fullscreen)').matches;
+                    modeString = isInPWAMode ? 'PWA' : 'Browser';
+                }
+
+                // Update install button visibility
+                if (permanentInstallBtn) {
+                    if (isInPWAMode) {
                         permanentInstallBtn.style.display = 'none';
-                        console.log('Install button hidden - app IS in standalone mode');
+                        console.log('Install button hidden - PWA mode detected');
+                    } else {
+                        permanentInstallBtn.style.display = 'block';
+                        console.log('Install button shown - browser mode');
                     }
                 }
+
+                // Store the detection result
+                window.isPWAMode = isInPWAMode;
             }, 100); // Small delay to ensure iOS has set all properties
         });
 
