@@ -137,14 +137,6 @@ const comingSoonFeatures = {
                 note: "Uses OpenLibrary API"
             },
             {
-                name: "Monthly Challenges",
-                icon: "🏆",
-                description: "Built-in reading challenges",
-                priority: "medium",
-                status: "planned",
-                note: "Pre-programmed challenges"
-            },
-            {
                 name: "Export Options",
                 icon: "💾",
                 description: "Multiple backup formats",
