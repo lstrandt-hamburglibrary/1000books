@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '3.7.0';</script>
+    <script>window.APP_VERSION = '3.7.1';</script>
     <style>
         * {
             margin: 0;
@@ -6596,20 +6596,44 @@
 
         // Check if app is already installed
         function isStandalone() {
-            return window.matchMedia('(display-mode: standalone)').matches ||
-                   window.navigator.standalone ||
-                   document.referrer.includes('android-app://');
+            // Check iOS standalone
+            if (window.navigator.standalone === true) {
+                console.log('iOS PWA detected via navigator.standalone');
+                return true;
+            }
+            // Check Android/Desktop PWA
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('PWA detected via display-mode: standalone');
+                return true;
+            }
+            // Check Android app referrer
+            if (document.referrer.includes('android-app://')) {
+                console.log('Android app detected via referrer');
+                return true;
+            }
+            // Check iOS specific meta tag approach
+            if (window.navigator.standalone !== undefined && window.navigator.standalone) {
+                console.log('iOS PWA detected via navigator.standalone (non-strict)');
+                return true;
+            }
+            return false;
         }
 
         // Show install button if not installed
         window.addEventListener('load', () => {
+            // Double-check standalone status after page loads
+            const standalone = isStandalone();
+            console.log('Page loaded. Standalone status:', standalone);
+            console.log('navigator.standalone:', window.navigator.standalone);
+            console.log('display-mode standalone:', window.matchMedia('(display-mode: standalone)').matches);
+
             if (permanentInstallBtn) {
-                // Always show the button unless in standalone mode
-                if (!isStandalone()) {
+                if (!standalone) {
                     permanentInstallBtn.style.display = 'block';
                     console.log('Install button shown - app not in standalone mode');
                 } else {
-                    console.log('Install button hidden - app is in standalone mode');
+                    permanentInstallBtn.style.display = 'none';
+                    console.log('Install button hidden - app IS in standalone mode');
                 }
             }
         });
@@ -6748,10 +6772,9 @@
 
         // Show iOS install instructions if needed
         if (isIOS() && !isStandalone()) {
-            // Show the permanent install button for iOS
-            if (permanentInstallBtn) {
-                permanentInstallBtn.style.display = 'block';
-            }
+            console.log('iOS device detected, not in standalone mode');
+            // The button visibility is already handled in the load event listener
+            // Don't show it again here
 
             // Check if not dismissed recently
             const iosDismissed = localStorage.getItem('iosInstallDismissed');
