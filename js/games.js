@@ -275,6 +275,7 @@ function createSortableButton(config, index) {
     const button = document.createElement('div');
     button.id = `sort-button-${index}`;
     button.dataset.correctBin = config.bin;
+    button.dataset.shape = config.shape || 'default';
     button.className = 'sortable-button';
 
     const size = config.size || 40;
@@ -299,20 +300,36 @@ function createSortableButton(config, index) {
     // Shape-specific styles
     if (config.shape === 'circle') {
         baseStyle += 'border-radius: 50%;';
-        // Add shine effect for circles
-        button.innerHTML = '<div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 30%; height: 30%; background: radial-gradient(circle, rgba(255,255,255,0.7), transparent); border-radius: 50%;"></div>';
+        // Add shine effect and button holes for circles
+        button.innerHTML = `
+            <div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 30%; height: 30%; background: radial-gradient(circle, rgba(255,255,255,0.7), transparent); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 30%; left: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 30%; right: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 30%; left: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 30%; right: 35%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+        `;
     } else if (config.shape === 'square') {
         baseStyle += 'border-radius: 8px;';
-        // Add shine effect for squares
-        button.innerHTML = '<div style="position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 40%; height: 25%; background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent); border-radius: 4px;"></div>';
+        // Add shine effect and button holes for squares
+        button.innerHTML = `
+            <div style="position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 40%; height: 25%; background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent); border-radius: 4px;"></div>
+            <div style="position: absolute; top: 25%; left: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; top: 25%; right: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 25%; left: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+            <div style="position: absolute; bottom: 25%; right: 25%; width: 3px; height: 3px; background: rgba(0,0,0,0.3); border-radius: 50%;"></div>
+        `;
     } else if (config.shape === 'star') {
         button.innerHTML = '⭐';
         baseStyle += `
-            background: linear-gradient(180deg, #ffd700, #ffb700);
-            font-size: ${size * 0.7}px;
+            background: transparent;
+            font-size: ${size}px;
             line-height: ${size}px;
             text-align: center;
-            border-radius: 8px;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         `;
     }
 
@@ -321,23 +338,31 @@ function createSortableButton(config, index) {
     // Add hover effect
     button.onmouseover = function() {
         if (window.selectedButton !== button) {
-            button.style.transform = 'translateY(-2px)';
-            button.style.boxShadow = `
-                0 6px 8px rgba(0,0,0,0.3),
-                inset 0 1px 0 rgba(255,255,255,0.5),
-                inset 0 -2px 0 rgba(0,0,0,0.2)
-            `;
+            if (config.shape === 'star') {
+                button.style.transform = 'translateY(-2px) scale(1.1)';
+            } else {
+                button.style.transform = 'translateY(-2px)';
+                button.style.boxShadow = `
+                    0 6px 8px rgba(0,0,0,0.3),
+                    inset 0 1px 0 rgba(255,255,255,0.5),
+                    inset 0 -2px 0 rgba(0,0,0,0.2)
+                `;
+            }
         }
     };
 
     button.onmouseout = function() {
         if (window.selectedButton !== button) {
-            button.style.transform = 'translateY(0)';
-            button.style.boxShadow = `
-                0 4px 6px rgba(0,0,0,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.5),
-                inset 0 -2px 0 rgba(0,0,0,0.2)
-            `;
+            if (config.shape === 'star') {
+                button.style.transform = 'translateY(0) scale(1)';
+            } else {
+                button.style.transform = 'translateY(0)';
+                button.style.boxShadow = `
+                    0 4px 6px rgba(0,0,0,0.2),
+                    inset 0 1px 0 rgba(255,255,255,0.5),
+                    inset 0 -2px 0 rgba(0,0,0,0.2)
+                `;
+            }
         }
     };
 
@@ -345,29 +370,42 @@ function createSortableButton(config, index) {
     button.onclick = function() {
         if (window.selectedButton === button) {
             window.selectedButton = null;
-            button.style.transform = 'translateY(0)';
-            button.style.boxShadow = `
-                0 4px 6px rgba(0,0,0,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.5),
-                inset 0 -2px 0 rgba(0,0,0,0.2)
-            `;
-        } else {
-            if (window.selectedButton) {
-                window.selectedButton.style.transform = 'translateY(0)';
-                window.selectedButton.style.boxShadow = `
+            if (config.shape === 'star') {
+                button.style.transform = 'translateY(0) scale(1)';
+            } else {
+                button.style.transform = 'translateY(0)';
+                button.style.boxShadow = `
                     0 4px 6px rgba(0,0,0,0.2),
                     inset 0 1px 0 rgba(255,255,255,0.5),
                     inset 0 -2px 0 rgba(0,0,0,0.2)
                 `;
             }
+        } else {
+            if (window.selectedButton) {
+                const prevShape = window.selectedButton.dataset.shape || 'default';
+                if (prevShape === 'star') {
+                    window.selectedButton.style.transform = 'translateY(0) scale(1)';
+                } else {
+                    window.selectedButton.style.transform = 'translateY(0)';
+                    window.selectedButton.style.boxShadow = `
+                        0 4px 6px rgba(0,0,0,0.2),
+                        inset 0 1px 0 rgba(255,255,255,0.5),
+                        inset 0 -2px 0 rgba(0,0,0,0.2)
+                    `;
+                }
+            }
             window.selectedButton = button;
-            button.style.transform = 'translateY(-4px) scale(1.1)';
-            button.style.boxShadow = `
-                0 8px 12px rgba(0,0,0,0.4),
-                0 0 20px ${config.color}88,
-                inset 0 1px 0 rgba(255,255,255,0.5),
-                inset 0 -2px 0 rgba(0,0,0,0.2)
-            `;
+            if (config.shape === 'star') {
+                button.style.transform = 'translateY(-4px) scale(1.2)';
+            } else {
+                button.style.transform = 'translateY(-4px) scale(1.1)';
+                button.style.boxShadow = `
+                    0 8px 12px rgba(0,0,0,0.4),
+                    0 0 20px ${config.color}88,
+                    inset 0 1px 0 rgba(255,255,255,0.5),
+                    inset 0 -2px 0 rgba(0,0,0,0.2)
+                `;
+            }
         }
     };
 
@@ -559,7 +597,7 @@ function startStoryMatch() {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 2.5rem;
             cursor: pointer;
             transition: transform 0.3s;
         `;
@@ -1160,7 +1198,7 @@ function checkWord() {
     }
 }
 
-// Letter Match Game - Match uppercase and lowercase letters
+// Letter Match Game - Multiple levels of letter matching
 function launchLetterMatchGame() {
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
@@ -1197,7 +1235,44 @@ function launchLetterMatchGame() {
                     ">Close ✕</button>
                 </div>
 
-                <p style="margin-bottom: 1rem;">Match the uppercase letter with its lowercase friend!</p>
+                <!-- Level Selection -->
+                <div id="letterLevelSelect" style="margin-bottom: 1rem; text-align: center;">
+                    <h3 id="levelSelectTitle" style="color: #667eea; margin-bottom: 1rem; text-align: center;">🎮 Pick a Level!</h3>
+                    <p id="levelSelectSubtitle" style="margin-bottom: 0.5rem;">Choose your challenge:</p>
+                    <div style="display: flex; gap: 0.3rem; flex-wrap: nowrap; justify-content: center;">
+                        <button onclick="selectLetterMatchLevel(1)" style="
+                            padding: 0.4rem 0.6rem;
+                            background: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 0.85rem;
+                            white-space: nowrap;
+                        ">L1: Upper/Lower</button>
+                        <button onclick="selectLetterMatchLevel(2)" style="
+                            padding: 0.4rem 0.6rem;
+                            background: #fbbf24;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 0.85rem;
+                            white-space: nowrap;
+                        ">L2: Letter/Picture</button>
+                        <button onclick="selectLetterMatchLevel(3)" style="
+                            padding: 0.4rem 0.6rem;
+                            background: #dc3545;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 0.85rem;
+                            white-space: nowrap;
+                        ">L3: Picture/Picture</button>
+                    </div>
+                </div>
+
 
                 <div style="
                     display: flex;
@@ -1215,10 +1290,10 @@ function launchLetterMatchGame() {
                 <div id="gameBoard" style="
                     position: relative;
                     display: flex;
-                    gap: ${window.innerWidth <= 480 ? '0.5rem' : '1rem'};
+                    gap: 1rem;
                     justify-content: space-evenly;
                     align-items: start;
-                    padding: ${window.innerWidth <= 480 ? '0.5rem' : '1rem'};
+                    padding: 1rem;
                     background: linear-gradient(135deg, #fbbf24, #f97316);
                     border-radius: 15px;
                     min-height: 400px;
@@ -1244,11 +1319,11 @@ function launchLetterMatchGame() {
                         z-index: 2;
                         min-width: fit-content;
                     ">
-                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: ${window.innerWidth <= 480 ? '0.9rem' : '1rem'};">Uppercase</h3>
+                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: 1rem;">Uppercase</h3>
                         <div id="uppercaseLetters" style="
                             display: flex;
                             flex-direction: column;
-                            gap: ${window.innerWidth <= 480 ? '0.5rem' : '0.8rem'};
+                            gap: 0.8rem;
                         ">
                             <!-- Uppercase letter cards will appear here -->
                         </div>
@@ -1260,7 +1335,7 @@ function launchLetterMatchGame() {
                         flex-direction: column;
                         justify-content: center;
                         align-items: center;
-                        min-width: ${window.innerWidth <= 480 ? '30px' : '60px'};
+                        min-width: 60px;
                         z-index: 2;
                     ">
                         <div id="matchIndicator" style="
@@ -1278,11 +1353,11 @@ function launchLetterMatchGame() {
                         z-index: 2;
                         min-width: fit-content;
                     ">
-                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: ${window.innerWidth <= 480 ? '0.9rem' : '1rem'};">Lowercase</h3>
+                        <h3 style="text-align: center; color: white; margin-bottom: 0.5rem; font-size: 1rem;">Lowercase</h3>
                         <div id="lowercaseLetters" style="
                             display: flex;
                             flex-direction: column;
-                            gap: ${window.innerWidth <= 480 ? '0.5rem' : '0.8rem'};
+                            gap: 0.8rem;
                         ">
                             <!-- Lowercase letter cards will appear here -->
                         </div>
@@ -1296,7 +1371,7 @@ function launchLetterMatchGame() {
                 ">
                     <h3 style="color: #28a745;">🎉 Fantastic! You matched all the letters!</h3>
                     <p>Score: <span id="finalLetterScore">0</span> | Time: <span id="finalLetterTime">0</span> seconds</p>
-                    <button onclick="startLetterMatch()" style="
+                    <button onclick="selectLetterMatchLevel(currentLetterMatchLevel)" style="
                         margin-top: 1rem;
                         padding: 0.75rem 2rem;
                         background: #667eea;
@@ -1311,17 +1386,53 @@ function launchLetterMatchGame() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', gameHTML);
-    startLetterMatch();
 }
 
-// Start Letter Match Game
-function startLetterMatch() {
+// Current letter match level
+let currentLetterMatchLevel = 1;  // Default to level 1
+let letterMatchGameTimer = null;  // Global timer reference
+
+// Select Letter Match Level
+function selectLetterMatchLevel(level) {
+    currentLetterMatchLevel = level;
+
+
+    // Update heading to show current level
+    const levelTitle = document.getElementById('levelSelectTitle');
+    const levelSubtitle = document.getElementById('levelSelectSubtitle');
+    if (levelTitle) {
+        levelTitle.textContent = `🎮 Level ${level} Active`;
+    }
+    if (levelSubtitle) {
+        levelSubtitle.textContent = 'Switch levels anytime:';
+    }
+
+    // Update button styles to show active level
+    const buttons = document.querySelectorAll('#letterLevelSelect button');
+    buttons.forEach((btn, index) => {
+        if (index + 1 === level) {
+            btn.style.opacity = '1';
+            btn.style.transform = 'scale(1.05)';
+            btn.style.fontWeight = 'bold';
+            btn.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        } else {
+            btn.style.opacity = '0.7';
+            btn.style.transform = 'scale(1)';
+            btn.style.fontWeight = 'normal';
+            btn.style.boxShadow = 'none';
+        }
+    });
+
+    startLetterMatch(level);
+}
+
+// Start Letter Match Game with level support
+function startLetterMatch(level = currentLetterMatchLevel || 1) {
     let selectedUppercase = null;
     let selectedLowercase = null;
     let matchesFound = 0;
     let score = 0;
     let gameTime = 0;
-    let gameTimer;
     let attempts = 0;
 
     // Letter pairs to use (randomly select 6)
@@ -1346,37 +1457,219 @@ function startLetterMatch() {
     document.getElementById('letterTimer').textContent = '0';
     document.getElementById('letterGameComplete').style.display = 'none';
 
-    // Clear timer if exists
-    if (gameTimer) clearInterval(gameTimer);
+    // Clear SVG canvas to remove ghost lines from previous games
+    const svg = document.getElementById('connectionCanvas');
+    if (svg) {
+        svg.innerHTML = '';
+    }
 
-    // Start timer
-    gameTimer = setInterval(() => {
+    // Clear any existing timer to prevent multiple timers
+    if (letterMatchGameTimer) {
+        clearInterval(letterMatchGameTimer);
+        letterMatchGameTimer = null;
+    }
+
+    // Start fresh timer
+    letterMatchGameTimer = setInterval(() => {
         gameTime++;
         document.getElementById('letterTimer').textContent = gameTime;
     }, 1000);
 
-    // Create uppercase letters (shuffled)
+    // Picture items for each letter - primary set
+    const letterPictures = {
+        'A': {emoji: '🍎', word: 'Apple'},
+        'B': {emoji: '🐻', word: 'Bear'},
+        'C': {emoji: '🐱', word: 'Cat'},
+        'D': {emoji: '🐶', word: 'Dog'},
+        'E': {emoji: '🐘', word: 'Elephant'},
+        'F': {emoji: '🐸', word: 'Frog'},
+        'G': {emoji: '🍇', word: 'Grapes'},
+        'H': {emoji: '🏠', word: 'House'},
+        'I': {emoji: '🍦', word: 'Ice Cream'},
+        'J': {emoji: '🧃', word: 'Juice'},
+        'K': {emoji: '🔑', word: 'Key'},
+        'L': {emoji: '🦁', word: 'Lion'},
+        'M': {emoji: '🐵', word: 'Monkey'},
+        'N': {emoji: '🌙', word: 'Night'},
+        'O': {emoji: '🐙', word: 'Octopus'},
+        'P': {emoji: '🐧', word: 'Penguin'},
+        'Q': {emoji: '👑', word: 'Queen'},
+        'R': {emoji: '🌈', word: 'Rainbow'},
+        'S': {emoji: '⭐', word: 'Star'},
+        'T': {emoji: '🐢', word: 'Turtle'},
+        'U': {emoji: '☂️', word: 'Umbrella'},
+        'V': {emoji: '🎻', word: 'Violin'},
+        'W': {emoji: '🐋', word: 'Whale'},
+        'X': {emoji: '🎄', word: 'Xmas'},
+        'Y': {emoji: '🪀', word: 'Yo-yo'},
+        'Z': {emoji: '🦓', word: 'Zebra'}
+    };
+
+    // Alternative pictures for Level 3 (different items that start with same letter)
+    const alternativePictures = {
+        'A': {emoji: '🐜', word: 'Ant'},
+        'B': {emoji: '🍌', word: 'Banana'},
+        'C': {emoji: '🥕', word: 'Carrot'},
+        'D': {emoji: '🦆', word: 'Duck'},
+        'E': {emoji: '🥚', word: 'Egg'},
+        'F': {emoji: '🔥', word: 'Fire'},
+        'G': {emoji: '🎸', word: 'Guitar'},
+        'H': {emoji: '🎩', word: 'Hat'},
+        'I': {emoji: '🦎', word: 'Iguana'},
+        'J': {emoji: '🏺', word: 'Jar'},
+        'K': {emoji: '🪁', word: 'Kite'},
+        'L': {emoji: '🍋', word: 'Lemon'},
+        'M': {emoji: '🌛', word: 'Moon'},
+        'N': {emoji: '👃', word: 'Nose'},
+        'O': {emoji: '🦉', word: 'Owl'},
+        'P': {emoji: '🍕', word: 'Pizza'},
+        'Q': {emoji: '👸', word: 'Queen'},
+        'R': {emoji: '🚀', word: 'Rocket'},
+        'S': {emoji: '☀️', word: 'Sun'},
+        'T': {emoji: '🦃', word: 'Turkey'},
+        'U': {emoji: '🦄', word: 'Unicorn'},
+        'V': {emoji: '🌋', word: 'Volcano'},
+        'W': {emoji: '⌚', word: 'Watch'},
+        'X': {emoji: '❌', word: 'X-mark'},
+        'Y': {emoji: '💛', word: 'Yellow'},
+        'Z': {emoji: '0️⃣', word: 'Zero'}
+    };
+
+    // Update column headers based on level
+    const uppercaseColumn = document.getElementById('uppercaseColumn');
+    const lowercaseColumn = document.getElementById('lowercaseColumn');
+
+    if (level === 1) {
+        uppercaseColumn.querySelector('h3').textContent = 'Uppercase';
+        lowercaseColumn.querySelector('h3').textContent = 'Lowercase';
+    } else if (level === 2) {
+        uppercaseColumn.querySelector('h3').textContent = 'Letters';
+        lowercaseColumn.querySelector('h3').textContent = 'Pictures';
+    } else if (level === 3) {
+        uppercaseColumn.querySelector('h3').textContent = 'Pictures Set 1';
+        lowercaseColumn.querySelector('h3').textContent = 'Pictures Set 2';
+    }
+
+    // Create cards based on level
     const uppercaseContainer = document.getElementById('uppercaseLetters');
-    uppercaseContainer.innerHTML = '';
-    const shuffledUppercase = [...selectedLetters].sort(() => Math.random() - 0.5);
-
-    shuffledUppercase.forEach(letter => {
-        const card = createLetterCard(letter, 'uppercase');
-        uppercaseContainer.appendChild(card);
-    });
-
-    // Create lowercase letters (shuffled differently)
     const lowercaseContainer = document.getElementById('lowercaseLetters');
+    uppercaseContainer.innerHTML = '';
     lowercaseContainer.innerHTML = '';
+
+    const shuffledUppercase = [...selectedLetters].sort(() => Math.random() - 0.5);
     const shuffledLowercase = [...selectedLetters].sort(() => Math.random() - 0.5);
 
-    shuffledLowercase.forEach(letter => {
-        const card = createLetterCard(letter.toLowerCase(), 'lowercase');
-        lowercaseContainer.appendChild(card);
-    });
+    if (level === 1) {
+        // Level 1: Uppercase and lowercase letters
+        shuffledUppercase.forEach(letter => {
+            const card = createLetterCard(letter, 'uppercase', level);
+            uppercaseContainer.appendChild(card);
+        });
+        shuffledLowercase.forEach(letter => {
+            const card = createLetterCard(letter.toLowerCase(), 'lowercase', level);
+            lowercaseContainer.appendChild(card);
+        });
+    } else if (level === 2) {
+        // Level 2: Letters and corresponding pictures
+        shuffledUppercase.forEach(letter => {
+            const card = createLetterCard(letter, 'uppercase', level);
+            uppercaseContainer.appendChild(card);
+        });
+        shuffledLowercase.forEach(letter => {
+            const card = createPictureCard(letter, 'lowercase', level);
+            lowercaseContainer.appendChild(card);
+        });
+    } else if (level === 3) {
+        // Level 3: Two different pictures that start with the same letter
+        shuffledUppercase.forEach(letter => {
+            const card = createPictureCard(letter, 'uppercase', level, true); // Use primary pictures
+            uppercaseContainer.appendChild(card);
+        });
+        shuffledLowercase.forEach(letter => {
+            const card = createPictureCard(letter, 'lowercase', level, false); // Use alternative pictures
+            lowercaseContainer.appendChild(card);
+        });
+    }
+
+    // Create picture card for levels 2 and 3
+    function createPictureCard(letter, type, level, usePrimary = true) {
+        const card = document.createElement('div');
+        card.dataset.letter = letter.toUpperCase();
+        card.dataset.type = type;
+        const screenWidth = window.innerWidth;
+        let cardSize, fontSize;
+
+        if (screenWidth <= 480) {
+            cardSize = '50px';
+            fontSize = '1.8rem';
+        } else if (screenWidth <= 768) {
+            cardSize = '60px';
+            fontSize = '2rem';
+        } else {
+            cardSize = '80px';
+            fontSize = '2.5rem';
+        }
+
+        // For Level 3, use different picture sets for each column
+        const picture = (level === 3 && !usePrimary)
+            ? alternativePictures[letter.toUpperCase()]
+            : letterPictures[letter.toUpperCase()];
+
+        card.style.cssText = `
+            width: ${cardSize};
+            height: ${cardSize};
+            background: white;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: ${fontSize};
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+            padding: 2px;
+        `;
+
+        // Add emoji only (no word shown)
+        card.innerHTML = `<span style="font-size: ${fontSize};">${picture.emoji}</span>`;
+
+        card.onclick = function() {
+            if (card.classList.contains('matched')) return;
+
+            // Clear previous selections of same type
+            document.querySelectorAll(`.letter-${type}-selected`).forEach(c => {
+                c.classList.remove(`letter-${type}-selected`);
+                c.style.border = '3px solid #ddd';
+                c.style.transform = 'scale(1)';
+                c.style.boxShadow = 'none';
+            });
+
+            // Select this card
+            card.classList.add(`letter-${type}-selected`);
+            card.style.border = `3px solid ${type === 'uppercase' ? '#dc2626' : '#2563eb'}`;
+            card.style.transform = 'scale(1.1)';
+            card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+
+            if (type === 'uppercase') {
+                selectedUppercase = letter.toUpperCase();
+            } else {
+                selectedLowercase = letter.toUpperCase();
+            }
+
+            // Check for match if both selected
+            if (selectedUppercase && selectedLowercase) {
+                attempts++;
+                checkLetterMatch();
+            }
+        };
+
+        return card;
+    }
 
     // Create letter card
-    function createLetterCard(letter, type) {
+    function createLetterCard(letter, type, level) {
         const card = document.createElement('div');
         card.dataset.letter = letter.toUpperCase();
         card.dataset.type = type;
@@ -1554,7 +1847,11 @@ function startLetterMatch() {
 
             // Check if game complete
             if (matchesFound === 6) {
-                clearInterval(gameTimer);
+                // Clear the global timer
+                if (letterMatchGameTimer) {
+                    clearInterval(letterMatchGameTimer);
+                    letterMatchGameTimer = null;
+                }
                 document.getElementById('finalLetterScore').textContent = score;
                 document.getElementById('finalLetterTime').textContent = gameTime;
 
@@ -1659,6 +1956,8 @@ window.checkWord = checkWord;
 window.toggleCategory = toggleCategory;
 window.closeMiniGame = closeMiniGame;
 window.checkGameAchievement = checkGameAchievement;
+window.selectLetterMatchLevel = selectLetterMatchLevel;
+window.startLetterMatch = startLetterMatch;
 
 // Empty data.js file (functionality is built into main app.js)
 // This file can be used for additional data management if needed

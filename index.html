@@ -2518,19 +2518,17 @@
             { books: 10, name: "First Chapter", emoji: "📖" },
             { books: 25, name: "Bookworm", emoji: "🐛" },
             { books: 50, name: "Page Turner", emoji: "📄" },
-            { books: 100, name: "Century Reader", emoji: "💯" },
+            { books: 100, name: "Bookworm Legend", emoji: "💯" },
             { books: 250, name: "Quarter Master", emoji: "🎯" },
             { books: 500, name: "Halfway Hero", emoji: "🌟" },
             { books: 750, name: "Super Reader", emoji: "🦸" },
-            { books: 1000, name: "Champion!", emoji: "🏆" }
+            { books: 1000, name: "Ultimate Bookworm", emoji: "🏆" }
         ];
 
         // Badges
         const badges = [
             // Getting Started
             { id: 'first-book', name: 'First Book', description: 'Read your first book!', emoji: '📘', condition: (books) => books.length >= 1 },
-            { id: 'first-five', name: 'High Five', description: 'Read 5 books', emoji: '✋', condition: (books) => books.length >= 5 },
-            { id: 'double-digits', name: 'Double Digits', description: 'Read 10 books', emoji: '🔟', condition: (books) => books.length >= 10 },
 
             // Streaks & Consistency
             { id: 'week-streak', name: 'Week Streak', description: '7 day reading streak', emoji: '🔥', condition: (books) => calculateStreak(books) >= 7 },
@@ -2554,12 +2552,7 @@
             { id: 'variety-reader', name: 'Variety Reader', description: 'Read books from 10 different authors', emoji: '🌈', condition: (books) => new Set(books.map(b => b.author).filter(a => a)).size >= 10 },
             { id: 'author-fan', name: 'Author Fan', description: 'Read 5 books by the same author', emoji: '✍️', condition: (books) => checkSameAuthor(books) >= 5 },
 
-            // Major Milestones
-            { id: 'quarter-century', name: 'Quarter Century', description: 'Read 25 books', emoji: '📚', condition: (books) => books.length >= 25 },
-            { id: 'half-century', name: 'Half Century', description: 'Read 50 books', emoji: '📖', condition: (books) => books.length >= 50 },
-            { id: 'bookworm-legend', name: 'Bookworm Legend', description: 'Read 250 books', emoji: '🏆', condition: (books) => books.length >= 250 },
-            { id: 'reading-champion', name: 'Reading Champion', description: 'Read 500 books', emoji: '👑', condition: (books) => books.length >= 500 },
-            { id: 'ultimate-bookworm', name: 'Ultimate Bookworm', description: 'Read 1000 books!', emoji: '🎯', condition: (books) => books.length >= 1000 },
+
 
             // Time Patterns
             { id: 'new-year-starter', name: 'New Year Starter', description: 'Read a book in first week of January', emoji: '🎊', condition: (books) => checkNewYearStarter(books) },
@@ -5257,7 +5250,7 @@
             const gameArea = document.getElementById('snowGameArea');
             const catcher = document.getElementById('snowCatcher');
 
-            // Mouse move
+            // Mouse move (keep centered for mouse/desktop)
             gameArea.addEventListener('mousemove', (e) => {
                 if (!snowGameData.gameActive || snowGameData.paused) return;
                 const rect = gameArea.getBoundingClientRect();
@@ -5267,13 +5260,14 @@
                 catcher.style.top = snowGameData.catcherY + 'px';
             });
 
-            // Touch move
+            // Touch move (offset up and left for better visibility)
             gameArea.addEventListener('touchmove', (e) => {
                 if (!snowGameData.gameActive || snowGameData.paused) return;
                 e.preventDefault();
                 const rect = gameArea.getBoundingClientRect();
-                snowGameData.catcherX = e.touches[0].clientX - rect.left - 20;
-                snowGameData.catcherY = e.touches[0].clientY - rect.top - 20;
+                // Offset glove 40px above and 10px left of finger position
+                snowGameData.catcherX = e.touches[0].clientX - rect.left - 30;
+                snowGameData.catcherY = e.touches[0].clientY - rect.top - 60;
                 catcher.style.left = snowGameData.catcherX + 'px';
                 catcher.style.top = snowGameData.catcherY + 'px';
             }, { passive: false });
@@ -5798,6 +5792,69 @@
 
             // Set up keyboard controls
             document.addEventListener('keydown', handleMazeKeyPress);
+
+            // Set up touch controls for drag movement
+            setupMazeTouchControls();
+        }
+
+        function setupMazeTouchControls() {
+            const canvas = document.getElementById('mazeCanvas');
+            let touchStartX = null;
+            let touchStartY = null;
+            let hasMoved = false;
+
+            canvas.addEventListener('touchstart', (e) => {
+                if (!mazeGameData.gameActive) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                touchStartX = touch.clientX - rect.left;
+                touchStartY = touch.clientY - rect.top;
+                hasMoved = false;
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!mazeGameData.gameActive || touchStartX === null) return;
+                e.preventDefault();
+                hasMoved = true;
+            });
+
+            canvas.addEventListener('touchend', (e) => {
+                if (!mazeGameData.gameActive || touchStartX === null || !hasMoved) return;
+                e.preventDefault();
+
+                const touch = e.changedTouches[0];
+                const rect = canvas.getBoundingClientRect();
+                const touchEndX = touch.clientX - rect.left;
+                const touchEndY = touch.clientY - rect.top;
+
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+
+                // Determine swipe direction based on which delta is larger
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // Horizontal swipe
+                    if (Math.abs(deltaX) > 30) { // Minimum swipe distance
+                        if (deltaX > 0) {
+                            moveDragon('right');
+                        } else {
+                            moveDragon('left');
+                        }
+                    }
+                } else {
+                    // Vertical swipe
+                    if (Math.abs(deltaY) > 30) { // Minimum swipe distance
+                        if (deltaY > 0) {
+                            moveDragon('down');
+                        } else {
+                            moveDragon('up');
+                        }
+                    }
+                }
+
+                touchStartX = null;
+                touchStartY = null;
+            });
         }
 
         function drawMaze() {
@@ -6256,25 +6313,24 @@
         }
 
         function getPuzzleImage() {
-            // Collection of kid-friendly images from Picsum (free image service)
-            // These are curated IDs that show kid-appropriate content
-            const imageIds = [
-                '237', // Cute puppy
-                '433', // Bear
-                '1074', // Lion
-                '582', // Fox
-                '659', // Nature/forest
-                '1084', // Walrus
-                '783', // Monkey
-                '1003', // Deer
-                '593', // Tiger
-                '837'  // Flowers
+            // Collection of cartoon-style/illustrated images
+            // Using various placeholder services that provide cartoon/illustration styles
+            const cartoonImages = [
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzg3Q0VFQiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+QtjwvdGV4dD48L3N2Zz4=', // Dog
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0ZGQjZDMSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+QsA==PC90ZXh0Pjwvc3ZnPg==', // Bunny
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0ZGRDcwMCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+mgQ==PC90ZXh0Pjwvc3ZnPg==', // Lion
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzk4RkI5OCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+Qvg==PC90ZXh0Pjwvc3ZnPg==', // Frog
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0RBNzBENiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+mhA==PC90ZXh0Pjwvc3ZnPg==', // Unicorn
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0ZGQTUwMCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+QtjwvdGV4dD48L3N2Zz4=', // Fox
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzg3Q0VGQSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+Qrw==PC90ZXh0Pjwvc3ZnPg==', // Dolphin
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0Y1REVFMSI vPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+Qvw==PC90ZXh0Pjwvc3ZnPg==', // Panda
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0Y0QTQ2MCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+QtQ==PC90ZXh0Pjwvc3ZnPg==', // Monkey
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI0U2RTZMQSI vPjx0ZXh0IHg9IjE1MCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+Qmw==PC90ZXh0Pjwvc3ZnPg=='  // Cat
             ];
 
-            // Use Picsum service for consistent, kid-friendly images
-            // Size 300x300 for good quality
-            const imageId = imageIds[puzzleGameData.currentImage % imageIds.length];
-            return `https://picsum.photos/id/${imageId}/300/300`;
+            // Use current image index
+            const imageUrl = cartoonImages[puzzleGameData.currentImage % cartoonImages.length];
+            return imageUrl;
         }
 
         function togglePuzzleMode() {
