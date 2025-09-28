@@ -279,49 +279,95 @@ function createSortableButton(config, index) {
 
     const size = config.size || 40;
 
-    // Base styles
+    // Base styles - make them look like actual buttons
     let baseStyle = `
         display: inline-block;
         width: ${size}px;
         height: ${size}px;
-        margin: 5px;
-        background: ${config.color};
+        margin: 8px;
+        background: linear-gradient(180deg, ${config.color}, ${config.color}dd);
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: all 0.2s;
         position: relative;
+        box-shadow:
+            0 4px 6px rgba(0,0,0,0.2),
+            inset 0 1px 0 rgba(255,255,255,0.5),
+            inset 0 -2px 0 rgba(0,0,0,0.2);
+        border: 2px solid rgba(0,0,0,0.3);
     `;
 
     // Shape-specific styles
     if (config.shape === 'circle') {
-        baseStyle += 'border-radius: 50%; border: 2px solid rgba(0,0,0,0.2);';
+        baseStyle += 'border-radius: 50%;';
+        // Add shine effect for circles
+        button.innerHTML = '<div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 30%; height: 30%; background: radial-gradient(circle, rgba(255,255,255,0.7), transparent); border-radius: 50%;"></div>';
     } else if (config.shape === 'square') {
-        baseStyle += 'border-radius: 5px; border: 2px solid rgba(0,0,0,0.2);';
+        baseStyle += 'border-radius: 8px;';
+        // Add shine effect for squares
+        button.innerHTML = '<div style="position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 40%; height: 25%; background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent); border-radius: 4px;"></div>';
     } else if (config.shape === 'star') {
         button.innerHTML = '⭐';
         baseStyle += `
-            background: transparent;
-            font-size: ${size}px;
+            background: linear-gradient(180deg, #ffd700, #ffb700);
+            font-size: ${size * 0.7}px;
             line-height: ${size}px;
             text-align: center;
+            border-radius: 8px;
         `;
     }
 
     button.style.cssText = baseStyle;
 
+    // Add hover effect
+    button.onmouseover = function() {
+        if (window.selectedButton !== button) {
+            button.style.transform = 'translateY(-2px)';
+            button.style.boxShadow = `
+                0 6px 8px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                inset 0 -2px 0 rgba(0,0,0,0.2)
+            `;
+        }
+    };
+
+    button.onmouseout = function() {
+        if (window.selectedButton !== button) {
+            button.style.transform = 'translateY(0)';
+            button.style.boxShadow = `
+                0 4px 6px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                inset 0 -2px 0 rgba(0,0,0,0.2)
+            `;
+        }
+    };
+
     // Click to select/deselect
     button.onclick = function() {
         if (window.selectedButton === button) {
             window.selectedButton = null;
-            button.style.transform = 'scale(1)';
-            button.style.boxShadow = '';
+            button.style.transform = 'translateY(0)';
+            button.style.boxShadow = `
+                0 4px 6px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                inset 0 -2px 0 rgba(0,0,0,0.2)
+            `;
         } else {
             if (window.selectedButton) {
-                window.selectedButton.style.transform = 'scale(1)';
-                window.selectedButton.style.boxShadow = '';
+                window.selectedButton.style.transform = 'translateY(0)';
+                window.selectedButton.style.boxShadow = `
+                    0 4px 6px rgba(0,0,0,0.2),
+                    inset 0 1px 0 rgba(255,255,255,0.5),
+                    inset 0 -2px 0 rgba(0,0,0,0.2)
+                `;
             }
             window.selectedButton = button;
-            button.style.transform = 'scale(1.2)';
-            button.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+            button.style.transform = 'translateY(-4px) scale(1.1)';
+            button.style.boxShadow = `
+                0 8px 12px rgba(0,0,0,0.4),
+                0 0 20px ${config.color}88,
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                inset 0 -2px 0 rgba(0,0,0,0.2)
+            `;
         }
     };
 
@@ -339,10 +385,17 @@ function checkButtonSort(button, binId) {
 
         // Move button to bin
         const binContent = document.getElementById(`bin-content-${binId}`);
-        button.style.transform = 'scale(1)';
-        button.style.boxShadow = '';
+        button.style.transform = 'scale(0.9)';
+        button.style.boxShadow = `
+            0 2px 4px rgba(0,0,0,0.2),
+            inset 0 1px 0 rgba(255,255,255,0.5),
+            inset 0 -2px 0 rgba(0,0,0,0.2)
+        `;
         button.style.cursor = 'default';
+        button.style.opacity = '0.9';
         button.onclick = null;
+        button.onmouseover = null;
+        button.onmouseout = null;
         binContent.appendChild(button);
 
         // Update score
