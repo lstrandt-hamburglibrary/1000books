@@ -30,6 +30,8 @@
 ## Testing Commands
 - No specific test framework currently set up
 - Manual testing in browser/PWA required
+- Desktop: Press Ctrl + Shift + G to make games testable
+- iOS: Tap five times to make games testable
 
 ## Code Style
 - Single-file application (all code in index.html)

@@ -1,0 +1,97 @@
+# Project: 1000 Books Before Kindergarten
+
+## Commit Guidelines
+- ALWAYS add a version number to commit messages
+- Version format: vX.Y.Z (e.g., v3.7.3)
+- Increment versions as follows:
+  - Patch (Z): Bug fixes, minor tweaks (v3.7.2 → v3.7.3)
+  - Minor (Y): New features, improvements (v3.7.2 → v3.8.0)
+  - Major (X): Breaking changes, major redesigns (v3.7.2 → v4.0.0)
+
+## Update Notifications - CRITICAL REQUIREMENTS
+### Version Update Process:
+1. **ALWAYS** update BOTH version numbers in sync:
+   - window.APP_VERSION in index.html (line 30)
+   - const VERSION in sw.js (line 2)
+2. **ALWAYS** include version number in commit messages (e.g., "Feature update - v4.1.0")
+3. **ALWAYS** show a prominent UPDATE BUTTON when new version is available
+4. **NEVER** auto-update without user consent - always require button click
+
+### Update UI Requirements:
+- Display a green update notification at top of screen with:
+  - Version number clearly shown (e.g., "Version 4.1.0 Available!")
+  - Prominent "Update Now" button
+  - Close/dismiss option (X button)
+- Notification should be:
+  - Highly visible (z-index: 999999)
+  - Green background (#4CAF50) for positive update messaging
+  - Centered at top of screen
+  - Include version number in the message
+
+## Important Files
+- index.html: Main app file (line 30: window.APP_VERSION = 'X.X.X')
+- sw.js: Service worker (line 2: const VERSION = 'X.X.X')
+- js/embedded-games.js: Contains all embedded game code
+- manifest.json: PWA manifest configuration
+- **BOTH version constants must match EXACTLY**
+
+## Development Workflow
+1. Make changes to code
+2. Update BOTH version constants to the SAME version:
+   - window.APP_VERSION in index.html (line 30)
+   - const VERSION in sw.js (line 2)
+3. Commit with version number: "Description - vX.Y.Z"
+4. Push to GitHub
+5. Users see update notification with version number
+6. Users click "Update Now" button to update
+
+## How Updates Work
+- App checks for updates every 10 seconds
+- Fetches index.html and compares versions
+- Shows green update notification with version number
+- User clicks "Update Now" button
+- App clears cache and reloads with new version
+- **Updates are NEVER automatic - always user-initiated**
+
+## Testing Commands
+- No specific test framework currently set up
+- Manual testing in browser/PWA required
+
+## Developer Features
+### Game Test Mode
+- **Keyboard Shortcut**: Ctrl+Shift+G (or Cmd+Shift+G on Mac)
+- **Purpose**: Unlocks all games for testing without meeting reading requirements
+- **How it works**:
+  1. Press Ctrl+Shift+G to toggle test mode
+  2. Toast notification shows: "🎮 Test Mode ENABLED - All games unlocked!"
+  3. All games become playable regardless of books read
+  4. Press Ctrl+Shift+G again to disable test mode
+- **Note**: Test mode is for development/testing only
+- **Persists**: Test mode state is temporary (resets on page reload)
+
+## Code Style
+- Main app in index.html with supporting JavaScript files
+- Embedded games extracted to js/embedded-games.js for performance
+- No external dependencies or frameworks (except Bootstrap CSS via CDN)
+- Pure vanilla JavaScript, HTML, CSS
+- Mobile-first design for parents tracking children's reading
+- File structure:
+  - index.html: Core app logic and UI (207KB)
+  - js/embedded-games.js: All embedded game code (66KB)
+  - js/games.js: Pete's Button Sort game
+  - js/bookSuggestions.js: Book recommendation data
+  - js/notifications.js: Notification system
+  - js/coming-soon.js: Coming soon features
+
+## Features
+- Track multiple children's reading progress
+- Capture book covers via camera
+- Gamification with badges and milestones
+- Works offline as a PWA
+- Data stored in localStorage
+
+## Deployment
+- Hosted on GitHub Pages
+- Updates deploy automatically on push to main branch
+- PWA updates typically appear within minutes to hours
+- Repository: https://github.com/lstrandt-hamburglibrary/1000books
