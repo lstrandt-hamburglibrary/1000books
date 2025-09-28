@@ -106,14 +106,6 @@ const comingSoonFeatures = {
                 priority: "low",
                 status: "planned",
                 placeholder: "characterQuiz"
-            },
-            {
-                name: "Drawing Pad",
-                icon: "🎨",
-                description: "Draw favorite book scenes",
-                priority: "medium",
-                status: "planned",
-                placeholder: "drawingPad"
             }
         ]
     },
