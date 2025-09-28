@@ -1,7 +1,7 @@
 // Service Worker for 1000 Books Before Kindergarten
-const VERSION = '3.4.1';
+const VERSION = '3.7.0';
 const CACHE_NAME = `1000books-v${VERSION}`;
-const BYPASS_CACHE = true; // Temporary: bypass cache to force updates
+const BYPASS_CACHE = true; // Always bypass cache to ensure updates are seen
 
 const urlsToCache = [
   './',
@@ -16,6 +16,7 @@ const urlsToCache = [
 
 // Install service worker
 self.addEventListener('install', event => {
+  console.log('Installing service worker version:', VERSION);
   // Force new service worker to activate immediately
   self.skipWaiting();
 
