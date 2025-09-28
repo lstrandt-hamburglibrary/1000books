@@ -2564,8 +2564,6 @@
 
             // Monthly Achievements
             { id: 'monthly-champion', name: 'Monthly Champion', description: 'Read 30+ books in a single month', emoji: '🏅', condition: (books) => checkMonthlyMax(books) >= 30 },
-            { id: 'consistent-reader', name: 'Consistent Reader', description: 'Read at least 1 book every month for 6 months', emoji: '📆', condition: (books) => checkMonthlyConsistency(books) >= 6 },
-            { id: 'year-long-reader', name: 'Year-Long Reader', description: 'Read at least 1 book every month for 12 months', emoji: '🗓️', condition: (books) => checkMonthlyConsistency(books) >= 12 },
             { id: 'book-a-day', name: 'Book-a-Day', description: 'Read every single day for an entire month', emoji: '📅', condition: (books) => checkFullMonthStreak(books) },
 
             // Growth & Improvement
@@ -2580,7 +2578,6 @@
 
             // Reading Times
             { id: 'weekday-warrior', name: 'Weekday Warrior', description: 'Read Monday-Friday for 2 weeks straight', emoji: '💼', condition: (books) => checkWeekdayStreak(books) >= 10 },
-            { id: 'early-achiever', name: 'Early Achiever', description: 'Complete 100 books in your first year', emoji: '🌟', condition: (books) => checkEarlyAchiever(books) },
 
             // Special Achievements
             { id: 'rereader', name: 'Repeat Reader', description: 'Read the same book 3 times', emoji: '🔄', condition: (books) => checkRereads(books) >= 3 }
@@ -4518,7 +4515,6 @@
                     const gameCard = document.createElement('div');
                     gameCard.className = 'game-card coming-soon-game';
                     gameCard.innerHTML = `
-                        <div style="position: absolute; top: 5px; right: 5px; background: #ff9800; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">SOON</div>
                         <div class="game-icon">${game.icon}</div>
                         <div class="game-name">${game.name}</div>
                         <div class="game-requirement" style="color: #999; font-size: 0.8rem;">

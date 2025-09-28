@@ -15,13 +15,6 @@ const comingSoonFeatures = {
                 status: "planned"
             },
             {
-                name: "Book Series",
-                icon: "📚",
-                description: "Group books in series together",
-                priority: "low",
-                status: "planned"
-            },
-            {
                 name: "Favorites List",
                 icon: "⭐",
                 description: "Mark and re-read favorite books easily",
@@ -293,33 +286,9 @@ function addDashboardFeatures() {
     // This function kept for future dashboard enhancements
 }
 
-// Add placeholders to library page
+// Library placeholders removed - all features now available!
 function addLibraryPlaceholders() {
-    const library = document.getElementById('library');
-    if (library && !library.querySelector('.series-placeholder')) {
-        const seriesPlaceholder = document.createElement('div');
-        seriesPlaceholder.className = 'series-placeholder';
-        seriesPlaceholder.innerHTML = `
-            <div style="
-                margin-bottom: 20px;
-                padding: 15px;
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                color: white;
-                border-radius: 10px;
-                text-align: center;
-            ">
-                <h4>📚 Book Series Tracking Coming Soon!</h4>
-                <p style="margin: 5px 0; font-size: 0.9rem;">
-                    Group books by series and track your progress
-                </p>
-            </div>
-        `;
-
-        const libraryHeader = library.querySelector('h2');
-        if (libraryHeader) {
-            libraryHeader.insertAdjacentElement('afterend', seriesPlaceholder);
-        }
-    }
+    // Series tracking placeholder removed
 }
 
 // Export for use in main app
