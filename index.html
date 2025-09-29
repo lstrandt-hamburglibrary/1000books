@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '3.9.11';</script>
+    <script>window.APP_VERSION = '3.9.12';</script>
     <style>
         * {
             margin: 0;
@@ -5826,7 +5826,9 @@
             const canvas = document.getElementById('mazeCanvas');
             let touchStartX = null;
             let touchStartY = null;
-            let hasMoved = false;
+            let isDragging = false;
+            let lastMoveTime = 0;
+            const moveDelay = 200; // Minimum time between moves in milliseconds
 
             canvas.addEventListener('touchstart', (e) => {
                 if (!mazeGameData.gameActive) return;
@@ -5835,48 +5837,67 @@
                 const rect = canvas.getBoundingClientRect();
                 touchStartX = touch.clientX - rect.left;
                 touchStartY = touch.clientY - rect.top;
-                hasMoved = false;
+                isDragging = true;
+                lastMoveTime = 0;
             });
 
             canvas.addEventListener('touchmove', (e) => {
-                if (!mazeGameData.gameActive || touchStartX === null) return;
-                e.preventDefault();
-                hasMoved = true;
-            });
-
-            canvas.addEventListener('touchend', (e) => {
-                if (!mazeGameData.gameActive || touchStartX === null || !hasMoved) return;
+                if (!mazeGameData.gameActive || !isDragging || touchStartX === null) return;
                 e.preventDefault();
 
-                const touch = e.changedTouches[0];
+                const currentTime = Date.now();
+                if (currentTime - lastMoveTime < moveDelay) return; // Throttle moves
+
+                const touch = e.touches[0];
                 const rect = canvas.getBoundingClientRect();
-                const touchEndX = touch.clientX - rect.left;
-                const touchEndY = touch.clientY - rect.top;
+                const touchCurrentX = touch.clientX - rect.left;
+                const touchCurrentY = touch.clientY - rect.top;
 
-                const deltaX = touchEndX - touchStartX;
-                const deltaY = touchEndY - touchStartY;
+                const deltaX = touchCurrentX - touchStartX;
+                const deltaY = touchCurrentY - touchStartY;
+                const minSwipeDistance = 20; // Reduced for better responsiveness
 
-                // Determine swipe direction based on which delta is larger
+                // Determine swipe direction and move one space
                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
                     // Horizontal swipe
-                    if (Math.abs(deltaX) > 30) { // Minimum swipe distance
+                    if (Math.abs(deltaX) > minSwipeDistance) {
                         if (deltaX > 0) {
                             moveDragon('right');
                         } else {
                             moveDragon('left');
                         }
+                        // Reset start position for next move
+                        touchStartX = touchCurrentX;
+                        touchStartY = touchCurrentY;
+                        lastMoveTime = currentTime;
                     }
                 } else {
                     // Vertical swipe
-                    if (Math.abs(deltaY) > 30) { // Minimum swipe distance
+                    if (Math.abs(deltaY) > minSwipeDistance) {
                         if (deltaY > 0) {
                             moveDragon('down');
                         } else {
                             moveDragon('up');
                         }
+                        // Reset start position for next move
+                        touchStartX = touchCurrentX;
+                        touchStartY = touchCurrentY;
+                        lastMoveTime = currentTime;
                     }
                 }
+            });
 
+            canvas.addEventListener('touchend', (e) => {
+                if (!mazeGameData.gameActive) return;
+                e.preventDefault();
+                isDragging = false;
+                touchStartX = null;
+                touchStartY = null;
+            });
+
+            // Also handle touchcancel
+            canvas.addEventListener('touchcancel', (e) => {
+                isDragging = false;
                 touchStartX = null;
                 touchStartY = null;
             });
