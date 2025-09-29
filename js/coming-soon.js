@@ -70,14 +70,6 @@ const comingSoonFeatures = {
                 placeholder: "phonicsGame"
             },
             {
-                name: "Rhyme Time",
-                icon: "🎵",
-                description: "Find rhyming words game",
-                priority: "medium",
-                status: "planned",
-                placeholder: "rhymeGame"
-            },
-            {
                 name: "Story Sequencing",
                 icon: "📖",
                 description: "Put story events in order",
