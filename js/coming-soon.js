@@ -50,13 +50,6 @@ const comingSoonFeatures = {
                 note: "Printable awards"
             },
             {
-                name: "Book Notes",
-                icon: "📝",
-                description: "Add personal notes to each book",
-                priority: "low",
-                status: "planned"
-            },
-            {
                 name: "Reading Calendar",
                 icon: "📅",
                 description: "Visual calendar of reading history",
