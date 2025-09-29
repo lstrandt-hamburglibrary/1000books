@@ -15,6 +15,9 @@ function launchGame(gameName) {
         case 'letter-match':
             launchLetterMatchGame();
             break;
+        case 'rhyme-trains':
+            launchRhymeTrainsGame();
+            break;
     }
 }
 
@@ -1934,6 +1937,500 @@ function closeMiniGame() {
 // Don't override the main closeGame function - remove this entirely
 // The main app already has closeGame defined for built-in games
 
+// Rhyme Family Trains Game
+function launchRhymeTrainsGame() {
+    const gameHTML = `
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        ">
+            <div style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 20px;
+                padding: 20px;
+                max-width: 95%;
+                width: 800px;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="color: white; margin: 0;">🚂 Rhyme Family Trains!</h2>
+                    <button onclick="closeMiniGame()" style="
+                        background: #dc3545;
+                        color: white;
+                        border: none;
+                        border-radius: 50%;
+                        width: 40px;
+                        height: 40px;
+                        font-size: 20px;
+                        cursor: pointer;
+                    ">✕</button>
+                </div>
+
+                <div id="rhymeGameArea" style="background: white; border-radius: 15px; padding: 20px; min-height: 400px;">
+                    <!-- Difficulty Selection -->
+                    <div id="rhymeDifficultySelect" style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="color: #667eea;">Choose Your Track!</h3>
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <button onclick="startRhymeTrains(1)" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer;">
+                                🟢 Easy<br><small>2 trains, 4 words</small>
+                            </button>
+                            <button onclick="startRhymeTrains(2)" style="padding: 10px 20px; background: #ffc107; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer;">
+                                🟡 Medium<br><small>3 trains, 6 words</small>
+                            </button>
+                            <button onclick="startRhymeTrains(3)" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer;">
+                                🔴 Hard<br><small>4 trains, 10 words</small>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Game Stats -->
+                    <div id="rhymeStats" style="display: none; text-align: center; margin-bottom: 10px;">
+                        <span style="font-size: 18px; margin: 0 10px;">🎯 Score: <span id="rhymeScore">0</span></span>
+                        <span style="font-size: 18px; margin: 0 10px;">⏱️ Time: <span id="rhymeTimer">0</span>s</span>
+                    </div>
+
+                    <!-- Word Cards Area -->
+                    <div id="wordCardsArea" style="display: none; min-height: 80px; margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 10px;">
+                        <h4 style="text-align: center; margin: 0 0 10px 0; color: #666;">Drag words to their rhyme family train!</h4>
+                        <div id="wordCards" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                            <!-- Word cards will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Train Station Area -->
+                    <div id="trainStation" style="display: none;">
+                        <!-- Trains will be added here -->
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="rhymeSuccess" style="display: none; text-align: center; padding: 20px;">
+                        <h2 style="color: #28a745;">🎉 All Aboard! Great Job! 🎉</h2>
+                        <p style="font-size: 20px;">You sorted all the rhymes correctly!</p>
+                        <div>
+                            <button onclick="resetRhymeTrains()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; margin: 5px;">Play Again</button>
+                            <button onclick="closeMiniGame()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; margin: 5px;">Exit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
+    initRhymeTrainsGame();
+}
+
+// Rhyme Trains Game Data
+let rhymeGameData = {
+    level: 1,
+    score: 0,
+    timer: 0,
+    timerInterval: null,
+    wordsPlaced: 0,
+    totalWords: 0,
+    trains: [],
+    words: []
+};
+
+// Word families with emojis from approved list
+const rhymeFamilies = {
+    'at': [
+        {word: 'cat', emoji: '🐱'},
+        {word: 'hat', emoji: '🎩'},
+        {word: 'bat', emoji: '🦇'},
+        {word: 'rat', emoji: '🐀'}
+    ],
+    'ar': [
+        {word: 'car', emoji: '🚗'},
+        {word: 'star', emoji: '⭐'},
+        {word: 'jar', emoji: '🫙'},
+        {word: 'guitar', emoji: '🎸'}
+    ],
+    'og': [
+        {word: 'dog', emoji: '🐶'},
+        {word: 'log', emoji: '🪵'},
+        {word: 'frog', emoji: '🐸'}
+    ],
+    'ee': [
+        {word: 'bee', emoji: '🐝'},
+        {word: 'tree', emoji: '🌳'},
+        {word: 'key', emoji: '🔑'}
+    ],
+    'ain': [
+        {word: 'rain', emoji: '🌧️'},
+        {word: 'train', emoji: '🚂'},
+        {word: 'brain', emoji: '🧠'},
+        {word: 'chain', emoji: '⛓️'}
+    ],
+    'ake': [
+        {word: 'cake', emoji: '🎂'},
+        {word: 'snake', emoji: '🐍'}
+    ],
+    'ing': [
+        {word: 'ring', emoji: '💍'},
+        {word: 'king', emoji: '👑'}
+    ],
+    'ock': [
+        {word: 'rock', emoji: '🪨'},
+        {word: 'lock', emoji: '🔒'}
+    ]
+};
+
+function initRhymeTrainsGame() {
+    // Reset game data
+    rhymeGameData = {
+        level: 1,
+        score: 0,
+        timer: 0,
+        timerInterval: null,
+        wordsPlaced: 0,
+        totalWords: 0,
+        trains: [],
+        words: []
+    };
+}
+
+function startRhymeTrains(level) {
+    rhymeGameData.level = level;
+    rhymeGameData.score = 0;
+    rhymeGameData.timer = 0;
+    rhymeGameData.wordsPlaced = 0;
+
+    // Hide difficulty selection
+    document.getElementById('rhymeDifficultySelect').style.display = 'none';
+    document.getElementById('rhymeStats').style.display = 'block';
+    document.getElementById('wordCardsArea').style.display = 'block';
+    document.getElementById('trainStation').style.display = 'block';
+
+    // Start timer
+    rhymeGameData.timerInterval = setInterval(() => {
+        rhymeGameData.timer++;
+        document.getElementById('rhymeTimer').textContent = rhymeGameData.timer;
+    }, 1000);
+
+    // Select word families based on level
+    let selectedFamilies = [];
+    const allFamilies = Object.keys(rhymeFamilies);
+
+    if (level === 1) {
+        selectedFamilies = ['at', 'og']; // 2 trains
+    } else if (level === 2) {
+        selectedFamilies = ['at', 'ar', 'ee']; // 3 trains
+    } else {
+        selectedFamilies = ['at', 'ar', 'og', 'ain']; // 4 trains
+    }
+
+    // Create trains
+    const trainStation = document.getElementById('trainStation');
+    trainStation.innerHTML = '';
+
+    selectedFamilies.forEach((family, index) => {
+        const trainColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731'];
+        const train = createTrain(family, trainColors[index % trainColors.length]);
+        trainStation.appendChild(train);
+        rhymeGameData.trains.push({family: family, element: train, words: []});
+    });
+
+    // Create word cards
+    const wordCardsArea = document.getElementById('wordCards');
+    wordCardsArea.innerHTML = '';
+    rhymeGameData.words = [];
+
+    selectedFamilies.forEach(family => {
+        const familyWords = rhymeFamilies[family];
+        const wordsToUse = level === 1 ? familyWords.slice(0, 2) :
+                          level === 2 ? familyWords.slice(0, 2) :
+                          familyWords.slice(0, 3);
+
+        wordsToUse.forEach(wordData => {
+            rhymeGameData.words.push({...wordData, family: family});
+        });
+    });
+
+    // Shuffle and create cards
+    rhymeGameData.words.sort(() => Math.random() - 0.5);
+    rhymeGameData.totalWords = rhymeGameData.words.length;
+
+    rhymeGameData.words.forEach(wordData => {
+        const card = createWordCard(wordData);
+        wordCardsArea.appendChild(card);
+    });
+}
+
+function createTrain(family, color) {
+    const train = document.createElement('div');
+    train.style.cssText = `
+        margin: 20px auto;
+        display: flex;
+        align-items: center;
+        min-height: 80px;
+        max-width: 600px;
+    `;
+    train.dataset.family = family;
+
+    // Create engine
+    const engine = document.createElement('div');
+    engine.style.cssText = `
+        background: ${color};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px 0 0 10px;
+        font-size: 24px;
+        font-weight: bold;
+        min-width: 80px;
+        text-align: center;
+        border: 3px solid #333;
+        position: relative;
+    `;
+    engine.innerHTML = `
+        <div>🚂</div>
+        <div style="font-size: 18px; margin-top: 5px;">-${family}</div>
+    `;
+
+    // Create cargo area
+    const cargo = document.createElement('div');
+    cargo.style.cssText = `
+        background: #f8f9fa;
+        border: 3px solid #333;
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+        min-height: 80px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        gap: 10px;
+        min-width: 200px;
+    `;
+    cargo.classList.add('train-cargo');
+    cargo.dataset.family = family;
+
+    // Add drop zone styling
+    cargo.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        cargo.style.background = '#e8f5e9';
+    });
+
+    cargo.addEventListener('dragleave', () => {
+        cargo.style.background = '#f8f9fa';
+    });
+
+    cargo.addEventListener('drop', (e) => {
+        e.preventDefault();
+        cargo.style.background = '#f8f9fa';
+
+        const wordData = JSON.parse(e.dataTransfer.getData('word'));
+        if (wordData.family === family) {
+            // Correct placement
+            handleCorrectPlacement(wordData, cargo);
+        } else {
+            // Wrong placement
+            handleWrongPlacement();
+        }
+    });
+
+    train.appendChild(engine);
+    train.appendChild(cargo);
+
+    return train;
+}
+
+function createWordCard(wordData) {
+    const card = document.createElement('div');
+    card.style.cssText = `
+        background: white;
+        border: 3px solid #667eea;
+        border-radius: 10px;
+        padding: 10px 15px;
+        cursor: grab;
+        transition: transform 0.2s;
+        user-select: none;
+    `;
+    card.draggable = true;
+    card.innerHTML = `
+        <div style="font-size: 30px; text-align: center;">${wordData.emoji}</div>
+        <div style="font-size: 16px; text-align: center; margin-top: 5px; font-weight: bold;">${wordData.word}</div>
+    `;
+
+    card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('word', JSON.stringify(wordData));
+        card.style.opacity = '0.5';
+    });
+
+    card.addEventListener('dragend', () => {
+        card.style.opacity = '1';
+    });
+
+    // Add touch support
+    let touchItem = null;
+    card.addEventListener('touchstart', (e) => {
+        touchItem = card.cloneNode(true);
+        touchItem.style.position = 'fixed';
+        touchItem.style.pointerEvents = 'none';
+        touchItem.style.zIndex = '10001';
+        touchItem.style.opacity = '0.8';
+        document.body.appendChild(touchItem);
+
+        const touch = e.touches[0];
+        touchItem.style.left = touch.clientX - 40 + 'px';
+        touchItem.style.top = touch.clientY - 40 + 'px';
+    });
+
+    card.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (touchItem) {
+            const touch = e.touches[0];
+            touchItem.style.left = touch.clientX - 40 + 'px';
+            touchItem.style.top = touch.clientY - 40 + 'px';
+        }
+    });
+
+    card.addEventListener('touchend', (e) => {
+        if (touchItem) {
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            if (target && target.classList.contains('train-cargo')) {
+                const family = target.dataset.family;
+                if (wordData.family === family) {
+                    handleCorrectPlacement(wordData, target);
+                    card.remove();
+                } else {
+                    handleWrongPlacement();
+                }
+            }
+
+            touchItem.remove();
+            touchItem = null;
+        }
+    });
+
+    return card;
+}
+
+function handleCorrectPlacement(wordData, cargo) {
+    // Create word element in train
+    const wordElement = document.createElement('div');
+    wordElement.style.cssText = `
+        background: #28a745;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        animation: popIn 0.3s ease;
+    `;
+    wordElement.innerHTML = `
+        <span style="font-size: 20px;">${wordData.emoji}</span>
+        <span style="font-size: 14px; font-weight: bold;">${wordData.word}</span>
+    `;
+
+    cargo.appendChild(wordElement);
+
+    // Update score
+    rhymeGameData.score += 10;
+    rhymeGameData.wordsPlaced++;
+    document.getElementById('rhymeScore').textContent = rhymeGameData.score;
+
+    // Remove the word card
+    const cards = document.querySelectorAll('#wordCards > div');
+    cards.forEach(card => {
+        if (card.textContent.includes(wordData.word)) {
+            card.remove();
+        }
+    });
+
+    // Check if game is complete
+    if (rhymeGameData.wordsPlaced === rhymeGameData.totalWords) {
+        endRhymeGame();
+    }
+
+    // Play success sound effect (visual feedback for now)
+    cargo.style.animation = 'trainChug 0.5s ease';
+    setTimeout(() => {
+        cargo.style.animation = '';
+    }, 500);
+}
+
+function handleWrongPlacement() {
+    // Visual feedback for wrong placement
+    if (typeof showToast === 'function') {
+        showToast('❌ That word doesn\'t rhyme! Try another train.');
+    }
+}
+
+function endRhymeGame() {
+    clearInterval(rhymeGameData.timerInterval);
+
+    // Hide game elements
+    document.getElementById('wordCardsArea').style.display = 'none';
+    document.getElementById('trainStation').style.display = 'none';
+
+    // Show success message
+    document.getElementById('rhymeSuccess').style.display = 'block';
+
+    // Calculate bonus
+    const timeBonus = Math.max(0, 100 - rhymeGameData.timer);
+    rhymeGameData.score += timeBonus;
+
+    // Animate trains leaving
+    const trains = document.querySelectorAll('#trainStation > div');
+    trains.forEach((train, index) => {
+        setTimeout(() => {
+            train.style.animation = 'trainLeave 1s ease forwards';
+        }, index * 200);
+    });
+}
+
+function resetRhymeTrains() {
+    // Reset display
+    document.getElementById('rhymeDifficultySelect').style.display = 'block';
+    document.getElementById('rhymeStats').style.display = 'none';
+    document.getElementById('wordCardsArea').style.display = 'none';
+    document.getElementById('trainStation').style.display = 'none';
+    document.getElementById('rhymeSuccess').style.display = 'none';
+
+    // Clear timer
+    if (rhymeGameData.timerInterval) {
+        clearInterval(rhymeGameData.timerInterval);
+    }
+
+    // Reset game data
+    initRhymeTrainsGame();
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes popIn {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes trainChug {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes trainLeave {
+        0% { transform: translateX(0); opacity: 1; }
+        100% { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
 // Check game achievements
 function checkGameAchievement(game, score) {
     // Could add game-specific badges here
@@ -1951,6 +2448,7 @@ window.launchPeteButtonGame = launchPeteButtonGame;
 window.launchStoryMatchGame = launchStoryMatchGame;
 window.launchWordBuilderGame = launchWordBuilderGame;
 window.launchLetterMatchGame = launchLetterMatchGame;
+window.launchRhymeTrainsGame = launchRhymeTrainsGame;
 window.startStoryMatch = startStoryMatch;
 window.checkCard = checkCard;
 window.selectWordBuilderLevel = selectWordBuilderLevel;
@@ -1962,6 +2460,8 @@ window.closeMiniGame = closeMiniGame;
 window.checkGameAchievement = checkGameAchievement;
 window.selectLetterMatchLevel = selectLetterMatchLevel;
 window.startLetterMatch = startLetterMatch;
+window.startRhymeTrains = startRhymeTrains;
+window.resetRhymeTrains = resetRhymeTrains;
 
 // Empty data.js file (functionality is built into main app.js)
 // This file can be used for additional data management if needed
