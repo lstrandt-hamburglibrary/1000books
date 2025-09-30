@@ -24,6 +24,9 @@ function launchGame(gameName) {
         case 'pattern-builder':
             launchPatternBuilderGame();
             break;
+        case 'trace-match':
+            launchTraceMatchGame();
+            break;
     }
 }
 
@@ -3209,6 +3212,453 @@ function showPatternComplete() {
 window.launchPatternBuilderGame = launchPatternBuilderGame;
 window.selectPatternLevel = selectPatternLevel;
 window.checkPatternAnswer = checkPatternAnswer;
+
+// Trace & Match Game
+const traceMatchLetters = {
+    level1: [ // Uppercase letters
+        { letter: 'A', matches: ['🍎 Apple', '🐜 Ant', '✈️ Airplane'] },
+        { letter: 'B', matches: ['🐻 Bear', '🦋 Butterfly', '🏀 Ball'] },
+        { letter: 'C', matches: ['🐱 Cat', '🚗 Car', '🧁 Cupcake'] },
+        { letter: 'D', matches: ['🐕 Dog', '🦆 Duck', '🥁 Drum'] },
+        { letter: 'E', matches: ['🥚 Egg', '🐘 Elephant', '👁️ Eye'] },
+        { letter: 'F', matches: ['🦊 Fox', '🐸 Frog', '🌸 Flower'] },
+        { letter: 'S', matches: ['⭐ Star', '☀️ Sun', '🐍 Snake'] },
+        { letter: 'T', matches: ['🌳 Tree', '🚂 Train', '🐯 Tiger'] }
+    ],
+    level2: [ // Lowercase letters
+        { letter: 'a', matches: ['🍎 apple', '🐜 ant', '✈️ airplane'] },
+        { letter: 'b', matches: ['🐻 bear', '🦋 butterfly', '🏀 ball'] },
+        { letter: 'c', matches: ['🐱 cat', '🚗 car', '🧁 cupcake'] },
+        { letter: 'd', matches: ['🐕 dog', '🦆 duck', '🥁 drum'] },
+        { letter: 'm', matches: ['🌙 moon', '🐵 monkey', '🍄 mushroom'] },
+        { letter: 'n', matches: ['🪺 nest', '👃 nose', '📰 newspaper'] },
+        { letter: 'p', matches: ['🐼 panda', '🍕 pizza', '🥞 pancake'] },
+        { letter: 's', matches: ['⭐ star', '☀️ sun', '🐍 snake'] }
+    ],
+    level3: [ // Mixed case
+        { letter: 'G', matches: ['🦒 Giraffe', '🍇 Grapes', '🎸 Guitar'] },
+        { letter: 'h', matches: ['🏠 house', '🐴 horse', '❤️ heart'] },
+        { letter: 'K', matches: ['🔑 Key', '🦘 Kangaroo', '👑 King'] },
+        { letter: 'r', matches: ['🌈 rainbow', '🚀 rocket', '🐰 rabbit'] },
+        { letter: 'W', matches: ['🍉 Watermelon', '🐋 Whale', '⌚ Watch'] },
+        { letter: 'z', matches: ['🦓 zebra', '⚡ zap', '🤐 zipper'] }
+    ]
+};
+
+let currentTraceLevel = 1;
+let currentTraceIndex = 0;
+let traceScore = 0;
+let traceCanvas = null;
+let traceCtx = null;
+let isTracing = false;
+let hasTracedLetter = false;
+
+// Launch Trace & Match Game
+function launchTraceMatchGame() {
+    currentTraceLevel = 1;
+    currentTraceIndex = 0;
+    traceScore = 0;
+
+    const gameHTML = `
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        ">
+            <div class="game-container" style="
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>✍️ Trace & Match</h2>
+                    <button onclick="closeMiniGame()" style="
+                        background: #e74c3c;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                    ">✕ Close</button>
+                </div>
+
+                <div id="traceLevelSelect">
+                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">
+                        Trace the letter, then match it to the right word!
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <button onclick="selectTraceLevel(1)" style="
+                            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 1<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Uppercase Letters</span>
+                        </button>
+                        <button onclick="selectTraceLevel(2)" style="
+                            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 2<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Lowercase Letters</span>
+                        </button>
+                        <button onclick="selectTraceLevel(3)" style="
+                            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 3<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Mixed Case</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="traceGameArea" style="display: none;"></div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
+}
+
+// Select Trace Level
+function selectTraceLevel(level) {
+    currentTraceLevel = level;
+    currentTraceIndex = 0;
+    traceScore = 0;
+    document.getElementById('traceLevelSelect').style.display = 'none';
+    document.getElementById('traceGameArea').style.display = 'block';
+    loadTraceLetter();
+}
+
+// Load Trace Letter
+function loadTraceLetter() {
+    const levelKey = `level${currentTraceLevel}`;
+    const letters = traceMatchLetters[levelKey];
+
+    if (currentTraceIndex >= letters.length) {
+        showTraceComplete();
+        return;
+    }
+
+    const letterData = letters[currentTraceIndex];
+    hasTracedLetter = false;
+
+    const gameArea = document.getElementById('traceGameArea');
+    gameArea.innerHTML = `
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <h3>Letter ${currentTraceIndex + 1} of ${letters.length}</h3>
+            <p>Score: ${traceScore}</p>
+        </div>
+
+        <div style="
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        ">
+            <p style="font-weight: bold; margin-bottom: 0.5rem; color: #6c757d;">Trace this letter:</p>
+            <div style="
+                font-size: 8rem;
+                font-weight: bold;
+                color: #dee2e6;
+                margin: 1rem 0;
+                font-family: 'Comic Sans MS', cursive;
+            ">${letterData.letter}</div>
+
+            <canvas id="traceCanvas"
+                width="300"
+                height="200"
+                style="
+                    border: 3px dashed #007bff;
+                    border-radius: 10px;
+                    background: white;
+                    cursor: crosshair;
+                    touch-action: none;
+                    display: block;
+                    margin: 0 auto;
+                "></canvas>
+
+            <button onclick="clearTraceCanvas()" style="
+                background: #6c757d;
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 10px;
+                cursor: pointer;
+                margin-top: 0.5rem;
+                font-size: 0.9rem;
+            ">🗑️ Clear</button>
+        </div>
+
+        <div id="matchSection" style="display: none;">
+            <p style="font-weight: bold; text-align: center; margin-bottom: 1rem;">
+                Now match "${letterData.letter}" to a word that starts with this letter:
+            </p>
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 1rem;
+            " id="matchOptions"></div>
+        </div>
+
+        <div id="traceFeedback" style="
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        "></div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+            <button id="doneTracingBtn" onclick="showMatchOptions()" style="
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 1rem;
+                font-weight: bold;
+                display: none;
+            ">✓ Done Tracing - Match It!</button>
+        </div>
+    `;
+
+    // Initialize canvas
+    setTimeout(() => {
+        traceCanvas = document.getElementById('traceCanvas');
+        if (traceCanvas) {
+            traceCtx = traceCanvas.getContext('2d');
+            traceCtx.lineWidth = 8;
+            traceCtx.lineCap = 'round';
+            traceCtx.strokeStyle = '#007bff';
+
+            // Mouse events
+            traceCanvas.addEventListener('mousedown', startTracing);
+            traceCanvas.addEventListener('mousemove', trace);
+            traceCanvas.addEventListener('mouseup', stopTracing);
+            traceCanvas.addEventListener('mouseout', stopTracing);
+
+            // Touch events
+            traceCanvas.addEventListener('touchstart', handleTouchStart);
+            traceCanvas.addEventListener('touchmove', handleTouchMove);
+            traceCanvas.addEventListener('touchend', stopTracing);
+        }
+    }, 100);
+}
+
+// Tracing functions
+function startTracing(e) {
+    isTracing = true;
+    const rect = traceCanvas.getBoundingClientRect();
+    traceCtx.beginPath();
+    traceCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    hasTracedLetter = true;
+    document.getElementById('doneTracingBtn').style.display = 'inline-block';
+}
+
+function trace(e) {
+    if (!isTracing) return;
+    const rect = traceCanvas.getBoundingClientRect();
+    traceCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    traceCtx.stroke();
+}
+
+function stopTracing() {
+    isTracing = false;
+}
+
+function handleTouchStart(e) {
+    e.preventDefault();
+    isTracing = true;
+    const rect = traceCanvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    traceCtx.beginPath();
+    traceCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    hasTracedLetter = true;
+    document.getElementById('doneTracingBtn').style.display = 'inline-block';
+}
+
+function handleTouchMove(e) {
+    e.preventDefault();
+    if (!isTracing) return;
+    const rect = traceCanvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    traceCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    traceCtx.stroke();
+}
+
+function clearTraceCanvas() {
+    if (traceCtx && traceCanvas) {
+        traceCtx.clearRect(0, 0, traceCanvas.width, traceCanvas.height);
+        hasTracedLetter = false;
+        document.getElementById('doneTracingBtn').style.display = 'none';
+    }
+}
+
+// Show Match Options
+function showMatchOptions() {
+    if (!hasTracedLetter) {
+        const feedback = document.getElementById('traceFeedback');
+        feedback.style.background = '#fff3cd';
+        feedback.style.color = '#856404';
+        feedback.innerHTML = '⚠️ Please trace the letter first!';
+        feedback.style.display = 'block';
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 2000);
+        return;
+    }
+
+    document.getElementById('matchSection').style.display = 'block';
+    document.getElementById('doneTracingBtn').style.display = 'none';
+
+    const levelKey = `level${currentTraceLevel}`;
+    const letterData = traceMatchLetters[levelKey][currentTraceIndex];
+    const correctMatch = letterData.matches[0]; // First match is correct
+
+    // Get 2 wrong options from other letters in this level
+    const allOtherMatches = traceMatchLetters[levelKey]
+        .filter((_, idx) => idx !== currentTraceIndex)
+        .flatMap(l => l.matches);
+    const wrongOptions = allOtherMatches.sort(() => Math.random() - 0.5).slice(0, 2);
+
+    const allOptions = [correctMatch, ...wrongOptions].sort(() => Math.random() - 0.5);
+
+    const matchOptions = document.getElementById('matchOptions');
+    matchOptions.innerHTML = allOptions.map(option => `
+        <button onclick="checkTraceMatch('${option.replace(/'/g, "\\\'")}')" style="
+            background: white;
+            border: 3px solid #dee2e6;
+            padding: 1.5rem 1rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            font-weight: bold;
+        " onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='#007bff'"
+           onmouseout="this.style.transform='scale(1)'; this.style.borderColor='#dee2e6'">
+            ${option}
+        </button>
+    `).join('');
+}
+
+// Check Trace Match
+function checkTraceMatch(selectedOption) {
+    const levelKey = `level${currentTraceLevel}`;
+    const letterData = traceMatchLetters[levelKey][currentTraceIndex];
+    const correctMatch = letterData.matches[0];
+    const feedback = document.getElementById('traceFeedback');
+
+    if (selectedOption === correctMatch) {
+        traceScore += 10;
+        feedback.style.background = '#d4edda';
+        feedback.style.color = '#155724';
+        feedback.innerHTML = `🎉 Perfect! "${letterData.letter}" is for ${selectedOption}!`;
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            currentTraceIndex++;
+            loadTraceLetter();
+        }, 2000);
+    } else {
+        feedback.style.background = '#f8d7da';
+        feedback.style.color = '#721c24';
+        feedback.innerHTML = `❌ Not quite! Try another one!`;
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 1500);
+    }
+}
+
+// Show Trace Complete
+function showTraceComplete() {
+    const gameArea = document.getElementById('traceGameArea');
+    gameArea.innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${traceScore}</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="selectTraceLevel(${currentTraceLevel})" style="
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🔄 Play Again</button>
+                ${currentTraceLevel < 3 ? `
+                <button onclick="selectTraceLevel(${currentTraceLevel + 1})" style="
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">➡️ Next Level</button>
+                ` : ''}
+                <button onclick="closeMiniGame()" style="
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🏠 Back to Games</button>
+            </div>
+        </div>
+    `;
+
+    // Check for achievement
+    if (traceScore >= 80) {
+        checkGameAchievement('trace-master');
+    }
+}
+
+window.launchTraceMatchGame = launchTraceMatchGame;
+window.selectTraceLevel = selectTraceLevel;
+window.clearTraceCanvas = clearTraceCanvas;
+window.showMatchOptions = showMatchOptions;
+window.checkTraceMatch = checkTraceMatch;
 
 // Empty data.js file (functionality is built into main app.js)
 // This file can be used for additional data management if needed

@@ -4665,6 +4665,14 @@
                     action: () => window.launchGame('pattern-builder')
                 },
                 {
+                    id: 'traceMatch',
+                    name: 'Trace & Match',
+                    icon: '✍️',
+                    requirement: 'Read 300 books',
+                    unlocked: unlockedGames.traceMatch,
+                    action: () => window.launchGame('trace-match')
+                },
+                {
                     id: 'drawingPad',
                     name: 'Drawing Pad',
                     icon: '🎨',
@@ -4725,6 +4733,7 @@
                 seasonSort: () => window.launchGame('story-match'),
                 storySequencing: () => window.launchGame('story-sequencing'),
                 patternBuilder: () => window.launchGame('pattern-builder'),
+                traceMatch: () => window.launchGame('trace-match'),
                 drawingPad: () => startDrawingPadGame()
             };
         }
@@ -4745,6 +4754,7 @@
                     seasonSort: true,
                     storySequencing: true,
                     patternBuilder: true,
+                    traceMatch: true,
                     drawingPad: true
                 };
             }
@@ -4762,6 +4772,7 @@
                     seasonSort: false,
                     storySequencing: false,
                     patternBuilder: false,
+                    traceMatch: false,
                     drawingPad: false
                 };
             }
@@ -4782,6 +4793,7 @@
                 seasonSort: totalBooks >= 150,
                 storySequencing: totalBooks >= 200,
                 patternBuilder: totalBooks >= 250,
+                traceMatch: totalBooks >= 300,
                 drawingPad: totalBooks >= 5
             };
         }
