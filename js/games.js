@@ -21,6 +21,9 @@ function launchGame(gameName) {
         case 'story-sequencing':
             launchStorySequencingGame();
             break;
+        case 'pattern-builder':
+            launchPatternBuilderGame();
+            break;
     }
 }
 
@@ -2896,6 +2899,316 @@ window.selectSequenceLevel = selectSequenceLevel;
 window.selectSequenceEvent = selectSequenceEvent;
 window.resetSequence = resetSequence;
 window.checkSequence = checkSequence;
+
+// Pattern Builder Game
+const patternShapes = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⭐', '❤️', '🔷', '🔶'];
+
+const patternLevels = {
+    level1: [
+        { pattern: ['🔴', '🔵', '🔴', '🔵', '?'], answer: '🔵' },
+        { pattern: ['⭐', '⭐', '❤️', '⭐', '⭐', '?'], answer: '❤️' },
+        { pattern: ['🟢', '🟡', '🟢', '?'], answer: '🟡' },
+        { pattern: ['🔵', '🔵', '🔴', '🔵', '🔵', '?'], answer: '🔴' },
+        { pattern: ['🟣', '🟠', '🟣', '🟠', '?'], answer: '🟣' }
+    ],
+    level2: [
+        { pattern: ['🔴', '🔵', '🟢', '🔴', '🔵', '?'], answer: '🟢' },
+        { pattern: ['⭐', '❤️', '❤️', '⭐', '❤️', '?'], answer: '❤️' },
+        { pattern: ['🟡', '🟡', '🟢', '🟡', '🟡', '?'], answer: '🟢' },
+        { pattern: ['🔷', '🔶', '🔷', '🔷', '🔶', '?'], answer: '🔷' },
+        { pattern: ['🔵', '🔴', '🔴', '🔵', '🔴', '?'], answer: '🔴' }
+    ],
+    level3: [
+        { pattern: ['🔴', '🔵', '🟢', '🟡', '🔴', '🔵', '🟢', '?'], answer: '🟡' },
+        { pattern: ['⭐', '⭐', '❤️', '❤️', '⭐', '⭐', '❤️', '?'], answer: '❤️' },
+        { pattern: ['🔷', '🔶', '🔷', '🔶', '🔶', '🔷', '🔶', '?'], answer: '🔷' },
+        { pattern: ['🟣', '🟣', '🟠', '🟣', '🟣', '🟠', '?'], answer: '🟣' },
+        { pattern: ['🔵', '🟢', '🟢', '🔵', '🔵', '🟢', '🟢', '?'], answer: '🔵' }
+    ]
+};
+
+let currentPatternLevel = 1;
+let currentPatternIndex = 0;
+let patternScore = 0;
+
+// Launch Pattern Builder Game
+function launchPatternBuilderGame() {
+    currentPatternLevel = 1;
+    currentPatternIndex = 0;
+    patternScore = 0;
+
+    const gameHTML = `
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        ">
+            <div class="game-container" style="
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>🔷 Pattern Builder</h2>
+                    <button onclick="closeMiniGame()" style="
+                        background: #e74c3c;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                    ">✕ Close</button>
+                </div>
+
+                <div id="patternLevelSelect">
+                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">
+                        Complete the pattern by choosing the correct shape!
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <button onclick="selectPatternLevel(1)" style="
+                            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 1<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Simple Patterns</span>
+                        </button>
+                        <button onclick="selectPatternLevel(2)" style="
+                            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 2<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Trickier Patterns</span>
+                        </button>
+                        <button onclick="selectPatternLevel(3)" style="
+                            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 3<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Long Patterns</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="patternGameArea" style="display: none;"></div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
+}
+
+// Select Pattern Level
+function selectPatternLevel(level) {
+    currentPatternLevel = level;
+    currentPatternIndex = 0;
+    patternScore = 0;
+    document.getElementById('patternLevelSelect').style.display = 'none';
+    document.getElementById('patternGameArea').style.display = 'block';
+    loadPatternPuzzle();
+}
+
+// Load Pattern Puzzle
+function loadPatternPuzzle() {
+    const levelKey = `level${currentPatternLevel}`;
+    const puzzles = patternLevels[levelKey];
+
+    if (currentPatternIndex >= puzzles.length) {
+        showPatternComplete();
+        return;
+    }
+
+    const puzzle = puzzles[currentPatternIndex];
+
+    // Get wrong answer options (3 random shapes that aren't the correct answer)
+    const wrongOptions = patternShapes.filter(s => s !== puzzle.answer).sort(() => Math.random() - 0.5).slice(0, 3);
+    const allOptions = [puzzle.answer, ...wrongOptions].sort(() => Math.random() - 0.5);
+
+    const gameArea = document.getElementById('patternGameArea');
+    gameArea.innerHTML = `
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <h3>Pattern ${currentPatternIndex + 1} of ${puzzles.length}</h3>
+            <p>Score: ${patternScore}</p>
+        </div>
+
+        <div style="
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        ">
+            <p style="font-weight: bold; margin-bottom: 1rem; color: #6c757d;">Complete the pattern:</p>
+            <div style="
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+                font-size: 3rem;
+            ">
+                ${puzzle.pattern.map(item => `
+                    <div style="
+                        width: 80px;
+                        height: 80px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: white;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    ">
+                        ${item === '?' ? '<span style="color: #6c757d;">?</span>' : item}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <p style="font-weight: bold; text-align: center; margin-bottom: 1rem;">Choose the missing shape:</p>
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            ">
+                ${allOptions.map(option => `
+                    <button onclick="checkPatternAnswer('${option}')" style="
+                        background: white;
+                        border: 3px solid #dee2e6;
+                        padding: 2rem;
+                        border-radius: 15px;
+                        cursor: pointer;
+                        font-size: 3rem;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='#007bff'"
+                       onmouseout="this.style.transform='scale(1)'; this.style.borderColor='#dee2e6'">
+                        ${option}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+
+        <div id="patternFeedback" style="
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        "></div>
+    `;
+}
+
+// Check Pattern Answer
+function checkPatternAnswer(selectedShape) {
+    const levelKey = `level${currentPatternLevel}`;
+    const puzzle = patternLevels[levelKey][currentPatternIndex];
+    const feedback = document.getElementById('patternFeedback');
+
+    if (selectedShape === puzzle.answer) {
+        patternScore += 10;
+        feedback.style.background = '#d4edda';
+        feedback.style.color = '#155724';
+        feedback.innerHTML = '🎉 Correct! Great pattern recognition!';
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            currentPatternIndex++;
+            loadPatternPuzzle();
+        }, 1500);
+    } else {
+        feedback.style.background = '#f8d7da';
+        feedback.style.color = '#721c24';
+        feedback.innerHTML = '❌ Not quite! Try again!';
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 1500);
+    }
+}
+
+// Show Pattern Complete
+function showPatternComplete() {
+    const gameArea = document.getElementById('patternGameArea');
+    gameArea.innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${patternScore}</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="selectPatternLevel(${currentPatternLevel})" style="
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🔄 Play Again</button>
+                ${currentPatternLevel < 3 ? `
+                <button onclick="selectPatternLevel(${currentPatternLevel + 1})" style="
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">➡️ Next Level</button>
+                ` : ''}
+                <button onclick="closeMiniGame()" style="
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🏠 Back to Games</button>
+            </div>
+        </div>
+    `;
+
+    // Check for achievement
+    if (patternScore >= 50) {
+        checkGameAchievement('pattern-master');
+    }
+}
+
+window.launchPatternBuilderGame = launchPatternBuilderGame;
+window.selectPatternLevel = selectPatternLevel;
+window.checkPatternAnswer = checkPatternAnswer;
 
 // Empty data.js file (functionality is built into main app.js)
 // This file can be used for additional data management if needed

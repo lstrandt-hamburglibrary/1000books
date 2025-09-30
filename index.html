@@ -4657,6 +4657,14 @@
                     action: () => window.launchGame('story-sequencing')
                 },
                 {
+                    id: 'patternBuilder',
+                    name: 'Pattern Builder',
+                    icon: '🔵',
+                    requirement: 'Read 250 books',
+                    unlocked: unlockedGames.patternBuilder,
+                    action: () => window.launchGame('pattern-builder')
+                },
+                {
                     id: 'drawingPad',
                     name: 'Drawing Pad',
                     icon: '🎨',
@@ -4716,6 +4724,7 @@
                 storyBuilder: () => window.launchGame('word-builder'),
                 seasonSort: () => window.launchGame('story-match'),
                 storySequencing: () => window.launchGame('story-sequencing'),
+                patternBuilder: () => window.launchGame('pattern-builder'),
                 drawingPad: () => startDrawingPadGame()
             };
         }
@@ -4735,6 +4744,7 @@
                     storyBuilder: true,
                     seasonSort: true,
                     storySequencing: true,
+                    patternBuilder: true,
                     drawingPad: true
                 };
             }
@@ -4751,6 +4761,7 @@
                     storyBuilder: false,
                     seasonSort: false,
                     storySequencing: false,
+                    patternBuilder: false,
                     drawingPad: false
                 };
             }
@@ -4770,6 +4781,7 @@
                 dragonMaze: totalBooks >= 100,
                 seasonSort: totalBooks >= 150,
                 storySequencing: totalBooks >= 200,
+                patternBuilder: totalBooks >= 250,
                 drawingPad: totalBooks >= 5
             };
         }
