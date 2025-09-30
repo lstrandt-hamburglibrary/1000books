@@ -4,32 +4,6 @@
 
 // Feature categories with their upcoming features
 const comingSoonFeatures = {
-    reading: {
-        title: "📚 Reading & Book Management",
-        features: [
-            {
-                name: "Reading Timer",
-                icon: "⏱️",
-                description: "Track reading time for each session",
-                priority: "medium",
-                status: "planned"
-            },
-            {
-                name: "Favorites List",
-                icon: "⭐",
-                description: "Mark and re-read favorite books easily",
-                priority: "medium",
-                status: "planned"
-            },
-            {
-                name: "Book Search",
-                icon: "🔍",
-                description: "Search and filter your library",
-                priority: "high",
-                status: "planned"
-            }
-        ]
-    },
     engagement: {
         title: "👨‍👩‍👧‍👦 Parent/Child Features",
         features: [
