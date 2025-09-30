@@ -17,19 +17,6 @@ const comingSoonFeatures = {
             }
         ]
     },
-    games: {
-        title: "🎮 Educational Games",
-        features: [
-            {
-                name: "Character Quiz",
-                icon: "🤔",
-                description: "Remember story character details",
-                priority: "low",
-                status: "planned",
-                placeholder: "characterQuiz"
-            }
-        ]
-    },
     sharing: {
         title: "🌟 Sharing & Backup",
         features: [
