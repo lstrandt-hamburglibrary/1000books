@@ -8,27 +8,12 @@ const comingSoonFeatures = {
         title: "👨‍👩‍👧‍👦 Parent/Child Features",
         features: [
             {
-                name: "Progress Reports",
-                icon: "📊",
-                description: "Create beautiful reports to share",
-                priority: "high",
-                status: "planned",
-                note: "PDF/image generation"
-            },
-            {
                 name: "Reading Certificates",
                 icon: "🏆",
                 description: "Generate achievement certificates",
                 priority: "medium",
                 status: "planned",
                 note: "Printable awards"
-            },
-            {
-                name: "Reading Calendar",
-                icon: "📅",
-                description: "Visual calendar of reading history",
-                priority: "medium",
-                status: "planned"
             }
         ]
     },
