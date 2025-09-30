@@ -8,7 +8,7 @@ const bookSuggestions = {
             { title: "Alphabet City", author: "Stephen T. Johnson", age: "3-6" },
             { title: "Alphabet Under Construction", author: "Denise Fleming", age: "3-6" },
             { title: "Animalia", author: "Graeme Base", age: "4-8" },
-            { title: "Chicka Chicka Boom Boom", author: "Bill Martin Jr. & John Archambault", age: "2-5" },
+            { title: "AlphaOops!: The Day Z Went First", author: "Alethea Kontis", age: "3-6" },
             { title: "Dr. Seuss's ABC", author: "Dr. Seuss", age: "2-5" },
             { title: "Eating the Alphabet", author: "Lois Ehlert", age: "2-5" },
             { title: "LMNO Peas", author: "Keith Baker", age: "3-6" },
@@ -282,7 +282,7 @@ const bookSuggestions = {
             { title: "Grandpa Green", author: "Lane Smith", age: "4-7" },
             { title: "Julius, the Baby of the World", author: "Kevin Henkes", age: "3-6" },
             { title: "Love You Forever", author: "Robert Munsch", age: "3-6" },
-            { title: "Owl Babies", author: "Martin Waddell", age: "2-5" },
+            { title: "The Kissing Hand", author: "Audrey Penn", age: "3-6" },
             { title: "Spot Loves His Mommy", author: "Eric Hill", age: "0-3" },
             { title: "The Relatives Came", author: "Cynthia Rylant", age: "3-6" },
             { title: "What Mommies Do Best / What Daddies Do Best", author: "Laura Numeroff", age: "2-5" }
@@ -293,14 +293,14 @@ const bookSuggestions = {
         emoji: "🍕",
         books: [
             { title: "Cloudy with a Chance of Meatballs", author: "Judi Barrett", age: "4-7" },
-            { title: "Eating the Alphabet", author: "Lois Ehlert", age: "2-5" },
+            { title: "The Duckling Gets a Cookie!?", author: "Mo Willems", age: "3-6" },
             { title: "Everybody Cooks Rice", author: "Norah Dooley", age: "4-7" },
             { title: "If You Give a Moose a Muffin", author: "Laura Numeroff", age: "3-6" },
             { title: "If You Give a Mouse a Cookie", author: "Laura Numeroff", age: "3-6" },
             { title: "If You Give a Pig a Pancake", author: "Laura Numeroff", age: "3-6" },
             { title: "Pancakes, Pancakes!", author: "Eric Carle", age: "3-6" },
             { title: "Stone Soup", author: "Marcia Brown", age: "3-6" },
-            { title: "The Very Hungry Caterpillar", author: "Eric Carle", age: "2-5" },
+            { title: "Green Eggs and Ham", author: "Dr. Seuss", age: "2-6" },
             { title: "Too Many Tamales", author: "Gary Soto", age: "4-7" }
         ]
     },
@@ -342,10 +342,10 @@ const bookSuggestions = {
         books: [
             { title: "Chrysanthemum", author: "Kevin Henkes", age: "3-6" },
             { title: "Frederick", author: "Leo Lionni", age: "3-6" },
-            { title: "If You Give a Mouse a Cookie", author: "Laura Numeroff", age: "3-6" },
+            { title: "A Weekend with Wendell", author: "Kevin Henkes", age: "3-6" },
             { title: "Maisy's ABC", author: "Lucy Cousins", age: "0-3" },
-            { title: "Mouse Count", author: "Ellen Stoll Walsh", age: "2-5" },
-            { title: "Mouse Paint", author: "Ellen Stoll Walsh", age: "2-5" },
+            { title: "Wemberly Worried", author: "Kevin Henkes", age: "3-6" },
+            { title: "Owen", author: "Kevin Henkes", age: "3-6" },
             { title: "Mouse Shapes", author: "Ellen Stoll Walsh", age: "2-5" },
             { title: "Seven Blind Mice", author: "Ed Young", age: "3-6" },
             { title: "Sheila Rae, the Brave", author: "Kevin Henkes", age: "3-6" },
@@ -356,10 +356,10 @@ const bookSuggestions = {
         name: "Monkey Business",
         emoji: "🐵",
         books: [
-            { title: "Caps for Sale", author: "Esphyr Slobodkina", age: "3-6" },
+            { title: "Little Monkey Says Good Night", author: "Ann Whitford Paul", age: "2-5" },
             { title: "Curious George and the Hot Air Balloon", author: "H.A. Rey", age: "3-6" },
             { title: "Curious George", author: "H.A. Rey", age: "3-6" },
-            { title: "Five Little Monkeys Jumping on the Bed", author: "Eileen Christelow", age: "2-5" },
+            { title: "Cheeky Monkey", author: "Marta Zafrilla", age: "3-6" },
             { title: "Five Little Monkeys Sitting in a Tree", author: "Eileen Christelow", age: "2-5" },
             { title: "Grumpy Monkey", author: "Suzanne Lang", age: "3-6" },
             { title: "Hand, Hand, Fingers, Thumb", author: "Al Perkins", age: "0-3" },
@@ -420,7 +420,7 @@ const bookSuggestions = {
         name: "School Days",
         emoji: "🏫",
         books: [
-            { title: "Chrysanthemum", author: "Kevin Henkes", age: "3-6" },
+            { title: "First Day Jitters", author: "Julie Danneberg", age: "3-6" },
             { title: "David Goes to School", author: "David Shannon", age: "3-6" },
             { title: "Froggy Goes to School", author: "Jonathan London", age: "3-6" },
             { title: "If You Ever Want to Bring an Alligator to School, Don't!", author: "Elise Parsley", age: "3-6" },
@@ -438,7 +438,7 @@ const bookSuggestions = {
         books: [
             { title: "City Shapes", author: "Diana Murray", age: "2-5" },
             { title: "Color Zoo", author: "Lois Ehlert", age: "2-5" },
-            { title: "Mouse Shapes", author: "Ellen Stoll Walsh", age: "2-5" },
+            { title: "Circle, Triangle, Elephant!", author: "Kenji Oikawa & Mayuko Takeuchi", age: "2-5" },
             { title: "Perfect Square", author: "Michael Hall", age: "3-6" },
             { title: "Round Is a Tortilla", author: "Roseanne Greenfield Thong", age: "2-5" },
             { title: "Shape by Shape", author: "Suse MacDonald", age: "2-5" },
@@ -469,12 +469,12 @@ const bookSuggestions = {
         emoji: "🌸",
         books: [
             { title: "And Then It's Spring", author: "Julie Fogliano", age: "3-6" },
-            { title: "Bear Wants More", author: "Karma Wilson", age: "2-5" },
+            { title: "The Carrot Seed", author: "Ruth Krauss", age: "2-5" },
             { title: "Mouse's First Spring", author: "Lauren Thompson", age: "0-3" },
             { title: "Muncha! Muncha! Muncha!", author: "Candace Fleming", age: "3-6" },
             { title: "Spring is Here", author: "Will Hillenbrand", age: "2-5" },
             { title: "The Tiny Seed", author: "Eric Carle", age: "3-6" },
-            { title: "Waiting for Wings", author: "Lois Ehlert", age: "3-6" },
+            { title: "It's Spring!", author: "Linda Glaser", age: "3-6" },
             { title: "Wake Up, It's Spring!", author: "Lisa Campbell Ernst", age: "2-5" },
             { title: "When Spring Comes", author: "Kevin Henkes", age: "3-6" },
             { title: "Worm Weather", author: "Jean Taft", age: "3-6" }
@@ -493,7 +493,7 @@ const bookSuggestions = {
             { title: "Pete at the Beach", author: "James Dean", age: "3-6" },
             { title: "Sun Dance, Water Dance", author: "Jonathan London", age: "3-6" },
             { title: "Surfer Chick", author: "Kristy Dempsey", age: "3-6" },
-            { title: "The Relatives Came", author: "Cynthia Rylant", age: "3-6" }
+            { title: "Beach Day!", author: "Karen Roosa", age: "2-5" }
         ]
     },
     thanksgiving: {
@@ -512,22 +512,6 @@ const bookSuggestions = {
             { title: "Twas the Night Before Thanksgiving", author: "Dav Pilkey", age: "3-6" }
         ]
     },
-    thingsgo: {
-        name: "Things That Go",
-        emoji: "🚗",
-        books: [
-            { title: "Big Machines: The Story of Virginia Lee Burton", author: "Sherri Duskey Rinker", age: "3-6" },
-            { title: "Cars and Trucks and Things That Go", author: "Richard Scarry", age: "2-5" },
-            { title: "Chugga-Chugga Choo-Choo", author: "Kevin Lewis", age: "2-5" },
-            { title: "Freight Train", author: "Donald Crews", age: "2-4" },
-            { title: "Goodnight, Goodnight, Construction Site", author: "Sherri Duskey Rinker", age: "2-5" },
-            { title: "I Stink!", author: "Kate & Jim McMullan", age: "3-6" },
-            { title: "Little Blue Truck", author: "Alice Schertle", age: "2-5" },
-            { title: "Sheep in a Jeep", author: "Nancy Shaw", age: "2-5" },
-            { title: "The Wheels on the Bus", author: "Paul O. Zelinsky", age: "0-3" },
-            { title: "Truck", author: "Donald Crews", age: "2-5" }
-        ]
-    },
     toys: {
         name: "Toys",
         emoji: "🧸",
@@ -537,7 +521,7 @@ const bookSuggestions = {
             { title: "I Lost My Bear", author: "Jules Feiffer", age: "3-6" },
             { title: "Knuffle Bunny Free", author: "Mo Willems", age: "3-6" },
             { title: "Lost in the Toy Museum", author: "David Lucas", age: "3-6" },
-            { title: "Old Bear", author: "Kevin Henkes", age: "3-6" },
+            { title: "The Gruffalo", author: "Julia Donaldson", age: "3-6" },
             { title: "Teddy Bears' Picnic", author: "Jimmy Kennedy", age: "2-5" },
             { title: "The Stuffed Animals Get Ready for Bed", author: "Alison Inches", age: "2-5" },
             { title: "The Velveteen Rabbit", author: "Margery Williams", age: "4-7" },
@@ -557,7 +541,135 @@ const bookSuggestions = {
             { title: "Tacky the Penguin", author: "Helen Lester", age: "3-6" },
             { title: "The Biggest Snowman Ever", author: "Steven Kroll", age: "3-6" },
             { title: "The Mitten", author: "Jan Brett", age: "3-6" },
-            { title: "The Snowy Day", author: "Ezra Jack Keats", age: "2-5" }
+            { title: "The Snowman", author: "Raymond Briggs", age: "2-6" }
+        ]
+    },
+    boats: {
+        name: "Boats & Ships",
+        emoji: "⛵",
+        books: [
+            { title: "The Little Tugboat", author: "Stephen Savage", age: "2-5" },
+            { title: "Little Tug", author: "Stephen Savage", age: "2-5" },
+            { title: "Row, Row, Row Your Boat", author: "Jane Cabrera", age: "0-3" },
+            { title: "Sail Away", author: "Donald Crews", age: "2-5" },
+            { title: "Mr. Gumpy's Outing", author: "John Burningham", age: "3-6" },
+            { title: "How to Build a Boat", author: "Elisha Cooper", age: "3-6" },
+            { title: "Toy Boat", author: "Randall de Sève", age: "3-6" },
+            { title: "The Boat Alphabet Book", author: "Jerry Pallotta", age: "3-6" },
+            { title: "Little Ferry", author: "Stephen Savage", age: "2-5" },
+            { title: "Boats for Bedtime", author: "Olga Pastuchiv", age: "2-5" }
+        ]
+    },
+    fish: {
+        name: "Fish & Underwater",
+        emoji: "🐟",
+        books: [
+            { title: "A Fish Out of Water", author: "Helen Palmer", age: "3-6" },
+            { title: "Fish is Fish", author: "Leo Lionni", age: "3-6" },
+            { title: "One Fish Two Fish Red Fish Blue Fish", author: "Dr. Seuss", age: "2-6" },
+            { title: "The Pout-Pout Fish", author: "Deborah Diesen", age: "3-6" },
+            { title: "Hooray for Fish!", author: "Lucy Cousins", age: "2-5" },
+            { title: "Mister Seahorse", author: "Eric Carle", age: "2-5" },
+            { title: "The Rainbow Fish", author: "Marcus Pfister", age: "3-6" },
+            { title: "Fish Eyes: A Book You Can Count On", author: "Lois Ehlert", age: "2-5" },
+            { title: "Pout-Pout Fish Goes to School", author: "Deborah Diesen", age: "3-6" },
+            { title: "Ten Little Fish", author: "Audrey Wood", age: "2-5" }
+        ]
+    },
+    trains: {
+        name: "Trains",
+        emoji: "🚂",
+        books: [
+            { title: "The Little Engine That Could", author: "Watty Piper", age: "3-6" },
+            { title: "Freight Train", author: "Donald Crews", age: "2-4" },
+            { title: "Chugga-Chugga Choo-Choo", author: "Kevin Lewis", age: "2-5" },
+            { title: "The Train Ride", author: "June Crebbin", age: "3-6" },
+            { title: "Trains Go", author: "Steve Light", age: "2-5" },
+            { title: "All Aboard!", author: "Mary Lyn Ray", age: "3-6" },
+            { title: "I Love Trains!", author: "Philemon Sturges", age: "2-5" },
+            { title: "Train", author: "Elisha Cooper", age: "3-6" },
+            { title: "Steam Train, Dream Train", author: "Sherri Duskey Rinker", age: "2-5" },
+            { title: "Two Little Trains", author: "Margaret Wise Brown", age: "2-5" }
+        ]
+    },
+    planes: {
+        name: "Planes & Flying",
+        emoji: "✈️",
+        books: [
+            { title: "Planes Go", author: "Steve Light", age: "2-5" },
+            { title: "Amazing Airplanes", author: "Tony Mitton", age: "2-5" },
+            { title: "First Flight", author: "David McPhail", age: "2-5" },
+            { title: "Fly!", author: "Mark Teague", age: "3-6" },
+            { title: "The Airplane Alphabet Book", author: "Jerry Pallotta", age: "3-6" },
+            { title: "Taking Flight: How the Wright Brothers Conquered the Sky", author: "Stephen Krensky", age: "4-7" },
+            { title: "Little Plane Learns to Write", author: "Stephen Savage", age: "2-5" },
+            { title: "Amelia and Eleanor Go for a Ride", author: "Pam Muñoz Ryan", age: "4-7" },
+            { title: "Flying", author: "Donald Crews", age: "2-5" },
+            { title: "Up in the Air", author: "Myron Uhlberg", age: "3-6" }
+        ]
+    },
+    farm: {
+        name: "Farm & Farm Animals",
+        emoji: "🚜",
+        books: [
+            { title: "Big Red Barn", author: "Margaret Wise Brown", age: "2-5" },
+            { title: "Click, Clack, Moo: Cows That Type", author: "Doreen Cronin", age: "3-6" },
+            { title: "Farm", author: "Elisha Cooper", age: "3-6" },
+            { title: "Mrs. Wishy-Washy's Farm", author: "Joy Cowley", age: "2-5" },
+            { title: "Giggle, Giggle, Quack", author: "Doreen Cronin", age: "3-6" },
+            { title: "Duck on a Bike", author: "David Shannon", age: "3-6" },
+            { title: "The Little Red Hen", author: "Paul Galdone", age: "2-5" },
+            { title: "Barnyard Dance!", author: "Sandra Boynton", age: "0-3" },
+            { title: "Down on the Farm", author: "Merrily Kutner", age: "2-5" },
+            { title: "Rooster's Off to See the World", author: "Eric Carle", age: "2-5" }
+        ]
+    },
+    weather: {
+        name: "Weather",
+        emoji: "⛈️",
+        books: [
+            { title: "The Wind Blew", author: "Pat Hutchins", age: "3-6" },
+            { title: "Rain", author: "Sam Usher", age: "3-6" },
+            { title: "Come On, Rain!", author: "Karen Hesse", age: "3-6" },
+            { title: "Cloudy With a Chance of Meatballs", author: "Judi Barrett", age: "4-7" },
+            { title: "It Looked Like Spilt Milk", author: "Charles G. Shaw", age: "2-5" },
+            { title: "What Will the Weather Be Like Today?", author: "Paul Rogers", age: "2-5" },
+            { title: "Storm", author: "Sam Usher", age: "3-6" },
+            { title: "Thunder Cake", author: "Patricia Polacco", age: "4-7" },
+            { title: "Snow", author: "Uri Shulevitz", age: "2-5" },
+            { title: "Listen to the Rain", author: "Bill Martin Jr.", age: "2-5" }
+        ]
+    },
+    superheroes: {
+        name: "Superheroes",
+        emoji: "🦸",
+        books: [
+            { title: "Even Superheroes Have Bad Days", author: "Shelly Becker", age: "3-6" },
+            { title: "Superhero ABC", author: "Bob McLeod", age: "3-6" },
+            { title: "Eliot Jones, Midnight Superhero", author: "Anne Cottringer", age: "3-6" },
+            { title: "Super Zach", author: "Jill McDonald", age: "3-6" },
+            { title: "Max the Brave", author: "Ed Vere", age: "3-6" },
+            { title: "Superbat", author: "Matt Carr", age: "3-6" },
+            { title: "My Teacher is a Monster! (No, I Am Not.)", author: "Peter Brown", age: "3-6" },
+            { title: "Superhero Dad", author: "Timothy Knapman", age: "3-6" },
+            { title: "Superhero Mom", author: "Timothy Knapman", age: "3-6" },
+            { title: "I Am Not a Chair!", author: "Ross Burach", age: "3-6" }
+        ]
+    },
+    construction: {
+        name: "Construction & Building",
+        emoji: "🏗️",
+        books: [
+            { title: "Goodnight, Goodnight, Construction Site", author: "Sherri Duskey Rinker", age: "2-5" },
+            { title: "Mighty, Mighty Construction Site", author: "Sherri Duskey Rinker", age: "2-5" },
+            { title: "The Little House", author: "Virginia Lee Burton", age: "3-6" },
+            { title: "Construction Countdown", author: "K.C. Olson", age: "2-5" },
+            { title: "I Stink!", author: "Kate & Jim McMullan", age: "3-6" },
+            { title: "I'm Dirty!", author: "Kate & Jim McMullan", age: "3-6" },
+            { title: "B is for Bulldozer: A Construction ABC", author: "June Sobel", age: "2-5" },
+            { title: "Iggy Peck, Architect", author: "Andrea Beaty", age: "4-7" },
+            { title: "Dreaming Up: A Celebration of Building", author: "Christy Hale", age: "4-7" },
+            { title: "Built to Last", author: "David Macaulay", age: "4-7" }
         ]
     }
 };
