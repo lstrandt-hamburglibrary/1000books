@@ -2458,7 +2458,7 @@ const storySequences = {
             events: [
                 { text: "😴 Wake up", order: 1 },
                 { text: "🪥 Brush teeth", order: 2 },
-                { text: "🍳 Eat breakfast", order: 3 }
+                { text: "🚌 Go to school", order: 3 }
             ]
         },
         {
@@ -2509,13 +2509,13 @@ const storySequences = {
     ],
     level3: [
         {
-            story: "Goldilocks",
+            story: "Making Hot Chocolate",
             events: [
-                { text: "🏠 Finds bear house", order: 1 },
-                { text: "🥣 Tries three bowls", order: 2 },
-                { text: "🪑 Breaks small chair", order: 3 },
-                { text: "😴 Sleeps in bed", order: 4 },
-                { text: "🐻 Bears come home", order: 5 }
+                { text: "🥛 Pour milk in pot", order: 1 },
+                { text: "🔥 Heat on stove", order: 2 },
+                { text: "🍫 Add chocolate", order: 3 },
+                { text: "🥄 Stir it up", order: 4 },
+                { text: "☕ Pour in mug", order: 5 }
             ]
         },
         {
