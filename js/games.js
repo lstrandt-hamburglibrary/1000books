@@ -2470,11 +2470,11 @@ const storySequences = {
             ]
         },
         {
-            story: "Making a Sandwich",
+            story: "Washing Hands",
             events: [
-                { text: "🍞 Get bread", order: 1 },
-                { text: "🥜 Add peanut butter", order: 2 },
-                { text: "🍓 Add jelly", order: 3 }
+                { text: "💧 Turn on water", order: 1 },
+                { text: "🧼 Add soap", order: 2 },
+                { text: "🚿 Rinse off soap", order: 3 }
             ]
         }
     ],
