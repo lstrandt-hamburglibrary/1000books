@@ -18,6 +18,9 @@ function launchGame(gameName) {
         case 'rhyme-trains':
             launchRhymeTrainsGame();
             break;
+        case 'story-sequencing':
+            launchStorySequencingGame();
+            break;
     }
 }
 
@@ -2447,8 +2450,435 @@ window.launchGame = launchGame;
 window.launchPeteButtonGame = launchPeteButtonGame;
 window.launchStoryMatchGame = launchStoryMatchGame;
 window.launchWordBuilderGame = launchWordBuilderGame;
+// Story Sequencing Game Data
+const storySequences = {
+    level1: [
+        {
+            story: "Morning Routine",
+            events: [
+                { text: "😴 Wake up", order: 1 },
+                { text: "🪥 Brush teeth", order: 2 },
+                { text: "🍳 Eat breakfast", order: 3 }
+            ]
+        },
+        {
+            story: "Planting a Seed",
+            events: [
+                { text: "🌱 Plant seed", order: 1 },
+                { text: "💧 Water it", order: 2 },
+                { text: "🌻 Flower grows", order: 3 }
+            ]
+        },
+        {
+            story: "Making a Sandwich",
+            events: [
+                { text: "🍞 Get bread", order: 1 },
+                { text: "🥜 Add peanut butter", order: 2 },
+                { text: "🍓 Add jelly", order: 3 }
+            ]
+        }
+    ],
+    level2: [
+        {
+            story: "The Very Hungry Caterpillar",
+            events: [
+                { text: "🥚 Tiny egg on leaf", order: 1 },
+                { text: "🐛 Caterpillar eats", order: 2 },
+                { text: "🟤 Makes cocoon", order: 3 },
+                { text: "🦋 Beautiful butterfly", order: 4 }
+            ]
+        },
+        {
+            story: "Three Little Pigs",
+            events: [
+                { text: "🏚️ Build straw house", order: 1 },
+                { text: "🪵 Build stick house", order: 2 },
+                { text: "🧱 Build brick house", order: 3 },
+                { text: "🐺 Wolf can't blow it down", order: 4 }
+            ]
+        },
+        {
+            story: "Going to School",
+            events: [
+                { text: "🎒 Pack backpack", order: 1 },
+                { text: "🚌 Ride the bus", order: 2 },
+                { text: "👋 Say hi to teacher", order: 3 },
+                { text: "📚 Learn and play", order: 4 }
+            ]
+        }
+    ],
+    level3: [
+        {
+            story: "Goldilocks",
+            events: [
+                { text: "🏠 Finds bear house", order: 1 },
+                { text: "🥣 Tries three bowls", order: 2 },
+                { text: "🪑 Breaks small chair", order: 3 },
+                { text: "😴 Sleeps in bed", order: 4 },
+                { text: "🐻 Bears come home", order: 5 }
+            ]
+        },
+        {
+            story: "Baking Cookies",
+            events: [
+                { text: "🥣 Mix ingredients", order: 1 },
+                { text: "🍪 Shape cookies", order: 2 },
+                { text: "🔥 Bake in oven", order: 3 },
+                { text: "❄️ Let them cool", order: 4 },
+                { text: "😋 Eat cookies", order: 5 }
+            ]
+        }
+    ]
+};
+
+let currentSequenceLevel = 1;
+let currentSequenceIndex = 0;
+let sequenceScore = 0;
+let userSequence = [];
+
+// Launch Story Sequencing Game
+function launchStorySequencingGame() {
+    currentSequenceLevel = 1;
+    currentSequenceIndex = 0;
+    sequenceScore = 0;
+
+    const gameHTML = `
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        ">
+            <div class="game-container" style="
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>📖 Story Sequencing</h2>
+                    <button onclick="closeMiniGame()" style="
+                        background: #e74c3c;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                    ">✕ Close</button>
+                </div>
+
+                <div id="sequenceLevelSelect">
+                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">
+                        Put the story events in the correct order!
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <button onclick="selectSequenceLevel(1)" style="
+                            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 1<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">3 Events</span>
+                        </button>
+                        <button onclick="selectSequenceLevel(2)" style="
+                            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 2<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">4 Events</span>
+                        </button>
+                        <button onclick="selectSequenceLevel(3)" style="
+                            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            Level 3<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">5 Events</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="sequenceGameArea" style="display: none;"></div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
+}
+
+// Select Sequence Level
+function selectSequenceLevel(level) {
+    currentSequenceLevel = level;
+    currentSequenceIndex = 0;
+    sequenceScore = 0;
+    document.getElementById('sequenceLevelSelect').style.display = 'none';
+    document.getElementById('sequenceGameArea').style.display = 'block';
+    loadSequenceStory();
+}
+
+// Load Story Sequence
+function loadSequenceStory() {
+    const levelKey = `level${currentSequenceLevel}`;
+    const stories = storySequences[levelKey];
+
+    if (currentSequenceIndex >= stories.length) {
+        showSequenceComplete();
+        return;
+    }
+
+    const story = stories[currentSequenceIndex];
+    const shuffledEvents = [...story.events].sort(() => Math.random() - 0.5);
+
+    userSequence = [];
+
+    const gameArea = document.getElementById('sequenceGameArea');
+    gameArea.innerHTML = `
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <h3>${story.story}</h3>
+            <p>Story ${currentSequenceIndex + 1} of ${stories.length} | Score: ${sequenceScore}</p>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <p style="font-weight: bold; margin-bottom: 1rem;">Your Sequence:</p>
+            <div id="userSequenceArea" style="
+                min-height: 80px;
+                background: #f8f9fa;
+                border: 2px dashed #dee2e6;
+                border-radius: 10px;
+                padding: 1rem;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                align-items: center;
+                justify-content: center;
+            ">
+                <span style="color: #999;">Tap events below in order...</span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <p style="font-weight: bold; margin-bottom: 1rem;">Available Events:</p>
+            <div id="availableEvents" style="
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            ">
+                ${shuffledEvents.map((event, index) => `
+                    <button onclick="selectSequenceEvent(${event.order})"
+                            id="event-${event.order}"
+                            style="
+                        background: white;
+                        border: 2px solid #007bff;
+                        padding: 1rem;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 1.1rem;
+                        transition: all 0.2s;
+                        text-align: left;
+                    " onmouseover="this.style.background='#e7f3ff'" onmouseout="this.style.background='white'">
+                        ${event.text}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button onclick="resetSequence()" style="
+                background: #ffc107;
+                color: white;
+                border: none;
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 1rem;
+                font-weight: bold;
+            ">🔄 Reset</button>
+            <button onclick="checkSequence()" id="checkSequenceBtn" style="
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 1rem;
+                font-weight: bold;
+                opacity: 0.5;
+                pointer-events: none;
+            ">✓ Check Order</button>
+        </div>
+
+        <div id="sequenceFeedback" style="
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        "></div>
+    `;
+}
+
+// Select Sequence Event
+function selectSequenceEvent(eventOrder) {
+    const levelKey = `level${currentSequenceLevel}`;
+    const story = storySequences[levelKey][currentSequenceIndex];
+    const event = story.events.find(e => e.order === eventOrder);
+
+    if (!event) return;
+
+    userSequence.push(event);
+
+    // Hide the selected event button
+    const eventBtn = document.getElementById(`event-${eventOrder}`);
+    if (eventBtn) {
+        eventBtn.style.display = 'none';
+    }
+
+    // Update user sequence display
+    const userArea = document.getElementById('userSequenceArea');
+    userArea.innerHTML = userSequence.map((e, index) => `
+        <div style="
+            background: #007bff;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+        ">
+            ${index + 1}. ${e.text}
+        </div>
+    `).join('');
+
+    // Enable check button when all events selected
+    if (userSequence.length === story.events.length) {
+        const checkBtn = document.getElementById('checkSequenceBtn');
+        checkBtn.style.opacity = '1';
+        checkBtn.style.pointerEvents = 'auto';
+    }
+}
+
+// Reset Sequence
+function resetSequence() {
+    userSequence = [];
+    loadSequenceStory();
+}
+
+// Check Sequence
+function checkSequence() {
+    const levelKey = `level${currentSequenceLevel}`;
+    const story = storySequences[levelKey][currentSequenceIndex];
+
+    let isCorrect = true;
+    for (let i = 0; i < userSequence.length; i++) {
+        if (userSequence[i].order !== i + 1) {
+            isCorrect = false;
+            break;
+        }
+    }
+
+    const feedback = document.getElementById('sequenceFeedback');
+
+    if (isCorrect) {
+        sequenceScore += 10;
+        feedback.style.background = '#d4edda';
+        feedback.style.color = '#155724';
+        feedback.innerHTML = '🎉 Perfect! That\'s the correct order!';
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            currentSequenceIndex++;
+            loadSequenceStory();
+        }, 2000);
+    } else {
+        feedback.style.background = '#f8d7da';
+        feedback.style.color = '#721c24';
+        feedback.innerHTML = '❌ Not quite right. Try again!';
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 2000);
+    }
+}
+
+// Show Sequence Complete
+function showSequenceComplete() {
+    const gameArea = document.getElementById('sequenceGameArea');
+    gameArea.innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${sequenceScore}</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="selectSequenceLevel(${currentSequenceLevel})" style="
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🔄 Play Again</button>
+                ${currentSequenceLevel < 3 ? `
+                <button onclick="selectSequenceLevel(${currentSequenceLevel + 1})" style="
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">➡️ Next Level</button>
+                ` : ''}
+                <button onclick="closeMiniGame()" style="
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🏠 Back to Games</button>
+            </div>
+        </div>
+    `;
+
+    // Check for achievement
+    if (sequenceScore >= 30) {
+        checkGameAchievement('story-sequencer');
+    }
+}
+
 window.launchLetterMatchGame = launchLetterMatchGame;
 window.launchRhymeTrainsGame = launchRhymeTrainsGame;
+window.launchStorySequencingGame = launchStorySequencingGame;
 window.startStoryMatch = startStoryMatch;
 window.checkCard = checkCard;
 window.selectWordBuilderLevel = selectWordBuilderLevel;
@@ -2462,6 +2892,10 @@ window.selectLetterMatchLevel = selectLetterMatchLevel;
 window.startLetterMatch = startLetterMatch;
 window.startRhymeTrains = startRhymeTrains;
 window.resetRhymeTrains = resetRhymeTrains;
+window.selectSequenceLevel = selectSequenceLevel;
+window.selectSequenceEvent = selectSequenceEvent;
+window.resetSequence = resetSequence;
+window.checkSequence = checkSequence;
 
 // Empty data.js file (functionality is built into main app.js)
 // This file can be used for additional data management if needed

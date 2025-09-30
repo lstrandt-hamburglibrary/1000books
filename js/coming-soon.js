@@ -21,22 +21,6 @@ const comingSoonFeatures = {
         title: "🎮 Educational Games",
         features: [
             {
-                name: "Phonics Practice",
-                icon: "🔤",
-                description: "Letter sounds matching game",
-                priority: "high",
-                status: "planned",
-                placeholder: "phonicsGame"
-            },
-            {
-                name: "Story Sequencing",
-                icon: "📖",
-                description: "Put story events in order",
-                priority: "medium",
-                status: "planned",
-                placeholder: "sequenceGame"
-            },
-            {
                 name: "Character Quiz",
                 icon: "🤔",
                 description: "Remember story character details",

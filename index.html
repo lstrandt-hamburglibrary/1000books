@@ -4519,6 +4519,14 @@
                     action: () => window.launchGame('story-match')
                 },
                 {
+                    id: 'storySequencing',
+                    name: 'Story Sequencing',
+                    icon: '📖',
+                    requirement: 'Read 200 books',
+                    unlocked: unlockedGames.storySequencing,
+                    action: () => window.launchGame('story-sequencing')
+                },
+                {
                     id: 'drawingPad',
                     name: 'Drawing Pad',
                     icon: '🎨',
@@ -4595,6 +4603,7 @@
                     rhymeTrains: true,
                     storyBuilder: true,
                     seasonSort: true,
+                    storySequencing: true,
                     drawingPad: true
                 };
             }
@@ -4610,6 +4619,7 @@
                     rhymeTrains: false,
                     storyBuilder: false,
                     seasonSort: false,
+                    storySequencing: false,
                     drawingPad: false
                 };
             }
@@ -4628,6 +4638,7 @@
                 snowflake: totalBooks >= 75,
                 dragonMaze: totalBooks >= 100,
                 seasonSort: totalBooks >= 150,
+                storySequencing: totalBooks >= 200,
                 drawingPad: totalBooks >= 5
             };
         }
