@@ -1606,7 +1606,7 @@
                         <div class="stat-value" id="thisWeek">0</div>
                         <div class="stat-label">This Week</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="showFavoritesList()" style="cursor: pointer;">
                         <div class="stat-emoji">⭐</div>
                         <div class="stat-value" id="favorites">0</div>
                         <div class="stat-label">Favorites</div>
@@ -3112,7 +3112,7 @@
                 } else if (booksNeeded === 1) {
                     currentMilestoneDiv.innerHTML = `<span style="color: #ff9800;">🎉 Just 1 more book to unlock ${nextMilestone.name}!</span>`;
                 } else {
-                    currentMilestoneDiv.innerHTML = `<span style="color: #6c757d;">📚 ${booksNeeded} books to your first milestone: ${nextMilestone.name} • ${randomEncouragement}</span>`;
+                    currentMilestoneDiv.innerHTML = `<span style="color: #6c757d;">📚 ${booksNeeded} books to your next milestone: ${nextMilestone.name} ${nextMilestone.emoji}</span>`;
                 }
             }
         }
@@ -3828,19 +3828,31 @@
                                         vertical-align: middle;
                                     ">
                                         <span style="font-weight: 600; color: #495057;">
-                                            ${group.title} ${group.count > 1 ? `<span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">${group.count}</span>` : ''} ${group.isFavorite ? '⭐' : ''}
+                                            ${group.title} ${group.count > 1 ? `<span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">${group.count}</span>` : ''}
                                         </span>
                                         ${group.author ? ` <span style="color: #6c757d; font-size: 0.9em;">— ${group.author}</span>` : ''}
+                                        <button onclick="toggleFavorite('${group.title.replace(/'/g, "\\'")}', '${(group.author || '').replace(/'/g, "\\'")}', ${group.isFavorite})" style="
+                                            float: right;
+                                            padding: 4px 8px;
+                                            background: transparent;
+                                            border: none;
+                                            border-radius: 4px;
+                                            font-size: 1em;
+                                            cursor: pointer;
+                                            margin-left: 5px;
+                                            line-height: 1;
+                                        " title="Toggle favorite">${group.isFavorite ? '⭐' : '☆'}</button>
                                         <button onclick="deleteBook('${group.bookIds[group.bookIds.length - 1].id}')" style="
                                             float: right;
-                                            padding: 2px 4px;
+                                            padding: 4px 8px;
                                             background: transparent;
                                             color: #dc3545;
                                             border: none;
                                             border-radius: 4px;
-                                            font-size: 0.75em;
+                                            font-size: 1em;
                                             cursor: pointer;
-                                            margin-left: 10px;
+                                            margin-left: 5px;
+                                            line-height: 1;
                                         " title="Remove most recent">🗑️</button>
                                     </div>
                                     <div style="
@@ -3862,6 +3874,124 @@
                         </div>
                     </div>
                 `;
+            }
+        }
+
+        // Show Favorites List
+        function showFavoritesList() {
+            if (appData.currentChild === null || !appData.children[appData.currentChild]) {
+                showToast('Please select a child first', 2000);
+                return;
+            }
+
+            const books = appData.children[appData.currentChild].books || [];
+            const favoriteBooks = books.filter(b => b.isFavorite);
+
+            if (favoriteBooks.length === 0) {
+                showToast('No favorites yet! Mark books with ⭐ in the library', 3000);
+                return;
+            }
+
+            // Group favorites by title
+            const bookGroups = {};
+            favoriteBooks.forEach(book => {
+                const key = `${book.title}|${book.author || ''}`;
+                if (!bookGroups[key]) {
+                    bookGroups[key] = {
+                        title: book.title,
+                        author: book.author,
+                        count: 0
+                    };
+                }
+                bookGroups[key].count++;
+            });
+
+            const sortedFavorites = Object.values(bookGroups).sort((a, b) =>
+                a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+            );
+
+            const favoritesHTML = `
+                <div id="favoritesModal" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 3000;
+                " onclick="if(event.target.id === 'favoritesModal') document.getElementById('favoritesModal').remove()">
+                    <div style="
+                        background: white;
+                        padding: 2rem;
+                        border-radius: 20px;
+                        max-width: 600px;
+                        width: 90%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                    " onclick="event.stopPropagation()">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h2 style="margin: 0;">⭐ Favorite Books</h2>
+                            <button onclick="document.getElementById('favoritesModal').remove()" style="
+                                background: #e74c3c;
+                                color: white;
+                                border: none;
+                                padding: 0.5rem 1rem;
+                                border-radius: 10px;
+                                cursor: pointer;
+                                font-size: 1rem;
+                            ">✕ Close</button>
+                        </div>
+                        <p style="color: #6c757d; margin-bottom: 1.5rem;">
+                            You have ${favoriteBooks.length} favorite book${favoriteBooks.length !== 1 ? 's' : ''}!
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            ${sortedFavorites.map(book => `
+                                <div style="
+                                    padding: 1rem;
+                                    background: #f8f9fa;
+                                    border-radius: 10px;
+                                    border-left: 4px solid #ffc107;
+                                ">
+                                    <div style="font-weight: 600; color: #495057; margin-bottom: 0.25rem;">
+                                        ${book.title} ${book.count > 1 ? `<span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">${book.count}</span>` : ''}
+                                    </div>
+                                    ${book.author ? `<div style="color: #6c757d; font-size: 0.9em;">${book.author}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', favoritesHTML);
+        }
+
+        // Toggle Favorite Status
+        function toggleFavorite(title, author, currentStatus) {
+            if (appData.currentChild === null || !appData.children[appData.currentChild]) {
+                return;
+            }
+
+            const books = appData.children[appData.currentChild].books || [];
+            const newStatus = !currentStatus;
+
+            // Update all instances of this book
+            let updatedCount = 0;
+            books.forEach(book => {
+                if (book.title === title && (book.author || '') === author) {
+                    book.isFavorite = newStatus;
+                    updatedCount++;
+                }
+            });
+
+            if (updatedCount > 0) {
+                saveData();
+                displayLibrary();
+                updateDashboard();
+                showToast(newStatus ? '⭐ Added to favorites!' : 'Removed from favorites', 1500);
             }
         }
 
@@ -6841,6 +6971,8 @@
         window.emailBackup = emailBackup;
         window.autoSaveBackup = autoSaveBackup;
         window.deleteBook = deleteBook;
+        window.showFavoritesList = showFavoritesList;
+        window.toggleFavorite = toggleFavorite;
 
         // Check for updates when app gains focus or comes online
         window.addEventListener('focus', () => {
