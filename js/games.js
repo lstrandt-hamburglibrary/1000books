@@ -2483,6 +2483,62 @@ const storySequences = {
                 { text: "🧼 Add soap", order: 2 },
                 { text: "🚿 Rinse off soap", order: 3 }
             ]
+        },
+        {
+            story: "Making a Sandwich",
+            events: [
+                { text: "🍞 Get two slices of bread", order: 1 },
+                { text: "🥜 Spread peanut butter and jelly", order: 2 },
+                { text: "🥪 Put bread together", order: 3 }
+            ]
+        },
+        {
+            story: "Getting Ready for School",
+            events: [
+                { text: "🧦 Put on socks", order: 1 },
+                { text: "👟 Put on sneakers", order: 2 },
+                { text: "🚌 Go to school", order: 3 }
+            ]
+        },
+        {
+            story: "Brushing Teeth",
+            events: [
+                { text: "🪥 Get toothbrush", order: 1 },
+                { text: "🦷 Put on toothpaste", order: 2 },
+                { text: "😁 Brush teeth", order: 3 }
+            ]
+        },
+        {
+            story: "Going to Bed",
+            events: [
+                { text: "🛁 Take a bath", order: 1 },
+                { text: "🧖 Dry off", order: 2 },
+                { text: "👕 Put on pajamas", order: 3 }
+            ]
+        },
+        {
+            story: "Building a Snowman",
+            events: [
+                { text: "⚪ Roll big snowball", order: 1 },
+                { text: "⛄ Stack snowballs", order: 2 },
+                { text: "🎩 Add hat and carrot", order: 3 }
+            ]
+        },
+        {
+            story: "Making Lemonade",
+            events: [
+                { text: "🍋 Squeeze lemons", order: 1 },
+                { text: "🍯 Add sugar", order: 2 },
+                { text: "🥤 Pour in cup", order: 3 }
+            ]
+        },
+        {
+            story: "Crossing the Street",
+            events: [
+                { text: "🛑 Stop at curb", order: 1 },
+                { text: "👀 Look both ways", order: 2 },
+                { text: "🚶 Walk across", order: 3 }
+            ]
         }
     ],
     level2: [
@@ -2512,6 +2568,69 @@ const storySequences = {
                 { text: "👋 Say hi to teacher", order: 3 },
                 { text: "📚 Learn and play", order: 4 }
             ]
+        },
+        {
+            story: "Baking Cookies",
+            events: [
+                { text: "🥣 Mix ingredients", order: 1 },
+                { text: "🍪 Shape cookies", order: 2 },
+                { text: "🔥 Bake in oven", order: 3 },
+                { text: "😋 Eat cookies", order: 4 }
+            ]
+        },
+        {
+            story: "Going to the Park",
+            events: [
+                { text: "🚗 Drive to park", order: 1 },
+                { text: "🏃 Run to playground", order: 2 },
+                { text: "🛝 Play on slide", order: 3 },
+                { text: "🏠 Go back home", order: 4 }
+            ]
+        },
+        {
+            story: "Making Pizza",
+            events: [
+                { text: "🍕 Roll out dough", order: 1 },
+                { text: "🍅 Add sauce", order: 2 },
+                { text: "🧀 Sprinkle cheese", order: 3 },
+                { text: "🔥 Bake in oven", order: 4 }
+            ]
+        },
+        {
+            story: "Planting a Garden",
+            events: [
+                { text: "🌱 Dig holes", order: 1 },
+                { text: "🌱 Plant seeds", order: 2 },
+                { text: "💧 Water garden", order: 3 },
+                { text: "🌻 Flowers bloom", order: 4 }
+            ]
+        },
+        {
+            story: "Getting Ready for Bed",
+            events: [
+                { text: "🍽️ Eat dinner", order: 1 },
+                { text: "📖 Read a story", order: 2 },
+                { text: "😴 Say goodnight", order: 3 },
+                { text: "💤 Go to sleep", order: 4 }
+            ]
+        },
+        {
+            story: "Building with Blocks",
+            events: [
+                { text: "📦 Get blocks out", order: 1 },
+                { text: "🏗️ Stack blocks high", order: 2 },
+                { text: "💥 Tower falls down", order: 3 },
+                { text: "😊 Build again", order: 4 }
+            ]
+        },
+        {
+            story: "Making a Birthday Cake",
+            events: [
+                { text: "🥣 Mix cake batter", order: 1 },
+                { text: "🔥 Bake the cake", order: 2 },
+                { text: "❄️ Let it cool", order: 3 },
+                { text: "🎂 Add frosting", order: 4 }
+            ]
         }
     ],
     level3: [
@@ -2533,6 +2652,96 @@ const storySequences = {
                 { text: "🔥 Bake in oven", order: 3 },
                 { text: "❄️ Let them cool", order: 4 },
                 { text: "😋 Eat cookies", order: 5 }
+            ]
+        },
+        {
+            story: "Going to the Library",
+            events: [
+                { text: "🚗 Drive to library", order: 1 },
+                { text: "📚 Pick out books", order: 2 },
+                { text: "💳 Check out books", order: 3 },
+                { text: "🏠 Go back home", order: 4 },
+                { text: "📖 Read the books", order: 5 }
+            ]
+        },
+        {
+            story: "Making a Snowman",
+            events: [
+                { text: "⚪ Roll first snowball", order: 1 },
+                { text: "⚪ Roll second snowball", order: 2 },
+                { text: "⛄ Stack them up", order: 3 },
+                { text: "🥕 Add carrot nose", order: 4 },
+                { text: "🎩 Put on hat", order: 5 }
+            ]
+        },
+        {
+            story: "Washing the Car",
+            events: [
+                { text: "🚗 Park the car", order: 1 },
+                { text: "💧 Spray with water", order: 2 },
+                { text: "🧽 Scrub with soap", order: 3 },
+                { text: "🚿 Rinse it off", order: 4 },
+                { text: "✨ Dry with towel", order: 5 }
+            ]
+        },
+        {
+            story: "Making Pancakes",
+            events: [
+                { text: "🥣 Mix batter", order: 1 },
+                { text: "🔥 Heat the pan", order: 2 },
+                { text: "🥞 Pour batter in", order: 3 },
+                { text: "🥞 Flip pancake", order: 4 },
+                { text: "🍯 Add syrup and eat", order: 5 }
+            ]
+        },
+        {
+            story: "Going Swimming",
+            events: [
+                { text: "👙 Put on swimsuit", order: 1 },
+                { text: "🚗 Go to pool", order: 2 },
+                { text: "🏊 Get in water", order: 3 },
+                { text: "🏊 Play in pool", order: 4 },
+                { text: "🧖 Dry off and go home", order: 5 }
+            ]
+        },
+        {
+            story: "Wrapping a Gift",
+            events: [
+                { text: "🧸 Put toy in box", order: 1 },
+                { text: "📦 Tape box shut", order: 2 },
+                { text: "🎁 Wrap with paper", order: 3 },
+                { text: "🎀 Tie with ribbon", order: 4 },
+                { text: "🎁 Give the gift", order: 5 }
+            ]
+        },
+        {
+            story: "Planting a Tree",
+            events: [
+                { text: "🕳️ Dig a hole", order: 1 },
+                { text: "🌳 Put tree in hole", order: 2 },
+                { text: "🪨 Cover with dirt", order: 3 },
+                { text: "💧 Water the tree", order: 4 },
+                { text: "🌳 Tree grows tall", order: 5 }
+            ]
+        },
+        {
+            story: "Making Lemonade",
+            events: [
+                { text: "🍋 Cut lemons in half", order: 1 },
+                { text: "🍋 Squeeze the juice", order: 2 },
+                { text: "🍯 Add sugar", order: 3 },
+                { text: "🥄 Stir it up", order: 4 },
+                { text: "🥤 Drink and enjoy", order: 5 }
+            ]
+        },
+        {
+            story: "Getting Ready for School",
+            events: [
+                { text: "😴 Wake up", order: 1 },
+                { text: "🍳 Eat breakfast", order: 2 },
+                { text: "🎒 Pack backpack", order: 3 },
+                { text: "🧦 Put on shoes", order: 4 },
+                { text: "🚌 Catch the bus", order: 5 }
             ]
         }
     ]
