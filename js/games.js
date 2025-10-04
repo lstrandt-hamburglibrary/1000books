@@ -2955,21 +2955,27 @@ let patternScore = 0;
 function launchPatternBuilderGame() {
     console.log('launchPatternBuilderGame called!');
     if (typeof showToast === 'function') {
-        showToast('DEBUG: launchPatternBuilderGame() called');
+        showToast('DEBUG: 1 - function called');
     }
 
     // Remove any existing game modal first
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: 2 - checking for modal');
+    }
     const existingModal = document.getElementById('gameModal');
     if (existingModal) {
         existingModal.remove();
     }
 
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: 3 - setting variables');
+    }
     currentPatternLevel = 1;
     currentPatternIndex = 0;
     patternScore = 0;
 
     if (typeof showToast === 'function') {
-        showToast('DEBUG: About to create gameHTML...');
+        showToast('DEBUG: 4 - about to create HTML');
     }
 
     const gameHTML = `
