@@ -3065,6 +3065,17 @@ function loadPatternPuzzle() {
     }
 
     try {
+        if (typeof showToast === 'function') {
+            showToast('Pattern: checking window.patternLevels...');
+        }
+
+        if (typeof window.patternLevels === 'undefined') {
+            if (typeof showToast === 'function') {
+                showToast('ERROR: window.patternLevels is undefined!');
+            }
+            return;
+        }
+
         const levelKey = `level${window.currentPatternLevel}`;
         if (typeof showToast === 'function') {
             showToast('Pattern levelKey: ' + levelKey);
