@@ -2920,9 +2920,40 @@ function launchPatternBuilderGame() {
                     ">Close ✕</button>
                 </div>
 
-                <p style="margin-bottom: 1.5rem; text-align: center;">Complete the pattern by choosing the correct shape!</p>
+                <div id="patternLevelSelect">
+                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">Choose your difficulty level!</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <button onclick="selectPatternLevel(1)" style="
+                            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                            border: none;
+                            padding: 1.5rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.1rem;
+                            font-weight: bold;
+                        ">Level 1<br><span style="font-size: 0.9rem; font-weight: normal;">Easy Patterns</span></button>
+                        <button onclick="selectPatternLevel(2)" style="
+                            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+                            border: none;
+                            padding: 1.5rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.1rem;
+                            font-weight: bold;
+                        ">Level 2<br><span style="font-size: 0.9rem; font-weight: normal;">Medium Patterns</span></button>
+                        <button onclick="selectPatternLevel(3)" style="
+                            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                            border: none;
+                            padding: 1.5rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.1rem;
+                            font-weight: bold;
+                        ">Level 3<br><span style="font-size: 0.9rem; font-weight: normal;">Hard Patterns</span></button>
+                    </div>
+                </div>
 
-                <div id="patternContent" style="margin-top: 1rem;">
+                <div id="patternContent" style="margin-top: 1rem; display: none;">
                     <!-- Pattern will appear here -->
                 </div>
             </div>
@@ -2930,21 +2961,40 @@ function launchPatternBuilderGame() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', gameHTML);
-    startPatternBuilder();
 }
 
-function startPatternBuilder() {
-    const patterns = [
-        { pattern: ['🔴', '🔵', '🔴', '🔵'], answer: '🔴', options: ['🔴', '🔵', '🟢', '🟡'] },
-        { pattern: ['⭐', '⭐', '❤️', '⭐', '⭐'], answer: '❤️', options: ['⭐', '❤️', '🔵', '🟢'] },
-        { pattern: ['🟢', '🟡', '🟢', '🟡', '🟢'], answer: '🟡', options: ['🟢', '🟡', '🔴', '🔵'] },
-        { pattern: ['🔵', '🔵', '🔴', '🔵', '🔵'], answer: '🔴', options: ['🔵', '🔴', '🟢', '⭐'] },
-        { pattern: ['🟣', '🟠', '🟣', '🟠', '🟣'], answer: '🟠', options: ['🟣', '🟠', '🔴', '🔵'] },
-        { pattern: ['🔴', '🔵', '🟢', '🔴', '🔵'], answer: '🟢', options: ['🔴', '🔵', '🟢', '🟡'] },
-        { pattern: ['⭐', '❤️', '❤️', '⭐', '❤️'], answer: '❤️', options: ['⭐', '❤️', '🔵', '🟢'] },
-        { pattern: ['🔷', '🔶', '🔷', '🔷', '🔶'], answer: '🔷', options: ['🔷', '🔶', '🔴', '🔵'] }
-    ];
+window.selectPatternLevel = function(level) {
+    document.getElementById('patternLevelSelect').style.display = 'none';
+    document.getElementById('patternContent').style.display = 'block';
+    startPatternBuilder(level);
+};
 
+function startPatternBuilder(level = 1) {
+    const patternsByLevel = {
+        1: [ // Easy - simple AB patterns
+            { pattern: ['🔴', '🔵', '🔴', '🔵'], answer: '🔴', options: ['🔴', '🔵', '🟢', '🟡'] },
+            { pattern: ['⭐', '⭐', '❤️', '⭐', '⭐'], answer: '❤️', options: ['⭐', '❤️', '🔵', '🟢'] },
+            { pattern: ['🟢', '🟡', '🟢', '🟡', '🟢'], answer: '🟡', options: ['🟢', '🟡', '🔴', '🔵'] },
+            { pattern: ['🔵', '🔵', '🔴', '🔵', '🔵'], answer: '🔴', options: ['🔵', '🔴', '🟢', '⭐'] },
+            { pattern: ['🟣', '🟠', '🟣', '🟠', '🟣'], answer: '🟠', options: ['🟣', '🟠', '🔴', '🔵'] }
+        ],
+        2: [ // Medium - ABC patterns
+            { pattern: ['🔴', '🔵', '🟢', '🔴', '🔵'], answer: '🟢', options: ['🔴', '🔵', '🟢', '🟡'] },
+            { pattern: ['⭐', '❤️', '🔷', '⭐', '❤️'], answer: '🔷', options: ['⭐', '❤️', '🔷', '🟢'] },
+            { pattern: ['🟡', '🟡', '🟢', '🟡', '🟡'], answer: '🟢', options: ['🟢', '🟡', '🔴', '🔵'] },
+            { pattern: ['🔷', '🔶', '🔷', '🔷', '🔶'], answer: '🔷', options: ['🔷', '🔶', '🔴', '🔵'] },
+            { pattern: ['🐱', '🐶', '🐱', '🐶'], answer: '🐱', options: ['🐱', '🐶', '🐭', '🐰'] }
+        ],
+        3: [ // Hard - longer and more complex patterns
+            { pattern: ['🔴', '🔵', '🟢', '🟡', '🔴', '🔵', '🟢'], answer: '🟡', options: ['🔴', '🔵', '🟢', '🟡'] },
+            { pattern: ['⭐', '⭐', '❤️', '❤️', '⭐', '⭐', '❤️'], answer: '❤️', options: ['⭐', '❤️', '🔵', '🟢'] },
+            { pattern: ['🔷', '🔶', '🔷', '🔶', '🔶', '🔷', '🔶'], answer: '🔷', options: ['🔷', '🔶', '🔴', '🔵'] },
+            { pattern: ['🟣', '🟣', '🟠', '🟣', '🟣', '🟠'], answer: '🟣', options: ['🟣', '🟠', '🔴', '🔵'] },
+            { pattern: ['🔵', '🟢', '🟢', '🔵', '🔵', '🟢', '🟢'], answer: '🔵', options: ['🔵', '🟢', '🔴', '🟡'] }
+        ]
+    };
+
+    const patterns = patternsByLevel[level];
     let currentPattern = 0;
     let score = 0;
 
@@ -2989,7 +3039,7 @@ function startPatternBuilder() {
                             font-size: 2rem;
                         ">${shape}</div>
                     `).join('')}
-                    <div style="
+                    <div id="patternAnswerBox" style="
                         width: 60px;
                         height: 60px;
                         background: white;
@@ -3049,16 +3099,37 @@ function startPatternBuilder() {
 
     window.checkPatternAnswer = function(selectedAnswer) {
         const puzzle = patterns[currentPattern];
+        const answerBox = document.getElementById('patternAnswerBox');
+
+        // Show the selected shape in the pattern box
+        if (answerBox) {
+            answerBox.textContent = selectedAnswer;
+            answerBox.style.color = 'inherit';
+        }
+
         if (selectedAnswer === puzzle.answer) {
             score += 10;
             if (typeof showToast === 'function') {
                 showToast('✅ Correct!');
             }
+            // Add a green border briefly to show success
+            if (answerBox) {
+                answerBox.style.border = '3px solid #28a745';
+            }
             currentPattern++;
-            setTimeout(showPattern, 500);
+            setTimeout(showPattern, 800);
         } else {
             if (typeof showToast === 'function') {
                 showToast('❌ Try again!');
+            }
+            // Add a red border briefly to show error, then reset
+            if (answerBox) {
+                answerBox.style.border = '3px solid #dc3545';
+                setTimeout(() => {
+                    answerBox.textContent = '?';
+                    answerBox.style.color = '#667eea';
+                    answerBox.style.border = 'none';
+                }, 1000);
             }
         }
     };
