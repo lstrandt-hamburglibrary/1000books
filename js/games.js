@@ -2906,7 +2906,7 @@ window.checkSequence = checkSequence;
 // Pattern Builder Game
 const patternShapes = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⭐', '❤️', '🔷', '🔶'];
 
-const window.patternLevels = {
+window.patternLevels = {
     level1: [
         { pattern: ['🔴', '🔵', '🔴', '🔵', '?'], answer: '🔵' },
         { pattern: ['⭐', '⭐', '❤️', '⭐', '⭐', '?'], answer: '❤️' },
@@ -3253,7 +3253,7 @@ window.selectPatternLevel = selectPatternLevel;
 window.checkPatternAnswer = checkPatternAnswer;
 
 // Trace & Match Game
-const window.traceMatchLetters = {
+window.traceMatchLetters = {
     level1: [ // Uppercase letters
         { letter: 'A', matches: ['🍎 Apple', '🐜 Ant', '✈️ Airplane'] },
         { letter: 'B', matches: ['🐻 Bear', '🦋 Butterfly', '🏀 Ball'] },
