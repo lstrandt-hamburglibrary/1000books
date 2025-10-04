@@ -2637,11 +2637,11 @@ const storySequences = {
         {
             story: "Making Hot Chocolate",
             events: [
-                { text: "🥛 Pour milk in pot", order: 1 },
-                { text: "🔥 Heat on stove", order: 2 },
-                { text: "🍫 Add chocolate", order: 3 },
-                { text: "🥄 Stir it up", order: 4 },
-                { text: "☕ Pour in mug", order: 5 }
+                { text: "🔥 Turn on stove", order: 1 },
+                { text: "🥛 Heat milk", order: 2 },
+                { text: "☕ Pour in mug", order: 3 },
+                { text: "🍫 Add chocolate packet", order: 4 },
+                { text: "🥄 Stir", order: 5 }
             ]
         },
         {
