@@ -25,6 +25,9 @@ function launchGame(gameName) {
         case 'story-sequencing':
             launchStorySequencingGame();
             break;
+        case 'pattern-builder':
+            launchPatternBuilderGame();
+            break;
     }
 }
 
@@ -2878,6 +2881,189 @@ function showSequenceComplete() {
     if (sequenceScore >= 30) {
         checkGameAchievement('story-sequencer');
     }
+}
+
+// Pattern Builder Game
+function launchPatternBuilderGame() {
+    const gameHTML = `
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        ">
+            <div class="game-container" style="
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>🔷 Pattern Builder</h2>
+                    <button onclick="closeMiniGame()" style="
+                        background: #dc3545;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">Close ✕</button>
+                </div>
+
+                <p style="margin-bottom: 1.5rem; text-align: center;">Complete the pattern by choosing the correct shape!</p>
+
+                <div id="patternContent" style="margin-top: 1rem;">
+                    <!-- Pattern will appear here -->
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
+    startPatternBuilder();
+}
+
+function startPatternBuilder() {
+    const patterns = [
+        { pattern: ['🔴', '🔵', '🔴', '🔵'], answer: '🔴', options: ['🔴', '🔵', '🟢', '🟡'] },
+        { pattern: ['⭐', '⭐', '❤️', '⭐', '⭐'], answer: '❤️', options: ['⭐', '❤️', '🔵', '🟢'] },
+        { pattern: ['🟢', '🟡', '🟢', '🟡', '🟢'], answer: '🟡', options: ['🟢', '🟡', '🔴', '🔵'] },
+        { pattern: ['🔵', '🔵', '🔴', '🔵', '🔵'], answer: '🔴', options: ['🔵', '🔴', '🟢', '⭐'] },
+        { pattern: ['🟣', '🟠', '🟣', '🟠', '🟣'], answer: '🟠', options: ['🟣', '🟠', '🔴', '🔵'] },
+        { pattern: ['🔴', '🔵', '🟢', '🔴', '🔵'], answer: '🟢', options: ['🔴', '🔵', '🟢', '🟡'] },
+        { pattern: ['⭐', '❤️', '❤️', '⭐', '❤️'], answer: '❤️', options: ['⭐', '❤️', '🔵', '🟢'] },
+        { pattern: ['🔷', '🔶', '🔷', '🔷', '🔶'], answer: '🔷', options: ['🔷', '🔶', '🔴', '🔵'] }
+    ];
+
+    let currentPattern = 0;
+    let score = 0;
+
+    function showPattern() {
+        if (currentPattern >= patterns.length) {
+            showComplete();
+            return;
+        }
+
+        const puzzle = patterns[currentPattern];
+        const content = document.getElementById('patternContent');
+
+        content.innerHTML = `
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <p style="font-weight: bold; margin-bottom: 0.5rem;">Pattern ${currentPattern + 1} of ${patterns.length}</p>
+                <p>Score: ${score}</p>
+            </div>
+
+            <div style="
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                padding: 2rem;
+                border-radius: 15px;
+                margin-bottom: 2rem;
+            ">
+                <p style="color: white; text-align: center; margin-bottom: 1rem; font-weight: bold;">Complete the pattern:</p>
+                <div style="
+                    display: flex;
+                    gap: 0.5rem;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    margin-bottom: 1rem;
+                ">
+                    ${puzzle.pattern.map(shape => `
+                        <div style="
+                            width: 60px;
+                            height: 60px;
+                            background: white;
+                            border-radius: 10px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 2rem;
+                        ">${shape}</div>
+                    `).join('')}
+                    <div style="
+                        width: 60px;
+                        height: 60px;
+                        background: white;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2rem;
+                        font-weight: bold;
+                        color: #667eea;
+                    ">?</div>
+                </div>
+            </div>
+
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            ">
+                ${puzzle.options.map(option => `
+                    <button onclick="checkPatternAnswer('${option}')" style="
+                        background: linear-gradient(135deg, #a8edea, #fed6e3);
+                        border: none;
+                        padding: 2rem;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 3rem;
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${option}</button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function showComplete() {
+        const content = document.getElementById('patternContent');
+        content.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <h3 style="color: #28a745; margin-bottom: 1rem;">🎉 Great Job!</h3>
+                <p style="font-size: 1.5rem; margin-bottom: 1rem;">You completed all patterns!</p>
+                <p style="font-size: 1.2rem; margin-bottom: 2rem;">Final Score: ${score}</p>
+                <button onclick="closeMiniGame()" style="
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">Back to Games</button>
+            </div>
+        `;
+        if (typeof checkGameAchievement === 'function') {
+            checkGameAchievement('pattern-master');
+        }
+    }
+
+    window.checkPatternAnswer = function(selectedAnswer) {
+        const puzzle = patterns[currentPattern];
+        if (selectedAnswer === puzzle.answer) {
+            score += 10;
+            if (typeof showToast === 'function') {
+                showToast('✅ Correct!');
+            }
+            currentPattern++;
+            setTimeout(showPattern, 500);
+        } else {
+            if (typeof showToast === 'function') {
+                showToast('❌ Try again!');
+            }
+        }
+    };
+
+    showPattern();
 }
 
 // Export functions to window
