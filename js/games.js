@@ -2906,7 +2906,7 @@ window.checkSequence = checkSequence;
 // Pattern Builder Game
 const patternShapes = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⭐', '❤️', '🔷', '🔶'];
 
-const patternLevels = {
+const window.patternLevels = {
     level1: [
         { pattern: ['🔴', '🔵', '🔴', '🔵', '?'], answer: '🔵' },
         { pattern: ['⭐', '⭐', '❤️', '⭐', '⭐', '?'], answer: '❤️' },
@@ -3070,7 +3070,7 @@ function loadPatternPuzzle() {
             showToast('Pattern levelKey: ' + levelKey);
         }
 
-        const puzzles = patternLevels[levelKey];
+        const puzzles = window.patternLevels[levelKey];
         if (typeof showToast === 'function') {
             showToast('Pattern puzzles: ' + (puzzles ? puzzles.length : 'undefined'));
         }
@@ -3082,7 +3082,7 @@ function loadPatternPuzzle() {
     }
 
     const levelKey = `level${window.currentPatternLevel}`;
-    const puzzles = patternLevels[levelKey];
+    const puzzles = window.patternLevels[levelKey];
 
     if (window.currentPatternIndex >= puzzles.length) {
         showPatternComplete();
@@ -3172,7 +3172,7 @@ function loadPatternPuzzle() {
 // Check Pattern Answer
 function checkPatternAnswer(selectedShape) {
     const levelKey = `level${window.currentPatternLevel}`;
-    const puzzle = patternLevels[levelKey][window.currentPatternIndex];
+    const puzzle = window.patternLevels[levelKey][window.currentPatternIndex];
     const feedback = document.getElementById('patternFeedback');
 
     if (selectedShape === puzzle.answer) {
@@ -3253,7 +3253,7 @@ window.selectPatternLevel = selectPatternLevel;
 window.checkPatternAnswer = checkPatternAnswer;
 
 // Trace & Match Game
-const traceMatchLetters = {
+const window.traceMatchLetters = {
     level1: [ // Uppercase letters
         { letter: 'A', matches: ['🍎 Apple', '🐜 Ant', '✈️ Airplane'] },
         { letter: 'B', matches: ['🐻 Bear', '🦋 Butterfly', '🏀 Ball'] },
@@ -3428,7 +3428,7 @@ function loadTraceLetter() {
             showToast('levelKey created: ' + levelKey);
         }
 
-        const letters = traceMatchLetters[levelKey];
+        const letters = window.traceMatchLetters[levelKey];
         if (typeof showToast === 'function') {
             showToast('letters: ' + (letters ? letters.length : 'undefined'));
         }
@@ -3440,7 +3440,7 @@ function loadTraceLetter() {
     }
 
     const levelKey = `level${window.currentTraceLevel}`;
-    const letters = traceMatchLetters[levelKey];
+    const letters = window.traceMatchLetters[levelKey];
 
     if (typeof showToast === 'function') {
         showToast('levelKey: ' + levelKey + ', letters: ' + (letters ? letters.length : 'undefined'));
@@ -3630,11 +3630,11 @@ function showMatchOptions() {
     document.getElementById('doneTracingBtn').style.display = 'none';
 
     const levelKey = `level${window.currentTraceLevel}`;
-    const letterData = traceMatchLetters[levelKey][window.currentTraceIndex];
+    const letterData = window.traceMatchLetters[levelKey][window.currentTraceIndex];
     const correctMatch = letterData.matches[0]; // First match is correct
 
     // Get 2 wrong options from other letters in this level
-    const allOtherMatches = traceMatchLetters[levelKey]
+    const allOtherMatches = window.traceMatchLetters[levelKey]
         .filter((_, idx) => idx !== window.currentTraceIndex)
         .flatMap(l => l.matches);
     const wrongOptions = allOtherMatches.sort(() => Math.random() - 0.5).slice(0, 2);
@@ -3662,7 +3662,7 @@ function showMatchOptions() {
 // Check Trace Match
 function checkTraceMatch(selectedOption) {
     const levelKey = `level${window.currentTraceLevel}`;
-    const letterData = traceMatchLetters[levelKey][window.currentTraceIndex];
+    const letterData = window.traceMatchLetters[levelKey][window.currentTraceIndex];
     const correctMatch = letterData.matches[0];
     const feedback = document.getElementById('traceFeedback');
 
