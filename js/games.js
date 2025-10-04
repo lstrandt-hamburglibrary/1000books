@@ -3385,8 +3385,16 @@ function selectTraceLevel(level) {
 
 // Load Trace Letter
 function loadTraceLetter() {
+    if (typeof showToast === 'function') {
+        showToast('loadTraceLetter called');
+    }
+
     const levelKey = `level${window.currentTraceLevel}`;
     const letters = traceMatchLetters[levelKey];
+
+    if (typeof showToast === 'function') {
+        showToast('levelKey: ' + levelKey + ', letters: ' + (letters ? letters.length : 'undefined'));
+    }
 
     if (window.currentTraceIndex >= letters.length) {
         showTraceComplete();
@@ -3397,6 +3405,9 @@ function loadTraceLetter() {
     window.hasTracedLetter = false;
 
     const gameArea = document.getElementById('traceGameArea');
+    if (typeof showToast === 'function') {
+        showToast('gameArea for innerHTML: ' + (gameArea ? 'found' : 'NOT FOUND'));
+    }
     gameArea.innerHTML = `
         <div style="text-align: center; margin-bottom: 1.5rem;">
             <h3>Letter ${window.currentTraceIndex + 1} of ${letters.length}</h3>
