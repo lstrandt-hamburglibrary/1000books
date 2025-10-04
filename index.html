@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '3.18.1';</script>
+    <script>window.APP_VERSION = '3.18.2';</script>
     <style>
         * {
             margin: 0;
@@ -6640,22 +6640,19 @@
         }
 
         function getPuzzleImage() {
-            // Simple colorful patterns that work well when split into puzzle pieces
+            // Cartoon animal images from puzzle-images folder
             const puzzleImages = [
-                // Colorful grid pattern
-                `data:image/svg+xml,${encodeURIComponent('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100" height="100" fill="#FF6B6B"/><rect x="100" y="0" width="100" height="100" fill="#4ECDC4"/><rect x="200" y="0" width="100" height="100" fill="#45B7D1"/><rect x="0" y="100" width="100" height="100" fill="#FFA07A"/><rect x="100" y="100" width="100" height="100" fill="#98D8C8"/><rect x="200" y="100" width="100" height="100" fill="#F7DC6F"/><rect x="0" y="200" width="100" height="100" fill="#BB8FCE"/><rect x="100" y="200" width="100" height="100" fill="#85C1E2"/><rect x="200" y="200" width="100" height="100" fill="#F8B4D9"/></svg>')}`,
-
-                // Diagonal stripes
-                `data:image/svg+xml,${encodeURIComponent('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="300" fill="#FFE5E5"/><path d="M 0 0 L 300 300 L 300 280 L 0 -20 Z" fill="#FF6B9D"/><path d="M 0 40 L 260 300 L 300 300 L 0 20 Z" fill="#FFA5C0"/><path d="M 0 80 L 220 300 L 260 300 L 0 60 Z" fill="#FFD4E5"/><path d="M 0 120 L 180 300 L 220 300 L 0 100 Z" fill="#FF8FB1"/><path d="M 0 160 L 140 300 L 180 300 L 0 140 Z" fill="#FFC4D6"/></svg>')}`,
-
-                // Polka dots
-                `data:image/svg+xml,${encodeURIComponent('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="300" fill="#E3F2FD"/><circle cx="50" cy="50" r="30" fill="#1976D2"/><circle cx="150" cy="50" r="30" fill="#42A5F5"/><circle cx="250" cy="50" r="30" fill="#64B5F6"/><circle cx="50" cy="150" r="30" fill="#90CAF9"/><circle cx="150" cy="150" r="30" fill="#1976D2"/><circle cx="250" cy="150" r="30" fill="#42A5F5"/><circle cx="50" cy="250" r="30" fill="#64B5F6"/><circle cx="150" cy="250" r="30" fill="#90CAF9"/><circle cx="250" cy="250" r="30" fill="#1976D2"/></svg>')}`,
-
-                // Sunset gradient
-                `data:image/svg+xml,${encodeURIComponent('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sunset" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#FF6B6B"/><stop offset="30%" style="stop-color:#FFA07A"/><stop offset="60%" style="stop-color:#FFD93D"/><stop offset="100%" style="stop-color:#6BCF7F"/></linearGradient></defs><rect width="300" height="300" fill="url(#sunset)"/><circle cx="150" cy="80" r="50" fill="#FFD700"/><circle cx="50" cy="200" r="25" fill="white" opacity="0.7"/><circle cx="250" cy="220" r="30" fill="white" opacity="0.7"/></svg>')}`,
-
-                // Checkered pattern
-                `data:image/svg+xml,${encodeURIComponent('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="75" height="75" fill="#E91E63"/><rect x="75" y="0" width="75" height="75" fill="#F06292"/><rect x="150" y="0" width="75" height="75" fill="#E91E63"/><rect x="225" y="0" width="75" height="75" fill="#F06292"/><rect x="0" y="75" width="75" height="75" fill="#F06292"/><rect x="75" y="75" width="75" height="75" fill="#E91E63"/><rect x="150" y="75" width="75" height="75" fill="#F06292"/><rect x="225" y="75" width="75" height="75" fill="#E91E63"/><rect x="0" y="150" width="75" height="75" fill="#E91E63"/><rect x="75" y="150" width="75" height="75" fill="#F06292"/><rect x="150" y="150" width="75" height="75" fill="#E91E63"/><rect x="225" y="150" width="75" height="75" fill="#F06292"/><rect x="0" y="225" width="75" height="75" fill="#F06292"/><rect x="75" y="225" width="75" height="75" fill="#E91E63"/><rect x="150" y="225" width="75" height="75" fill="#F06292"/><rect x="225" y="225" width="75" height="75" fill="#E91E63"/></svg>')}`
+                'puzzle-images/cartoon-bear-9867996_1280.png',
+                'puzzle-images/cartoon-leopard-9867986_1280.png',
+                'puzzle-images/cat-9868344_1280.png',
+                'puzzle-images/crab-9868441_1280.png',
+                'puzzle-images/frog-9868429_1280.png',
+                'puzzle-images/octopus-9868433_1280.png',
+                'puzzle-images/parrot-9868391_1280.png',
+                'puzzle-images/pig-9868481_1280.png',
+                'puzzle-images/rhinoceros-9868373_1280.png',
+                'puzzle-images/snake-9868425_1280.png',
+                'puzzle-images/turtle-9868368_1280.png'
             ];
 
             // Use current image index
