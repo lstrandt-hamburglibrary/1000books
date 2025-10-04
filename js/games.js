@@ -3407,7 +3407,7 @@ function loadTraceLetter() {
                 font-family: 'Comic Sans MS', cursive;
             ">${letterData.letter}</div>
 
-            <canvas id="window.traceCanvas"
+            <canvas id="traceCanvas"
                 width="300"
                 height="200"
                 style="
@@ -3469,7 +3469,7 @@ function loadTraceLetter() {
 
     // Initialize canvas
     setTimeout(() => {
-        window.traceCanvas = document.getElementById('window.traceCanvas');
+        window.traceCanvas = document.getElementById('traceCanvas');
         if (window.traceCanvas) {
             window.traceCtx = window.traceCanvas.getContext('2d');
             window.traceCtx.lineWidth = 8;
