@@ -3038,16 +3038,49 @@ function launchPatternBuilderGame() {
 
 // Select Pattern Level
 function selectPatternLevel(level) {
+    if (typeof showToast === 'function') {
+        showToast('selectPatternLevel called with level ' + level);
+    }
     window.currentPatternLevel = level;
     window.currentPatternIndex = 0;
     window.patternScore = 0;
-    document.getElementById('patternLevelSelect').style.display = 'none';
-    document.getElementById('patternGameArea').style.display = 'block';
+
+    const levelSelect = document.getElementById('patternLevelSelect');
+    const gameArea = document.getElementById('patternGameArea');
+
+    if (typeof showToast === 'function') {
+        showToast('Pattern: levelSelect ' + (levelSelect ? 'found' : 'NOT FOUND') + ', gameArea ' + (gameArea ? 'found' : 'NOT FOUND'));
+    }
+
+    if (levelSelect) levelSelect.style.display = 'none';
+    if (gameArea) gameArea.style.display = 'block';
+
     loadPatternPuzzle();
 }
 
 // Load Pattern Puzzle
 function loadPatternPuzzle() {
+    if (typeof showToast === 'function') {
+        showToast('loadPatternPuzzle called');
+    }
+
+    try {
+        const levelKey = `level${window.currentPatternLevel}`;
+        if (typeof showToast === 'function') {
+            showToast('Pattern levelKey: ' + levelKey);
+        }
+
+        const puzzles = patternLevels[levelKey];
+        if (typeof showToast === 'function') {
+            showToast('Pattern puzzles: ' + (puzzles ? puzzles.length : 'undefined'));
+        }
+    } catch(e) {
+        if (typeof showToast === 'function') {
+            showToast('ERROR in loadPatternPuzzle: ' + e.message);
+        }
+        return;
+    }
+
     const levelKey = `level${window.currentPatternLevel}`;
     const puzzles = patternLevels[levelKey];
 
