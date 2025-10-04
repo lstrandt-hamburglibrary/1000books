@@ -3389,6 +3389,23 @@ function loadTraceLetter() {
         showToast('loadTraceLetter called');
     }
 
+    try {
+        const levelKey = `level${window.currentTraceLevel}`;
+        if (typeof showToast === 'function') {
+            showToast('levelKey created: ' + levelKey);
+        }
+
+        const letters = traceMatchLetters[levelKey];
+        if (typeof showToast === 'function') {
+            showToast('letters: ' + (letters ? letters.length : 'undefined'));
+        }
+    } catch(e) {
+        if (typeof showToast === 'function') {
+            showToast('ERROR in loadTraceLetter: ' + e.message);
+        }
+        return;
+    }
+
     const levelKey = `level${window.currentTraceLevel}`;
     const letters = traceMatchLetters[levelKey];
 
