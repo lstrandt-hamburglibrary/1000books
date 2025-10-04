@@ -3017,7 +3017,7 @@ function launchPatternBuilderGame() {
                             font-size: 1.2rem;
                             font-weight: bold;
                             transition: transform 0.2s;
-                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ">
                             Level 1<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">Simple Patterns</span>
                         </button>
@@ -3030,7 +3030,7 @@ function launchPatternBuilderGame() {
                             font-size: 1.2rem;
                             font-weight: bold;
                             transition: transform 0.2s;
-                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ">
                             Level 2<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">Trickier Patterns</span>
                         </button>
@@ -3043,7 +3043,7 @@ function launchPatternBuilderGame() {
                             font-size: 1.2rem;
                             font-weight: bold;
                             transition: transform 0.2s;
-                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ">
                             Level 3<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">Long Patterns</span>
                         </button>
@@ -3357,7 +3357,7 @@ function launchTraceMatchGame() {
                             font-size: 1.2rem;
                             font-weight: bold;
                             transition: transform 0.2s;
-                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ">
                             Level 1<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">Uppercase Letters</span>
                         </button>
@@ -3370,7 +3370,7 @@ function launchTraceMatchGame() {
                             font-size: 1.2rem;
                             font-weight: bold;
                             transition: transform 0.2s;
-                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ">
                             Level 2<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">Lowercase Letters</span>
                         </button>
@@ -3383,7 +3383,7 @@ function launchTraceMatchGame() {
                             font-size: 1.2rem;
                             font-weight: bold;
                             transition: transform 0.2s;
-                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ">
                             Level 3<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">Mixed Case</span>
                         </button>
