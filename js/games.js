@@ -2970,9 +2970,25 @@ function launchPatternBuilderGame() {
     if (typeof showToast === 'function') {
         showToast('DEBUG: 3 - setting variables');
     }
-    currentPatternLevel = 1;
-    currentPatternIndex = 0;
-    patternScore = 0;
+
+    try {
+        window.currentPatternLevel = 1;
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: 3a - set level');
+        }
+        window.currentPatternIndex = 0;
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: 3b - set index');
+        }
+        window.patternScore = 0;
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: 3c - set score');
+        }
+    } catch(e) {
+        if (typeof showToast === 'function') {
+            showToast('ERROR setting vars: ' + e.message);
+        }
+    }
 
     if (typeof showToast === 'function') {
         showToast('DEBUG: 4 - about to create HTML');
@@ -3305,21 +3321,43 @@ let hasTracedLetter = false;
 function launchTraceMatchGame() {
     console.log('launchTraceMatchGame called!');
     if (typeof showToast === 'function') {
-        showToast('DEBUG: launchTraceMatchGame() called');
+        showToast('DEBUG: T1 - function called');
     }
 
     // Remove any existing game modal first
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: T2 - checking for modal');
+    }
     const existingModal = document.getElementById('gameModal');
     if (existingModal) {
         existingModal.remove();
     }
 
-    currentTraceLevel = 1;
-    currentTraceIndex = 0;
-    traceScore = 0;
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: T3 - setting variables');
+    }
+
+    try {
+        window.currentTraceLevel = 1;
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: T3a - set level');
+        }
+        window.currentTraceIndex = 0;
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: T3b - set index');
+        }
+        window.traceScore = 0;
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: T3c - set score');
+        }
+    } catch(e) {
+        if (typeof showToast === 'function') {
+            showToast('ERROR setting trace vars: ' + e.message);
+        }
+    }
 
     if (typeof showToast === 'function') {
-        showToast('DEBUG: About to create trace gameHTML...');
+        showToast('DEBUG: T4 - about to create HTML');
     }
 
     const gameHTML = `
