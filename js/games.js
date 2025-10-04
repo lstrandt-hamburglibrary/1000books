@@ -2880,6 +2880,8 @@ function showSequenceComplete() {
     }
 }
 
+// Export functions to window
+window.launchGame = launchGame;
 window.launchLetterMatchGame = launchLetterMatchGame;
 window.launchRhymeTrainsGame = launchRhymeTrainsGame;
 window.launchStorySequencingGame = launchStorySequencingGame;
@@ -2891,16 +2893,3 @@ window.clearWord = clearWord;
 window.checkWord = checkWord;
 window.toggleCategory = toggleCategory;
 window.closeMiniGame = closeMiniGame;
-        <div style="text-align: center; padding: 2rem;">
-            <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
-            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${traceGameState.score}</p>
-            <button onclick="closeMiniGame()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">🏠 Back to Games</button>
-        </div>
-    `;
-}
-
-window.launchTraceMatchGame = launchTraceMatchGame;
-window.selectTraceLevel = selectTraceLevel;
-window.clearTraceCanvas = clearTraceCanvas;
-window.checkTraceMatch = checkTraceMatch;
-// This file can be used for additional data management if needed
