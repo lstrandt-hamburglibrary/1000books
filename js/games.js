@@ -1,3 +1,4 @@
+console.log("games.js loaded successfully");
 // Mini Games for BookWorm Journey
 
 // Launch game based on selection
