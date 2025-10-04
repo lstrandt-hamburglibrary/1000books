@@ -2930,9 +2930,9 @@ const patternLevels = {
     ]
 };
 
-let currentPatternLevel = 1;
-let currentPatternIndex = 0;
-let patternScore = 0;
+let window.currentPatternLevel = 1;
+let window.currentPatternIndex = 0;
+let window.patternScore = 0;
 
 // Launch Pattern Builder Game
 function launchPatternBuilderGame() {
@@ -2942,9 +2942,9 @@ function launchPatternBuilderGame() {
         existingModal.remove();
     }
 
-    window.currentPatternLevel = 1;
-    window.currentPatternIndex = 0;
-    window.patternScore = 0;
+    window.window.currentPatternLevel = 1;
+    window.window.currentPatternIndex = 0;
+    window.window.patternScore = 0;
 
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
@@ -3038,9 +3038,9 @@ function launchPatternBuilderGame() {
 
 // Select Pattern Level
 function selectPatternLevel(level) {
-    currentPatternLevel = level;
-    currentPatternIndex = 0;
-    patternScore = 0;
+    window.currentPatternLevel = level;
+    window.currentPatternIndex = 0;
+    window.patternScore = 0;
     document.getElementById('patternLevelSelect').style.display = 'none';
     document.getElementById('patternGameArea').style.display = 'block';
     loadPatternPuzzle();
@@ -3048,15 +3048,15 @@ function selectPatternLevel(level) {
 
 // Load Pattern Puzzle
 function loadPatternPuzzle() {
-    const levelKey = `level${currentPatternLevel}`;
+    const levelKey = `level${window.currentPatternLevel}`;
     const puzzles = patternLevels[levelKey];
 
-    if (currentPatternIndex >= puzzles.length) {
+    if (window.currentPatternIndex >= puzzles.length) {
         showPatternComplete();
         return;
     }
 
-    const puzzle = puzzles[currentPatternIndex];
+    const puzzle = puzzles[window.currentPatternIndex];
 
     // Get wrong answer options (3 random shapes that aren't the correct answer)
     const wrongOptions = patternShapes.filter(s => s !== puzzle.answer).sort(() => Math.random() - 0.5).slice(0, 3);
@@ -3065,8 +3065,8 @@ function loadPatternPuzzle() {
     const gameArea = document.getElementById('patternGameArea');
     gameArea.innerHTML = `
         <div style="text-align: center; margin-bottom: 1.5rem;">
-            <h3>Pattern ${currentPatternIndex + 1} of ${puzzles.length}</h3>
-            <p>Score: ${patternScore}</p>
+            <h3>Pattern ${window.currentPatternIndex + 1} of ${puzzles.length}</h3>
+            <p>Score: ${window.patternScore}</p>
         </div>
 
         <div style="
@@ -3138,19 +3138,19 @@ function loadPatternPuzzle() {
 
 // Check Pattern Answer
 function checkPatternAnswer(selectedShape) {
-    const levelKey = `level${currentPatternLevel}`;
-    const puzzle = patternLevels[levelKey][currentPatternIndex];
+    const levelKey = `level${window.currentPatternLevel}`;
+    const puzzle = patternLevels[levelKey][window.currentPatternIndex];
     const feedback = document.getElementById('patternFeedback');
 
     if (selectedShape === puzzle.answer) {
-        patternScore += 10;
+        window.patternScore += 10;
         feedback.style.background = '#d4edda';
         feedback.style.color = '#155724';
         feedback.innerHTML = '🎉 Correct! Great pattern recognition!';
         feedback.style.display = 'block';
 
         setTimeout(() => {
-            currentPatternIndex++;
+            window.currentPatternIndex++;
             loadPatternPuzzle();
         }, 1500);
     } else {
@@ -3171,9 +3171,9 @@ function showPatternComplete() {
     gameArea.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
             <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
-            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${patternScore}</p>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${window.patternScore}</p>
             <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <button onclick="selectPatternLevel(${currentPatternLevel})" style="
+                <button onclick="selectPatternLevel(${window.currentPatternLevel})" style="
                     background: #007bff;
                     color: white;
                     border: none;
@@ -3183,8 +3183,8 @@ function showPatternComplete() {
                     font-size: 1rem;
                     font-weight: bold;
                 ">🔄 Play Again</button>
-                ${currentPatternLevel < 3 ? `
-                <button onclick="selectPatternLevel(${currentPatternLevel + 1})" style="
+                ${window.currentPatternLevel < 3 ? `
+                <button onclick="selectPatternLevel(${window.currentPatternLevel + 1})" style="
                     background: #28a745;
                     color: white;
                     border: none;
@@ -3210,7 +3210,7 @@ function showPatternComplete() {
     `;
 
     // Check for achievement
-    if (patternScore >= 50) {
+    if (window.patternScore >= 50) {
         checkGameAchievement('pattern-master');
     }
 }
@@ -3251,13 +3251,13 @@ const traceMatchLetters = {
     ]
 };
 
-let currentTraceLevel = 1;
-let currentTraceIndex = 0;
-let traceScore = 0;
-let traceCanvas = null;
-let traceCtx = null;
-let isTracing = false;
-let hasTracedLetter = false;
+let window.currentTraceLevel = 1;
+let window.currentTraceIndex = 0;
+let window.traceScore = 0;
+let window.traceCanvas = null;
+let window.traceCtx = null;
+let window.isTracing = false;
+let window.hasTracedLetter = false;
 
 // Launch Trace & Match Game
 function launchTraceMatchGame() {
@@ -3267,9 +3267,9 @@ function launchTraceMatchGame() {
         existingModal.remove();
     }
 
-    window.currentTraceLevel = 1;
-    window.currentTraceIndex = 0;
-    window.traceScore = 0;
+    window.window.currentTraceLevel = 1;
+    window.window.currentTraceIndex = 0;
+    window.window.traceScore = 0;
 
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
@@ -3363,9 +3363,9 @@ function launchTraceMatchGame() {
 
 // Select Trace Level
 function selectTraceLevel(level) {
-    currentTraceLevel = level;
-    currentTraceIndex = 0;
-    traceScore = 0;
+    window.currentTraceLevel = level;
+    window.currentTraceIndex = 0;
+    window.traceScore = 0;
     document.getElementById('traceLevelSelect').style.display = 'none';
     document.getElementById('traceGameArea').style.display = 'block';
     loadTraceLetter();
@@ -3373,22 +3373,22 @@ function selectTraceLevel(level) {
 
 // Load Trace Letter
 function loadTraceLetter() {
-    const levelKey = `level${currentTraceLevel}`;
+    const levelKey = `level${window.currentTraceLevel}`;
     const letters = traceMatchLetters[levelKey];
 
-    if (currentTraceIndex >= letters.length) {
+    if (window.currentTraceIndex >= letters.length) {
         showTraceComplete();
         return;
     }
 
-    const letterData = letters[currentTraceIndex];
-    hasTracedLetter = false;
+    const letterData = letters[window.currentTraceIndex];
+    window.hasTracedLetter = false;
 
     const gameArea = document.getElementById('traceGameArea');
     gameArea.innerHTML = `
         <div style="text-align: center; margin-bottom: 1.5rem;">
-            <h3>Letter ${currentTraceIndex + 1} of ${letters.length}</h3>
-            <p>Score: ${traceScore}</p>
+            <h3>Letter ${window.currentTraceIndex + 1} of ${letters.length}</h3>
+            <p>Score: ${window.traceScore}</p>
         </div>
 
         <div style="
@@ -3407,7 +3407,7 @@ function loadTraceLetter() {
                 font-family: 'Comic Sans MS', cursive;
             ">${letterData.letter}</div>
 
-            <canvas id="traceCanvas"
+            <canvas id="window.traceCanvas"
                 width="300"
                 height="200"
                 style="
@@ -3469,79 +3469,79 @@ function loadTraceLetter() {
 
     // Initialize canvas
     setTimeout(() => {
-        traceCanvas = document.getElementById('traceCanvas');
-        if (traceCanvas) {
-            traceCtx = traceCanvas.getContext('2d');
-            traceCtx.lineWidth = 8;
-            traceCtx.lineCap = 'round';
-            traceCtx.strokeStyle = '#007bff';
+        window.traceCanvas = document.getElementById('window.traceCanvas');
+        if (window.traceCanvas) {
+            window.traceCtx = window.traceCanvas.getContext('2d');
+            window.traceCtx.lineWidth = 8;
+            window.traceCtx.lineCap = 'round';
+            window.traceCtx.strokeStyle = '#007bff';
 
             // Mouse events
-            traceCanvas.addEventListener('mousedown', startTracing);
-            traceCanvas.addEventListener('mousemove', trace);
-            traceCanvas.addEventListener('mouseup', stopTracing);
-            traceCanvas.addEventListener('mouseout', stopTracing);
+            window.traceCanvas.addEventListener('mousedown', startTracing);
+            window.traceCanvas.addEventListener('mousemove', trace);
+            window.traceCanvas.addEventListener('mouseup', stopTracing);
+            window.traceCanvas.addEventListener('mouseout', stopTracing);
 
             // Touch events
-            traceCanvas.addEventListener('touchstart', handleTouchStart);
-            traceCanvas.addEventListener('touchmove', handleTouchMove);
-            traceCanvas.addEventListener('touchend', stopTracing);
+            window.traceCanvas.addEventListener('touchstart', handleTouchStart);
+            window.traceCanvas.addEventListener('touchmove', handleTouchMove);
+            window.traceCanvas.addEventListener('touchend', stopTracing);
         }
     }, 100);
 }
 
 // Tracing functions
 function startTracing(e) {
-    isTracing = true;
-    const rect = traceCanvas.getBoundingClientRect();
-    traceCtx.beginPath();
-    traceCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-    hasTracedLetter = true;
+    window.isTracing = true;
+    const rect = window.traceCanvas.getBoundingClientRect();
+    window.traceCtx.beginPath();
+    window.traceCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    window.hasTracedLetter = true;
     document.getElementById('doneTracingBtn').style.display = 'inline-block';
 }
 
 function trace(e) {
-    if (!isTracing) return;
-    const rect = traceCanvas.getBoundingClientRect();
-    traceCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    traceCtx.stroke();
+    if (!window.isTracing) return;
+    const rect = window.traceCanvas.getBoundingClientRect();
+    window.traceCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    window.traceCtx.stroke();
 }
 
 function stopTracing() {
-    isTracing = false;
+    window.isTracing = false;
 }
 
 function handleTouchStart(e) {
     e.preventDefault();
-    isTracing = true;
-    const rect = traceCanvas.getBoundingClientRect();
+    window.isTracing = true;
+    const rect = window.traceCanvas.getBoundingClientRect();
     const touch = e.touches[0];
-    traceCtx.beginPath();
-    traceCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    hasTracedLetter = true;
+    window.traceCtx.beginPath();
+    window.traceCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    window.hasTracedLetter = true;
     document.getElementById('doneTracingBtn').style.display = 'inline-block';
 }
 
 function handleTouchMove(e) {
     e.preventDefault();
-    if (!isTracing) return;
-    const rect = traceCanvas.getBoundingClientRect();
+    if (!window.isTracing) return;
+    const rect = window.traceCanvas.getBoundingClientRect();
     const touch = e.touches[0];
-    traceCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    traceCtx.stroke();
+    window.traceCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    window.traceCtx.stroke();
 }
 
 function clearTraceCanvas() {
-    if (traceCtx && traceCanvas) {
-        traceCtx.clearRect(0, 0, traceCanvas.width, traceCanvas.height);
-        hasTracedLetter = false;
+    if (window.traceCtx && window.traceCanvas) {
+        window.traceCtx.clearRect(0, 0, window.traceCanvas.width, window.traceCanvas.height);
+        window.hasTracedLetter = false;
         document.getElementById('doneTracingBtn').style.display = 'none';
     }
 }
 
 // Show Match Options
 function showMatchOptions() {
-    if (!hasTracedLetter) {
+    if (!window.hasTracedLetter) {
         const feedback = document.getElementById('traceFeedback');
         feedback.style.background = '#fff3cd';
         feedback.style.color = '#856404';
@@ -3556,13 +3556,13 @@ function showMatchOptions() {
     document.getElementById('matchSection').style.display = 'block';
     document.getElementById('doneTracingBtn').style.display = 'none';
 
-    const levelKey = `level${currentTraceLevel}`;
-    const letterData = traceMatchLetters[levelKey][currentTraceIndex];
+    const levelKey = `level${window.currentTraceLevel}`;
+    const letterData = traceMatchLetters[levelKey][window.currentTraceIndex];
     const correctMatch = letterData.matches[0]; // First match is correct
 
     // Get 2 wrong options from other letters in this level
     const allOtherMatches = traceMatchLetters[levelKey]
-        .filter((_, idx) => idx !== currentTraceIndex)
+        .filter((_, idx) => idx !== window.currentTraceIndex)
         .flatMap(l => l.matches);
     const wrongOptions = allOtherMatches.sort(() => Math.random() - 0.5).slice(0, 2);
 
@@ -3588,20 +3588,20 @@ function showMatchOptions() {
 
 // Check Trace Match
 function checkTraceMatch(selectedOption) {
-    const levelKey = `level${currentTraceLevel}`;
-    const letterData = traceMatchLetters[levelKey][currentTraceIndex];
+    const levelKey = `level${window.currentTraceLevel}`;
+    const letterData = traceMatchLetters[levelKey][window.currentTraceIndex];
     const correctMatch = letterData.matches[0];
     const feedback = document.getElementById('traceFeedback');
 
     if (selectedOption === correctMatch) {
-        traceScore += 10;
+        window.traceScore += 10;
         feedback.style.background = '#d4edda';
         feedback.style.color = '#155724';
         feedback.innerHTML = `🎉 Perfect! "${letterData.letter}" is for ${selectedOption}!`;
         feedback.style.display = 'block';
 
         setTimeout(() => {
-            currentTraceIndex++;
+            window.currentTraceIndex++;
             loadTraceLetter();
         }, 2000);
     } else {
@@ -3622,9 +3622,9 @@ function showTraceComplete() {
     gameArea.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
             <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
-            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${traceScore}</p>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${window.traceScore}</p>
             <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <button onclick="selectTraceLevel(${currentTraceLevel})" style="
+                <button onclick="selectTraceLevel(${window.currentTraceLevel})" style="
                     background: #007bff;
                     color: white;
                     border: none;
@@ -3634,8 +3634,8 @@ function showTraceComplete() {
                     font-size: 1rem;
                     font-weight: bold;
                 ">🔄 Play Again</button>
-                ${currentTraceLevel < 3 ? `
-                <button onclick="selectTraceLevel(${currentTraceLevel + 1})" style="
+                ${window.currentTraceLevel < 3 ? `
+                <button onclick="selectTraceLevel(${window.currentTraceLevel + 1})" style="
                     background: #28a745;
                     color: white;
                     border: none;
@@ -3661,7 +3661,7 @@ function showTraceComplete() {
     `;
 
     // Check for achievement
-    if (traceScore >= 80) {
+    if (window.traceScore >= 80) {
         checkGameAchievement('trace-master');
     }
 }
