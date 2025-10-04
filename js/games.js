@@ -2930,9 +2930,9 @@ const patternLevels = {
     ]
 };
 
-let window.currentPatternLevel = 1;
-let window.currentPatternIndex = 0;
-let window.patternScore = 0;
+let currentPatternLevel = 1;
+let currentPatternIndex = 0;
+let patternScore = 0;
 
 // Launch Pattern Builder Game
 function launchPatternBuilderGame() {
@@ -2942,9 +2942,9 @@ function launchPatternBuilderGame() {
         existingModal.remove();
     }
 
-    window.window.currentPatternLevel = 1;
-    window.window.currentPatternIndex = 0;
-    window.window.patternScore = 0;
+    window.currentPatternLevel = 1;
+    window.currentPatternIndex = 0;
+    window.patternScore = 0;
 
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
@@ -3251,13 +3251,13 @@ const traceMatchLetters = {
     ]
 };
 
-let window.currentTraceLevel = 1;
-let window.currentTraceIndex = 0;
-let window.traceScore = 0;
-let window.traceCanvas = null;
-let window.traceCtx = null;
-let window.isTracing = false;
-let window.hasTracedLetter = false;
+let currentTraceLevel = 1;
+let currentTraceIndex = 0;
+let traceScore = 0;
+let traceCanvas = null;
+let traceCtx = null;
+let isTracing = false;
+let hasTracedLetter = false;
 
 // Launch Trace & Match Game
 function launchTraceMatchGame() {
@@ -3267,9 +3267,9 @@ function launchTraceMatchGame() {
         existingModal.remove();
     }
 
-    window.window.currentTraceLevel = 1;
-    window.window.currentTraceIndex = 0;
-    window.window.traceScore = 0;
+    window.currentTraceLevel = 1;
+    window.currentTraceIndex = 0;
+    window.traceScore = 0;
 
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
