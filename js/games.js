@@ -2,6 +2,7 @@
 
 // Launch game based on selection
 function launchGame(gameName) {
+    console.log('launchGame called with:', gameName);
     switch(gameName) {
         case 'pete-buttons':
             launchPeteButtonGame();
@@ -22,11 +23,15 @@ function launchGame(gameName) {
             launchStorySequencingGame();
             break;
         case 'pattern-builder':
+            console.log('Calling launchPatternBuilderGame...');
             launchPatternBuilderGame();
             break;
         case 'trace-match':
+            console.log('Calling launchTraceMatchGame...');
             launchTraceMatchGame();
             break;
+        default:
+            console.error('Unknown game:', gameName);
     }
 }
 
@@ -2936,6 +2941,8 @@ let patternScore = 0;
 
 // Launch Pattern Builder Game
 function launchPatternBuilderGame() {
+    console.log('launchPatternBuilderGame called!');
+
     // Remove any existing game modal first
     const existingModal = document.getElementById('gameModal');
     if (existingModal) {
@@ -3261,6 +3268,8 @@ let hasTracedLetter = false;
 
 // Launch Trace & Match Game
 function launchTraceMatchGame() {
+    console.log('launchTraceMatchGame called!');
+
     // Remove any existing game modal first
     const existingModal = document.getElementById('gameModal');
     if (existingModal) {
