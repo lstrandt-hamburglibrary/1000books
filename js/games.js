@@ -2946,8 +2946,9 @@ let patternGameState = {
     score: 0
 };
 
-    if (typeof showToast === "function") showToast("launchPatternBuilderGame called");
 function launchPatternBuilderGame() {
+    if (typeof showToast === "function") showToast("launchPatternBuilderGame called");
+
     const existingModal = document.getElementById('gameModal');
     if (existingModal) existingModal.remove();
 
