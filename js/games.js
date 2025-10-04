@@ -3,6 +3,9 @@ console.log("games.js loaded successfully"); if(typeof showToast === "function")
 
 // Launch game based on selection
 function launchGame(gameName) {
+    if (typeof showToast === 'function') {
+        showToast('launchGame called with: ' + gameName);
+    }
     switch(gameName) {
         case 'pete-buttons':
             launchPeteButtonGame();
@@ -23,9 +26,15 @@ function launchGame(gameName) {
             launchStorySequencingGame();
             break;
         case 'pattern-builder':
+            if (typeof showToast === 'function') {
+                showToast('About to call launchPatternBuilderGame');
+            }
             launchPatternBuilderGame();
             break;
         case 'trace-match':
+            if (typeof showToast === 'function') {
+                showToast('About to call launchTraceMatchGame');
+            }
             launchTraceMatchGame();
             break;
     }
