@@ -2,10 +2,6 @@
 
 // Launch game based on selection
 function launchGame(gameName) {
-    console.log('launchGame called with:', gameName);
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: launchGame(' + gameName + ')');
-    }
     switch(gameName) {
         case 'pete-buttons':
             launchPeteButtonGame();
@@ -26,24 +22,11 @@ function launchGame(gameName) {
             launchStorySequencingGame();
             break;
         case 'pattern-builder':
-            console.log('Calling launchPatternBuilderGame...');
-            if (typeof showToast === 'function') {
-                showToast('Launching Pattern Builder...');
-            }
             launchPatternBuilderGame();
             break;
         case 'trace-match':
-            console.log('Calling launchTraceMatchGame...');
-            if (typeof showToast === 'function') {
-                showToast('Launching Trace & Match...');
-            }
             launchTraceMatchGame();
             break;
-        default:
-            console.error('Unknown game:', gameName);
-            if (typeof showToast === 'function') {
-                showToast('ERROR: Unknown game ' + gameName);
-            }
     }
 }
 
@@ -2953,46 +2936,15 @@ let patternScore = 0;
 
 // Launch Pattern Builder Game
 function launchPatternBuilderGame() {
-    console.log('launchPatternBuilderGame called!');
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: 1 - function called');
-    }
-
     // Remove any existing game modal first
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: 2 - checking for modal');
-    }
     const existingModal = document.getElementById('gameModal');
     if (existingModal) {
         existingModal.remove();
     }
 
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: 3 - setting variables');
-    }
-
-    try {
-        window.currentPatternLevel = 1;
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: 3a - set level');
-        }
-        window.currentPatternIndex = 0;
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: 3b - set index');
-        }
-        window.patternScore = 0;
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: 3c - set score');
-        }
-    } catch(e) {
-        if (typeof showToast === 'function') {
-            showToast('ERROR setting vars: ' + e.message);
-        }
-    }
-
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: 4 - about to create HTML');
-    }
+    window.currentPatternLevel = 1;
+    window.currentPatternIndex = 0;
+    window.patternScore = 0;
 
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
@@ -3081,17 +3033,7 @@ function launchPatternBuilderGame() {
         </div>
     `;
 
-    try {
-        document.body.insertAdjacentHTML('beforeend', gameHTML);
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: Pattern game HTML inserted!');
-        }
-    } catch (error) {
-        console.error('Error inserting Pattern Builder HTML:', error);
-        if (typeof showToast === 'function') {
-            showToast('ERROR: ' + error.message);
-        }
-    }
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
 }
 
 // Select Pattern Level
@@ -3319,46 +3261,15 @@ let hasTracedLetter = false;
 
 // Launch Trace & Match Game
 function launchTraceMatchGame() {
-    console.log('launchTraceMatchGame called!');
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: T1 - function called');
-    }
-
     // Remove any existing game modal first
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: T2 - checking for modal');
-    }
     const existingModal = document.getElementById('gameModal');
     if (existingModal) {
         existingModal.remove();
     }
 
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: T3 - setting variables');
-    }
-
-    try {
-        window.currentTraceLevel = 1;
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: T3a - set level');
-        }
-        window.currentTraceIndex = 0;
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: T3b - set index');
-        }
-        window.traceScore = 0;
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: T3c - set score');
-        }
-    } catch(e) {
-        if (typeof showToast === 'function') {
-            showToast('ERROR setting trace vars: ' + e.message);
-        }
-    }
-
-    if (typeof showToast === 'function') {
-        showToast('DEBUG: T4 - about to create HTML');
-    }
+    window.currentTraceLevel = 1;
+    window.currentTraceIndex = 0;
+    window.traceScore = 0;
 
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
@@ -3447,17 +3358,7 @@ function launchTraceMatchGame() {
         </div>
     `;
 
-    try {
-        document.body.insertAdjacentHTML('beforeend', gameHTML);
-        if (typeof showToast === 'function') {
-            showToast('DEBUG: Trace game HTML inserted!');
-        }
-    } catch (error) {
-        console.error('Error inserting Trace & Match HTML:', error);
-        if (typeof showToast === 'function') {
-            showToast('ERROR: ' + error.message);
-        }
-    }
+    document.body.insertAdjacentHTML('beforeend', gameHTML);
 }
 
 // Select Trace Level
