@@ -2936,6 +2936,12 @@ let patternScore = 0;
 
 // Launch Pattern Builder Game
 function launchPatternBuilderGame() {
+    // Remove any existing game modal first
+    const existingModal = document.getElementById('gameModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
     currentPatternLevel = 1;
     currentPatternIndex = 0;
     patternScore = 0;
@@ -3255,6 +3261,12 @@ let hasTracedLetter = false;
 
 // Launch Trace & Match Game
 function launchTraceMatchGame() {
+    // Remove any existing game modal first
+    const existingModal = document.getElementById('gameModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
     currentTraceLevel = 1;
     currentTraceIndex = 0;
     traceScore = 0;
