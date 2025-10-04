@@ -3095,9 +3095,9 @@ let traceGameState = {
     hasTraced: false
 };
 
-    if (typeof showToast === "function") showToast("launchTraceMatchGame called");
 function launchTraceMatchGame() {
     const existingModal = document.getElementById('gameModal');
+    if (typeof showToast === "function") showToast("launchTraceMatchGame called");
     if (existingModal) existingModal.remove();
 
     traceGameState = { level: 1, index: 0, score: 0, hasTraced: false };
