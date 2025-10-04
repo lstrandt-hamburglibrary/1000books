@@ -3055,7 +3055,17 @@ function launchPatternBuilderGame() {
         </div>
     `;
 
-    document.body.insertAdjacentHTML('beforeend', gameHTML);
+    try {
+        document.body.insertAdjacentHTML('beforeend', gameHTML);
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: Pattern game HTML inserted!');
+        }
+    } catch (error) {
+        console.error('Error inserting Pattern Builder HTML:', error);
+        if (typeof showToast === 'function') {
+            showToast('ERROR: ' + error.message);
+        }
+    }
 }
 
 // Select Pattern Level
@@ -3385,7 +3395,17 @@ function launchTraceMatchGame() {
         </div>
     `;
 
-    document.body.insertAdjacentHTML('beforeend', gameHTML);
+    try {
+        document.body.insertAdjacentHTML('beforeend', gameHTML);
+        if (typeof showToast === 'function') {
+            showToast('DEBUG: Trace game HTML inserted!');
+        }
+    } catch (error) {
+        console.error('Error inserting Trace & Match HTML:', error);
+        if (typeof showToast === 'function') {
+            showToast('ERROR: ' + error.message);
+        }
+    }
 }
 
 // Select Trace Level
