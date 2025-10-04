@@ -3363,11 +3363,23 @@ function launchTraceMatchGame() {
 
 // Select Trace Level
 function selectTraceLevel(level) {
+    if (typeof showToast === 'function') {
+        showToast('selectTraceLevel called with level ' + level);
+    }
     window.currentTraceLevel = level;
     window.currentTraceIndex = 0;
     window.traceScore = 0;
-    document.getElementById('traceLevelSelect').style.display = 'none';
-    document.getElementById('traceGameArea').style.display = 'block';
+
+    const levelSelect = document.getElementById('traceLevelSelect');
+    const gameArea = document.getElementById('traceGameArea');
+
+    if (typeof showToast === 'function') {
+        showToast('levelSelect: ' + (levelSelect ? 'found' : 'NOT FOUND') + ', gameArea: ' + (gameArea ? 'found' : 'NOT FOUND'));
+    }
+
+    if (levelSelect) levelSelect.style.display = 'none';
+    if (gameArea) gameArea.style.display = 'block';
+
     loadTraceLetter();
 }
 
