@@ -3,6 +3,9 @@
 // Launch game based on selection
 function launchGame(gameName) {
     console.log('launchGame called with:', gameName);
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: launchGame(' + gameName + ')');
+    }
     switch(gameName) {
         case 'pete-buttons':
             launchPeteButtonGame();
@@ -24,14 +27,23 @@ function launchGame(gameName) {
             break;
         case 'pattern-builder':
             console.log('Calling launchPatternBuilderGame...');
+            if (typeof showToast === 'function') {
+                showToast('Launching Pattern Builder...');
+            }
             launchPatternBuilderGame();
             break;
         case 'trace-match':
             console.log('Calling launchTraceMatchGame...');
+            if (typeof showToast === 'function') {
+                showToast('Launching Trace & Match...');
+            }
             launchTraceMatchGame();
             break;
         default:
             console.error('Unknown game:', gameName);
+            if (typeof showToast === 'function') {
+                showToast('ERROR: Unknown game ' + gameName);
+            }
     }
 }
 
@@ -2942,6 +2954,9 @@ let patternScore = 0;
 // Launch Pattern Builder Game
 function launchPatternBuilderGame() {
     console.log('launchPatternBuilderGame called!');
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: launchPatternBuilderGame() called');
+    }
 
     // Remove any existing game modal first
     const existingModal = document.getElementById('gameModal');
@@ -3269,6 +3284,9 @@ let hasTracedLetter = false;
 // Launch Trace & Match Game
 function launchTraceMatchGame() {
     console.log('launchTraceMatchGame called!');
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: launchTraceMatchGame() called');
+    }
 
     // Remove any existing game modal first
     const existingModal = document.getElementById('gameModal');
