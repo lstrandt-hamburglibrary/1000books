@@ -2903,10 +2903,10 @@ window.selectSequenceEvent = selectSequenceEvent;
 window.resetSequence = resetSequence;
 window.checkSequence = checkSequence;
 
-// Pattern Builder Game - Clean rewrite
-const PATTERN_SHAPES = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⭐', '❤️', '🔷', '🔶'];
+// Pattern Builder Game
+window.patternShapes = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⭐', '❤️', '🔷', '🔶'];
 
-const PATTERN_LEVELS = {
+window.patternLevels = {
     level1: [
         { pattern: ['🔴', '🔵', '🔴', '🔵', '?'], answer: '🔵' },
         { pattern: ['⭐', '⭐', '❤️', '⭐', '⭐', '?'], answer: '❤️' },
@@ -2930,39 +2930,104 @@ const PATTERN_LEVELS = {
     ]
 };
 
-let patternGameState = {
-    level: 1,
-    index: 0,
-    score: 0
-};
+let currentPatternLevel = 1;
+let currentPatternIndex = 0;
+let patternScore = 0;
 
+// Launch Pattern Builder Game
 function launchPatternBuilderGame() {
+    // Remove any existing game modal first
     const existingModal = document.getElementById('gameModal');
-    if (existingModal) existingModal.remove();
+    if (existingModal) {
+        existingModal.remove();
+    }
 
-    patternGameState = { level: 1, index: 0, score: 0 };
+    window.currentPatternLevel = 1;
+    window.currentPatternIndex = 0;
+    window.patternScore = 0;
 
     const gameHTML = `
-        <div id="gameModal" class="game-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 3000;">
-            <div class="game-container" style="background: white; padding: 2rem; border-radius: 20px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        ">
+            <div class="game-container" style="
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>🔷 Pattern Builder</h2>
-                    <button onclick="closeMiniGame()" style="background: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">✕ Close</button>
+                    <button onclick="closeMiniGame()" style="
+                        background: #e74c3c;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                    ">✕ Close</button>
                 </div>
+
                 <div id="patternLevelSelect">
-                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">Complete the pattern by choosing the correct shape!</p>
+                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">
+                        Complete the pattern by choosing the correct shape!
+                    </p>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <button onclick="selectPatternLevel(1)" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border: none; padding: 2rem; border-radius: 15px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">
-                            Level 1<br><span style="font-size: 0.9rem; font-weight: normal;">Simple Patterns</span>
+                        <button onclick="selectPatternLevel(1)" style="
+                            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        ">
+                            Level 1<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Simple Patterns</span>
                         </button>
-                        <button onclick="selectPatternLevel(2)" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); border: none; padding: 2rem; border-radius: 15px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">
-                            Level 2<br><span style="font-size: 0.9rem; font-weight: normal;">Trickier Patterns</span>
+                        <button onclick="selectPatternLevel(2)" style="
+                            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        ">
+                            Level 2<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Trickier Patterns</span>
                         </button>
-                        <button onclick="selectPatternLevel(3)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; padding: 2rem; border-radius: 15px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">
-                            Level 3<br><span style="font-size: 0.9rem; font-weight: normal;">Long Patterns</span>
+                        <button onclick="selectPatternLevel(3)" style="
+                            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        ">
+                            Level 3<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Long Patterns</span>
                         </button>
                     </div>
                 </div>
+
                 <div id="patternGameArea" style="display: none;"></div>
             </div>
         </div>
@@ -2971,82 +3036,236 @@ function launchPatternBuilderGame() {
     document.body.insertAdjacentHTML('beforeend', gameHTML);
 }
 
+// Select Pattern Level
 function selectPatternLevel(level) {
-    patternGameState.level = level;
-    patternGameState.index = 0;
-    patternGameState.score = 0;
+    if (typeof showToast === 'function') {
+        showToast('selectPatternLevel called with level ' + level);
+    }
+    window.currentPatternLevel = level;
+    window.currentPatternIndex = 0;
+    window.patternScore = 0;
 
-    document.getElementById('patternLevelSelect').style.display = 'none';
-    document.getElementById('patternGameArea').style.display = 'block';
+    const levelSelect = document.getElementById('patternLevelSelect');
+    const gameArea = document.getElementById('patternGameArea');
+
+    if (typeof showToast === 'function') {
+        showToast('Pattern: levelSelect ' + (levelSelect ? 'found' : 'NOT FOUND') + ', gameArea ' + (gameArea ? 'found' : 'NOT FOUND'));
+    }
+
+    if (levelSelect) levelSelect.style.display = 'none';
+    if (gameArea) gameArea.style.display = 'block';
+
     loadPatternPuzzle();
 }
 
+// Load Pattern Puzzle
 function loadPatternPuzzle() {
-    const levelKey = `level${patternGameState.level}`;
-    const puzzles = PATTERN_LEVELS[levelKey];
+    if (typeof showToast === 'function') {
+        showToast('loadPatternPuzzle called');
+    }
 
-    if (patternGameState.index >= puzzles.length) {
+    try {
+        if (typeof showToast === 'function') {
+            showToast('Pattern: checking window.patternLevels...');
+        }
+
+        if (typeof window.patternLevels === 'undefined') {
+            if (typeof showToast === 'function') {
+                showToast('ERROR: window.patternLevels is undefined!');
+            }
+            return;
+        }
+
+        const levelKey = `level${window.currentPatternLevel}`;
+        if (typeof showToast === 'function') {
+            showToast('Pattern levelKey: ' + levelKey);
+        }
+
+        const puzzles = window.patternLevels[levelKey];
+        if (typeof showToast === 'function') {
+            showToast('Pattern puzzles: ' + (puzzles ? puzzles.length : 'undefined'));
+        }
+    } catch(e) {
+        if (typeof showToast === 'function') {
+            showToast('ERROR in loadPatternPuzzle: ' + e.message);
+        }
+        return;
+    }
+
+    const levelKey = `level${window.currentPatternLevel}`;
+    const puzzles = window.patternLevels[levelKey];
+
+    if (window.currentPatternIndex >= puzzles.length) {
         showPatternComplete();
         return;
     }
 
-    const puzzle = puzzles[patternGameState.index];
-    const wrongOptions = PATTERN_SHAPES.filter(s => s !== puzzle.answer).sort(() => Math.random() - 0.5).slice(0, 3);
+    const puzzle = puzzles[window.currentPatternIndex];
+
+    // Get wrong answer options (3 random shapes that aren't the correct answer)
+    const wrongOptions = window.patternShapes.filter(s => s !== puzzle.answer).sort(() => Math.random() - 0.5).slice(0, 3);
     const allOptions = [puzzle.answer, ...wrongOptions].sort(() => Math.random() - 0.5);
 
     const gameArea = document.getElementById('patternGameArea');
     gameArea.innerHTML = `
         <div style="text-align: center; margin-bottom: 1.5rem;">
-            <h3>Pattern ${patternGameState.index + 1} of ${puzzles.length}</h3>
-            <p>Score: ${patternGameState.score}</p>
+            <h3>Pattern ${window.currentPatternIndex + 1} of ${puzzles.length}</h3>
+            <p>Score: ${window.patternScore}</p>
         </div>
-        <div style="background: #f8f9fa; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
+
+        <div style="
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        ">
             <p style="font-weight: bold; margin-bottom: 1rem; color: #6c757d;">Complete the pattern:</p>
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; font-size: 3rem;">
-                ${puzzle.pattern.map(item => `<div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">${item}</div>`).join('')}
+            <div style="
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+                font-size: 3rem;
+            ">
+                ${puzzle.pattern.map(item => `
+                    <div style="
+                        width: 80px;
+                        height: 80px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: white;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    ">
+                        ${item === '?' ? '<span style="color: #6c757d;">?</span>' : item}
+                    </div>
+                `).join('')}
             </div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem;">
-            ${allOptions.map(shape => `
-                <button onclick="checkPatternAnswer('${shape}')" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 2rem; border-radius: 10px; cursor: pointer; font-size: 3rem;">
-                    ${shape}
-                </button>
-            `).join('')}
+
+        <div style="margin-bottom: 1rem;">
+            <p style="font-weight: bold; text-align: center; margin-bottom: 1rem;">Choose the missing shape:</p>
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            ">
+                ${allOptions.map(option => `
+                    <button onclick="checkPatternAnswer('${option}')" style="
+                        background: white;
+                        border: 3px solid #dee2e6;
+                        padding: 2rem;
+                        border-radius: 15px;
+                        cursor: pointer;
+                        font-size: 3rem;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='#007bff'"
+                       onmouseout="this.style.transform='scale(1)'; this.style.borderColor='#dee2e6'">
+                        ${option}
+                    </button>
+                `).join('')}
+            </div>
         </div>
+
+        <div id="patternFeedback" style="
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        "></div>
     `;
 }
 
+// Check Pattern Answer
 function checkPatternAnswer(selectedShape) {
-    const levelKey = `level${patternGameState.level}`;
-    const puzzle = PATTERN_LEVELS[levelKey][patternGameState.index];
+    const levelKey = `level${window.currentPatternLevel}`;
+    const puzzle = window.patternLevels[levelKey][window.currentPatternIndex];
+    const feedback = document.getElementById('patternFeedback');
 
     if (selectedShape === puzzle.answer) {
-        patternGameState.score += 10;
-        if (typeof showToast === 'function') showToast('✅ Correct!');
-        patternGameState.index++;
-        setTimeout(loadPatternPuzzle, 500);
+        window.patternScore += 10;
+        feedback.style.background = '#d4edda';
+        feedback.style.color = '#155724';
+        feedback.innerHTML = '🎉 Correct! Great pattern recognition!';
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            window.currentPatternIndex++;
+            loadPatternPuzzle();
+        }, 1500);
     } else {
-        if (typeof showToast === 'function') showToast('❌ Try again!');
+        feedback.style.background = '#f8d7da';
+        feedback.style.color = '#721c24';
+        feedback.innerHTML = '❌ Not quite! Try again!';
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 1500);
     }
 }
 
+// Show Pattern Complete
 function showPatternComplete() {
     const gameArea = document.getElementById('patternGameArea');
     gameArea.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
             <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
-            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${patternGameState.score}</p>
-            <button onclick="closeMiniGame()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">🏠 Back to Games</button>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${window.patternScore}</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="selectPatternLevel(${window.currentPatternLevel})" style="
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🔄 Play Again</button>
+                ${window.currentPatternLevel < 3 ? `
+                <button onclick="selectPatternLevel(${window.currentPatternLevel + 1})" style="
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">➡️ Next Level</button>
+                ` : ''}
+                <button onclick="closeMiniGame()" style="
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🏠 Back to Games</button>
+            </div>
         </div>
     `;
+
+    // Check for achievement
+    if (window.patternScore >= 50) {
+        checkGameAchievement('pattern-master');
+    }
 }
 
 window.launchPatternBuilderGame = launchPatternBuilderGame;
 window.selectPatternLevel = selectPatternLevel;
 window.checkPatternAnswer = checkPatternAnswer;
-// Trace & Match Game - Clean rewrite
-const TRACE_LETTERS = {
-    level1: [
+
+// Trace & Match Game
+window.traceMatchLetters = {
+    level1: [ // Uppercase letters
         { letter: 'A', matches: ['🍎 Apple', '🐜 Ant', '✈️ Airplane'] },
         { letter: 'B', matches: ['🐻 Bear', '🦋 Butterfly', '🏀 Ball'] },
         { letter: 'C', matches: ['🐱 Cat', '🚗 Car', '🧁 Cupcake'] },
@@ -3056,7 +3275,7 @@ const TRACE_LETTERS = {
         { letter: 'S', matches: ['⭐ Star', '☀️ Sun', '🐍 Snake'] },
         { letter: 'T', matches: ['🌳 Tree', '🚂 Train', '🐯 Tiger'] }
     ],
-    level2: [
+    level2: [ // Lowercase letters
         { letter: 'a', matches: ['🍎 apple', '🐜 ant', '✈️ airplane'] },
         { letter: 'b', matches: ['🐻 bear', '🦋 butterfly', '🏀 ball'] },
         { letter: 'c', matches: ['🐱 cat', '🚗 car', '🧁 cupcake'] },
@@ -3066,7 +3285,7 @@ const TRACE_LETTERS = {
         { letter: 'p', matches: ['🐼 panda', '🍕 pizza', '🥞 pancake'] },
         { letter: 's', matches: ['⭐ star', '☀️ sun', '🐍 snake'] }
     ],
-    level3: [
+    level3: [ // Mixed case
         { letter: 'G', matches: ['🦒 Giraffe', '🍇 Grapes', '🎸 Guitar'] },
         { letter: 'h', matches: ['🏠 house', '🐴 horse', '❤️ heart'] },
         { letter: 'K', matches: ['🔑 Key', '🦘 Kangaroo', '👑 King'] },
@@ -3076,40 +3295,108 @@ const TRACE_LETTERS = {
     ]
 };
 
-let traceGameState = {
-    level: 1,
-    index: 0,
-    score: 0,
-    hasTraced: false
-};
+let currentTraceLevel = 1;
+let currentTraceIndex = 0;
+let traceScore = 0;
+let traceCanvas = null;
+let traceCtx = null;
+let isTracing = false;
+let hasTracedLetter = false;
 
+// Launch Trace & Match Game
 function launchTraceMatchGame() {
+    // Remove any existing game modal first
     const existingModal = document.getElementById('gameModal');
-    if (existingModal) existingModal.remove();
+    if (existingModal) {
+        existingModal.remove();
+    }
 
-    traceGameState = { level: 1, index: 0, score: 0, hasTraced: false };
+    window.currentTraceLevel = 1;
+    window.currentTraceIndex = 0;
+    window.traceScore = 0;
 
     const gameHTML = `
-        <div id="gameModal" class="game-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 3000;">
-            <div class="game-container" style="background: white; padding: 2rem; border-radius: 20px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
+        <div id="gameModal" class="game-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        ">
+            <div class="game-container" style="
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2>✍️ Trace & Match</h2>
-                    <button onclick="closeMiniGame()" style="background: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">✕ Close</button>
+                    <button onclick="closeMiniGame()" style="
+                        background: #e74c3c;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                    ">✕ Close</button>
                 </div>
+
                 <div id="traceLevelSelect">
-                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">Trace the letter, then match it to the right word!</p>
+                    <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">
+                        Trace the letter, then match it to the right word!
+                    </p>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <button onclick="selectTraceLevel(1)" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border: none; padding: 2rem; border-radius: 15px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">
-                            Level 1<br><span style="font-size: 0.9rem; font-weight: normal;">Uppercase Letters</span>
+                        <button onclick="selectTraceLevel(1)" style="
+                            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        ">
+                            Level 1<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Uppercase Letters</span>
                         </button>
-                        <button onclick="selectTraceLevel(2)" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); border: none; padding: 2rem; border-radius: 15px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">
-                            Level 2<br><span style="font-size: 0.9rem; font-weight: normal;">Lowercase Letters</span>
+                        <button onclick="selectTraceLevel(2)" style="
+                            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        ">
+                            Level 2<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Lowercase Letters</span>
                         </button>
-                        <button onclick="selectTraceLevel(3)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; padding: 2rem; border-radius: 15px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">
-                            Level 3<br><span style="font-size: 0.9rem; font-weight: normal;">Mixed Case</span>
+                        <button onclick="selectTraceLevel(3)" style="
+                            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                            border: none;
+                            padding: 2rem;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            transition: transform 0.2s;
+                        ">
+                            Level 3<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Mixed Case</span>
                         </button>
                     </div>
                 </div>
+
                 <div id="traceGameArea" style="display: none;"></div>
             </div>
         </div>
@@ -3118,132 +3405,356 @@ function launchTraceMatchGame() {
     document.body.insertAdjacentHTML('beforeend', gameHTML);
 }
 
+// Select Trace Level
 function selectTraceLevel(level) {
-    traceGameState.level = level;
-    traceGameState.index = 0;
-    traceGameState.score = 0;
+    if (typeof showToast === 'function') {
+        showToast('selectTraceLevel called with level ' + level);
+    }
+    window.currentTraceLevel = level;
+    window.currentTraceIndex = 0;
+    window.traceScore = 0;
 
-    document.getElementById('traceLevelSelect').style.display = 'none';
-    document.getElementById('traceGameArea').style.display = 'block';
+    const levelSelect = document.getElementById('traceLevelSelect');
+    const gameArea = document.getElementById('traceGameArea');
+
+    if (typeof showToast === 'function') {
+        showToast('levelSelect: ' + (levelSelect ? 'found' : 'NOT FOUND') + ', gameArea: ' + (gameArea ? 'found' : 'NOT FOUND'));
+    }
+
+    if (levelSelect) levelSelect.style.display = 'none';
+    if (gameArea) gameArea.style.display = 'block';
+
     loadTraceLetter();
 }
 
+// Load Trace Letter
 function loadTraceLetter() {
-    const levelKey = `level${traceGameState.level}`;
-    const letters = TRACE_LETTERS[levelKey];
+    if (typeof showToast === 'function') {
+        showToast('loadTraceLetter called');
+    }
 
-    if (traceGameState.index >= letters.length) {
+    try {
+        const levelKey = `level${window.currentTraceLevel}`;
+        if (typeof showToast === 'function') {
+            showToast('levelKey created: ' + levelKey);
+        }
+
+        const letters = window.traceMatchLetters[levelKey];
+        if (typeof showToast === 'function') {
+            showToast('letters: ' + (letters ? letters.length : 'undefined'));
+        }
+    } catch(e) {
+        if (typeof showToast === 'function') {
+            showToast('ERROR in loadTraceLetter: ' + e.message);
+        }
+        return;
+    }
+
+    const levelKey = `level${window.currentTraceLevel}`;
+    const letters = window.traceMatchLetters[levelKey];
+
+    if (typeof showToast === 'function') {
+        showToast('levelKey: ' + levelKey + ', letters: ' + (letters ? letters.length : 'undefined'));
+    }
+
+    if (window.currentTraceIndex >= letters.length) {
         showTraceComplete();
         return;
     }
 
-    const letterData = letters[traceGameState.index];
-    traceGameState.hasTraced = false;
-
-    // Create wrong options from other letters at this level
-    const allMatches = letters.flatMap(l => l.matches);
-    const wrongMatches = allMatches.filter(m => !letterData.matches.includes(m)).sort(() => Math.random() - 0.5).slice(0, 2);
-    const allOptions = [...letterData.matches, ...wrongMatches].sort(() => Math.random() - 0.5);
+    const letterData = letters[window.currentTraceIndex];
+    window.hasTracedLetter = false;
 
     const gameArea = document.getElementById('traceGameArea');
+    if (typeof showToast === 'function') {
+        showToast('gameArea for innerHTML: ' + (gameArea ? 'found' : 'NOT FOUND'));
+    }
     gameArea.innerHTML = `
         <div style="text-align: center; margin-bottom: 1.5rem;">
-            <h3>Letter ${traceGameState.index + 1} of ${letters.length}</h3>
-            <p>Score: ${traceGameState.score}</p>
+            <h3>Letter ${window.currentTraceIndex + 1} of ${letters.length}</h3>
+            <p>Score: ${window.traceScore}</p>
         </div>
-        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; text-align: center;">
-            <p style="font-weight: bold; margin-bottom: 0.5rem; color: #6c757d;">Practice writing this letter:</p>
-            <div style="font-size: 8rem; font-weight: bold; color: #dee2e6; margin: 1rem 0; font-family: 'Comic Sans MS', cursive;">${letterData.letter}</div>
-            <canvas id="traceCanvas" width="300" height="200" style="border: 3px dashed #007bff; border-radius: 10px; background: white; cursor: crosshair; touch-action: none; display: block; margin: 0 auto;"></canvas>
-            <button onclick="clearTraceCanvas()" style="background: #6c757d; color: white; border: none; padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; margin-top: 0.5rem; font-size: 0.9rem;">🗑️ Clear</button>
+
+        <div style="
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        ">
+            <p style="font-weight: bold; margin-bottom: 0.5rem; color: #6c757d;">Trace this letter:</p>
+            <div style="
+                font-size: 8rem;
+                font-weight: bold;
+                color: #dee2e6;
+                margin: 1rem 0;
+                font-family: 'Comic Sans MS', cursive;
+            ">${letterData.letter}</div>
+
+            <canvas id="traceCanvas"
+                width="300"
+                height="200"
+                style="
+                    border: 3px dashed #007bff;
+                    border-radius: 10px;
+                    background: white;
+                    cursor: crosshair;
+                    touch-action: none;
+                    display: block;
+                    margin: 0 auto;
+                "></canvas>
+
+            <button onclick="clearTraceCanvas()" style="
+                background: #6c757d;
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 10px;
+                cursor: pointer;
+                margin-top: 0.5rem;
+                font-size: 0.9rem;
+            ">🗑️ Clear</button>
         </div>
-        <div style="margin-top: 1.5rem;">
-            <p style="font-weight: bold; text-align: center; margin-bottom: 1rem;">Match "${letterData.letter}" to a word that starts with this letter:</p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
-                ${allOptions.map(match => `
-                    <button onclick="checkTraceMatch('${match.replace(/'/g, "\\'")}', '${letterData.letter}')" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 1rem; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold;">
-                        ${match}
-                    </button>
-                `).join('')}
-            </div>
+
+        <div id="matchSection" style="display: none;">
+            <p style="font-weight: bold; text-align: center; margin-bottom: 1rem;">
+                Now match "${letterData.letter}" to a word that starts with this letter:
+            </p>
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 1rem;
+            " id="matchOptions"></div>
+        </div>
+
+        <div id="traceFeedback" style="
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        "></div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+            <button id="doneTracingBtn" onclick="showMatchOptions()" style="
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 1rem;
+                font-weight: bold;
+                display: none;
+            ">✓ Done Tracing - Match It!</button>
         </div>
     `;
 
-    // Initialize canvas after a short delay to ensure it's in DOM
-    setTimeout(initTraceCanvas, 100);
+    // Initialize canvas
+    setTimeout(() => {
+        window.traceCanvas = document.getElementById('traceCanvas');
+        if (window.traceCanvas) {
+            window.traceCtx = window.traceCanvas.getContext('2d');
+            window.traceCtx.lineWidth = 8;
+            window.traceCtx.lineCap = 'round';
+            window.traceCtx.strokeStyle = '#007bff';
+
+            // Mouse events
+            window.traceCanvas.addEventListener('mousedown', startTracing);
+            window.traceCanvas.addEventListener('mousemove', trace);
+            window.traceCanvas.addEventListener('mouseup', stopTracing);
+            window.traceCanvas.addEventListener('mouseout', stopTracing);
+
+            // Touch events
+            window.traceCanvas.addEventListener('touchstart', handleTouchStart);
+            window.traceCanvas.addEventListener('touchmove', handleTouchMove);
+            window.traceCanvas.addEventListener('touchend', stopTracing);
+        }
+    }, 100);
 }
 
-function initTraceCanvas() {
-    const canvas = document.getElementById('traceCanvas');
-    if (!canvas) return;
+// Tracing functions
+function startTracing(e) {
+    window.isTracing = true;
+    const rect = window.traceCanvas.getBoundingClientRect();
+    window.traceCtx.beginPath();
+    window.traceCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    window.hasTracedLetter = true;
+    document.getElementById('doneTracingBtn').style.display = 'inline-block';
+}
 
-    const ctx = canvas.getContext('2d');
-    ctx.lineWidth = 8;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#007bff';
+function trace(e) {
+    if (!window.isTracing) return;
+    const rect = window.traceCanvas.getBoundingClientRect();
+    window.traceCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    window.traceCtx.stroke();
+}
 
-    let isDrawing = false;
+function stopTracing() {
+    window.isTracing = false;
+}
 
-    canvas.addEventListener('mousedown', () => isDrawing = true);
-    canvas.addEventListener('mouseup', () => { isDrawing = false; ctx.beginPath(); });
-    canvas.addEventListener('mousemove', (e) => {
-        if (!isDrawing) return;
-        const rect = canvas.getBoundingClientRect();
-        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-    });
+function handleTouchStart(e) {
+    e.preventDefault();
+    window.isTracing = true;
+    const rect = window.traceCanvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    window.traceCtx.beginPath();
+    window.traceCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    window.hasTracedLetter = true;
+    document.getElementById('doneTracingBtn').style.display = 'inline-block';
+}
 
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); isDrawing = true; });
-    canvas.addEventListener('touchend', (e) => { e.preventDefault(); isDrawing = false; ctx.beginPath(); });
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        if (!isDrawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    });
+function handleTouchMove(e) {
+    e.preventDefault();
+    if (!window.isTracing) return;
+    const rect = window.traceCanvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    window.traceCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    window.traceCtx.stroke();
 }
 
 function clearTraceCanvas() {
-    const canvas = document.getElementById('traceCanvas');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (window.traceCtx && window.traceCanvas) {
+        window.traceCtx.clearRect(0, 0, window.traceCanvas.width, window.traceCanvas.height);
+        window.hasTracedLetter = false;
+        document.getElementById('doneTracingBtn').style.display = 'none';
     }
 }
 
-function checkTraceMatch(selectedMatch, correctLetter) {
-    const levelKey = `level${traceGameState.level}`;
-    const letterData = TRACE_LETTERS[levelKey][traceGameState.index];
+// Show Match Options
+function showMatchOptions() {
+    if (!window.hasTracedLetter) {
+        const feedback = document.getElementById('traceFeedback');
+        feedback.style.background = '#fff3cd';
+        feedback.style.color = '#856404';
+        feedback.innerHTML = '⚠️ Please trace the letter first!';
+        feedback.style.display = 'block';
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 2000);
+        return;
+    }
 
-    if (letterData.matches.includes(selectedMatch)) {
-        traceGameState.score += 10;
-        if (typeof showToast === 'function') showToast('✅ Correct match!');
-        traceGameState.index++;
-        setTimeout(loadTraceLetter, 500);
+    document.getElementById('matchSection').style.display = 'block';
+    document.getElementById('doneTracingBtn').style.display = 'none';
+
+    const levelKey = `level${window.currentTraceLevel}`;
+    const letterData = window.traceMatchLetters[levelKey][window.currentTraceIndex];
+    const correctMatch = letterData.matches[0]; // First match is correct
+
+    // Get 2 wrong options from other letters in this level
+    const allOtherMatches = window.traceMatchLetters[levelKey]
+        .filter((_, idx) => idx !== window.currentTraceIndex)
+        .flatMap(l => l.matches);
+    const wrongOptions = allOtherMatches.sort(() => Math.random() - 0.5).slice(0, 2);
+
+    const allOptions = [correctMatch, ...wrongOptions].sort(() => Math.random() - 0.5);
+
+    const matchOptions = document.getElementById('matchOptions');
+    matchOptions.innerHTML = allOptions.map(option => `
+        <button onclick="checkTraceMatch('${option.replace(/'/g, "\\\'")}')" style="
+            background: white;
+            border: 3px solid #dee2e6;
+            padding: 1.5rem 1rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            font-weight: bold;
+        " onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='#007bff'"
+           onmouseout="this.style.transform='scale(1)'; this.style.borderColor='#dee2e6'">
+            ${option}
+        </button>
+    `).join('');
+}
+
+// Check Trace Match
+function checkTraceMatch(selectedOption) {
+    const levelKey = `level${window.currentTraceLevel}`;
+    const letterData = window.traceMatchLetters[levelKey][window.currentTraceIndex];
+    const correctMatch = letterData.matches[0];
+    const feedback = document.getElementById('traceFeedback');
+
+    if (selectedOption === correctMatch) {
+        window.traceScore += 10;
+        feedback.style.background = '#d4edda';
+        feedback.style.color = '#155724';
+        feedback.innerHTML = `🎉 Perfect! "${letterData.letter}" is for ${selectedOption}!`;
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            window.currentTraceIndex++;
+            loadTraceLetter();
+        }, 2000);
     } else {
-        if (typeof showToast === 'function') showToast('❌ Try again!');
+        feedback.style.background = '#f8d7da';
+        feedback.style.color = '#721c24';
+        feedback.innerHTML = `❌ Not quite! Try another one!`;
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 1500);
     }
 }
 
+// Show Trace Complete
 function showTraceComplete() {
     const gameArea = document.getElementById('traceGameArea');
     gameArea.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
             <h2 style="color: #28a745; margin-bottom: 1rem;">🎉 Level Complete!</h2>
-            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${traceGameState.score}</p>
-            <button onclick="closeMiniGame()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">🏠 Back to Games</button>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: ${window.traceScore}</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="selectTraceLevel(${window.currentTraceLevel})" style="
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🔄 Play Again</button>
+                ${window.currentTraceLevel < 3 ? `
+                <button onclick="selectTraceLevel(${window.currentTraceLevel + 1})" style="
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">➡️ Next Level</button>
+                ` : ''}
+                <button onclick="closeMiniGame()" style="
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                ">🏠 Back to Games</button>
+            </div>
         </div>
     `;
+
+    // Check for achievement
+    if (window.traceScore >= 80) {
+        checkGameAchievement('trace-master');
+    }
 }
 
 window.launchTraceMatchGame = launchTraceMatchGame;
 window.selectTraceLevel = selectTraceLevel;
 window.clearTraceCanvas = clearTraceCanvas;
+window.showMatchOptions = showMatchOptions;
 window.checkTraceMatch = checkTraceMatch;
+
+// Empty data.js file (functionality is built into main app.js)
 // This file can be used for additional data management if needed
