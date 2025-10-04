@@ -2968,6 +2968,10 @@ function launchPatternBuilderGame() {
     currentPatternIndex = 0;
     patternScore = 0;
 
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: About to create gameHTML...');
+    }
+
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
             position: fixed;
@@ -3307,6 +3311,10 @@ function launchTraceMatchGame() {
     currentTraceLevel = 1;
     currentTraceIndex = 0;
     traceScore = 0;
+
+    if (typeof showToast === 'function') {
+        showToast('DEBUG: About to create trace gameHTML...');
+    }
 
     const gameHTML = `
         <div id="gameModal" class="game-modal" style="
