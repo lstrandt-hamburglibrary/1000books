@@ -1,4 +1,4 @@
-console.log("games.js loaded successfully");
+console.log("games.js loaded successfully"); if(typeof showToast === "function") showToast("games.js loaded");
 // Mini Games for BookWorm Journey
 
 // Launch game based on selection
@@ -2937,6 +2937,7 @@ let patternGameState = {
     score: 0
 };
 
+    if (typeof showToast === "function") showToast("launchPatternBuilderGame called");
 function launchPatternBuilderGame() {
     const existingModal = document.getElementById('gameModal');
     if (existingModal) existingModal.remove();
@@ -3084,6 +3085,7 @@ let traceGameState = {
     hasTraced: false
 };
 
+    if (typeof showToast === "function") showToast("launchTraceMatchGame called");
 function launchTraceMatchGame() {
     const existingModal = document.getElementById('gameModal');
     if (existingModal) existingModal.remove();
