@@ -2904,7 +2904,7 @@ window.resetSequence = resetSequence;
 window.checkSequence = checkSequence;
 
 // Pattern Builder Game
-const patternShapes = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⭐', '❤️', '🔷', '🔶'];
+window.patternShapes = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⭐', '❤️', '🔷', '🔶'];
 
 window.patternLevels = {
     level1: [
@@ -3103,7 +3103,7 @@ function loadPatternPuzzle() {
     const puzzle = puzzles[window.currentPatternIndex];
 
     // Get wrong answer options (3 random shapes that aren't the correct answer)
-    const wrongOptions = patternShapes.filter(s => s !== puzzle.answer).sort(() => Math.random() - 0.5).slice(0, 3);
+    const wrongOptions = window.patternShapes.filter(s => s !== puzzle.answer).sort(() => Math.random() - 0.5).slice(0, 3);
     const allOptions = [puzzle.answer, ...wrongOptions].sort(() => Math.random() - 0.5);
 
     const gameArea = document.getElementById('patternGameArea');
