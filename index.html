@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '3.19.0';</script>
+    <script>window.APP_VERSION = '3.20.0';</script>
     <style>
         * {
             margin: 0;
@@ -4343,31 +4343,71 @@
             canvas.height = 900;
             const ctx = canvas.getContext('2d');
 
+            // Dynamic color schemes based on achievement type
+            let colorScheme;
+
+            if (type === 'milestone') {
+                // Different colors for milestone tiers
+                if (data.books >= 1000) {
+                    colorScheme = { primary: '#ffd700', secondary: '#ff8c00', bg1: '#fffbf0', bg2: '#fff4d6' }; // Gold
+                } else if (data.books >= 500) {
+                    colorScheme = { primary: '#9d4edd', secondary: '#c77dff', bg1: '#f8f0ff', bg2: '#ede0ff' }; // Royal Purple
+                } else if (data.books >= 250) {
+                    colorScheme = { primary: '#e63946', secondary: '#f77f00', bg1: '#fff5f5', bg2: '#ffe8e8' }; // Red-Orange
+                } else if (data.books >= 100) {
+                    colorScheme = { primary: '#06a77d', secondary: '#059669', bg1: '#f0fdf9', bg2: '#d1fae5' }; // Emerald
+                } else if (data.books >= 50) {
+                    colorScheme = { primary: '#3b82f6', secondary: '#2563eb', bg1: '#eff6ff', bg2: '#dbeafe' }; // Blue
+                } else {
+                    colorScheme = { primary: '#ec4899', secondary: '#db2777', bg1: '#fdf2f8', bg2: '#fce7f3' }; // Pink
+                }
+            } else {
+                // Badge color themes based on category
+                const badgeId = data.id || '';
+                if (badgeId.includes('streak') || badgeId.includes('warrior')) {
+                    colorScheme = { primary: '#f97316', secondary: '#ea580c', bg1: '#fff7ed', bg2: '#fed7aa' }; // Fire/Orange
+                } else if (badgeId.includes('favorite') || badgeId.includes('love') || badgeId.includes('fan')) {
+                    colorScheme = { primary: '#ec4899', secondary: '#db2777', bg1: '#fdf2f8', bg2: '#fce7f3' }; // Pink/Love
+                } else if (badgeId.includes('speed') || badgeId.includes('marathon')) {
+                    colorScheme = { primary: '#eab308', secondary: '#ca8a04', bg1: '#fefce8', bg2: '#fef08a' }; // Lightning Yellow
+                } else if (badgeId.includes('variety') || badgeId.includes('explorer') || badgeId.includes('category')) {
+                    colorScheme = { primary: '#8b5cf6', secondary: '#7c3aed', bg1: '#faf5ff', bg2: '#ede9fe' }; // Rainbow Purple
+                } else if (badgeId.includes('winter') || badgeId.includes('holiday')) {
+                    colorScheme = { primary: '#0ea5e9', secondary: '#0284c7', bg1: '#f0f9ff', bg2: '#e0f2fe' }; // Ice Blue
+                } else if (badgeId.includes('spring') || badgeId.includes('summer')) {
+                    colorScheme = { primary: '#22c55e', secondary: '#16a34a', bg1: '#f0fdf4', bg2: '#dcfce7' }; // Spring Green
+                } else if (badgeId.includes('century') || badgeId.includes('champion') || badgeId.includes('best')) {
+                    colorScheme = { primary: '#f59e0b', secondary: '#d97706', bg1: '#fffbeb', bg2: '#fef3c7' }; // Gold Trophy
+                } else {
+                    colorScheme = { primary: '#06b6d4', secondary: '#0891b2', bg1: '#ecfeff', bg2: '#cffafe' }; // Cyan (default)
+                }
+            }
+
             // Background gradient
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#f8f9fa');
-            gradient.addColorStop(1, '#e9ecef');
+            gradient.addColorStop(0, colorScheme.bg1);
+            gradient.addColorStop(1, colorScheme.bg2);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Decorative border
-            ctx.strokeStyle = '#667eea';
+            ctx.strokeStyle = colorScheme.primary;
             ctx.lineWidth = 20;
             ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
 
             // Inner border
-            ctx.strokeStyle = '#764ba2';
+            ctx.strokeStyle = colorScheme.secondary;
             ctx.lineWidth = 4;
             ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
 
             // Title
-            ctx.fillStyle = '#667eea';
+            ctx.fillStyle = colorScheme.primary;
             ctx.font = 'bold 70px "Segoe UI", Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('Certificate of Achievement', canvas.width / 2, 180);
 
             // Decorative line under title
-            ctx.strokeStyle = '#764ba2';
+            ctx.strokeStyle = colorScheme.secondary;
             ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.moveTo(300, 210);
@@ -4386,7 +4426,7 @@
 
             // Decorative underline for name
             const nameWidth = ctx.measureText(childName).width;
-            ctx.strokeStyle = '#667eea';
+            ctx.strokeStyle = colorScheme.primary;
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo((canvas.width - nameWidth) / 2, 375);
@@ -4405,7 +4445,7 @@
                 ctx.fillText(data.emoji, canvas.width / 2, 560);
 
                 // Milestone name
-                ctx.fillStyle = '#667eea';
+                ctx.fillStyle = colorScheme.primary;
                 ctx.font = 'bold 50px "Segoe UI", Arial, sans-serif';
                 ctx.fillText(data.name, canvas.width / 2, 640);
 
@@ -4422,7 +4462,7 @@
                 ctx.fillText(data.emoji, canvas.width / 2, 560);
 
                 // Badge name
-                ctx.fillStyle = '#667eea';
+                ctx.fillStyle = colorScheme.primary;
                 ctx.font = 'bold 50px "Segoe UI", Arial, sans-serif';
                 ctx.fillText(data.name, canvas.width / 2, 640);
 
