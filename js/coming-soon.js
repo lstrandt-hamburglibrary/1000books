@@ -4,19 +4,6 @@
 
 // Feature categories with their upcoming features
 const comingSoonFeatures = {
-    engagement: {
-        title: "👨‍👩‍👧‍👦 Parent/Child Features",
-        features: [
-            {
-                name: "Reading Certificates",
-                icon: "🏆",
-                description: "Generate achievement certificates",
-                priority: "medium",
-                status: "planned",
-                note: "Printable awards"
-            }
-        ]
-    },
     sharing: {
         title: "🌟 Sharing & Backup",
         features: [
