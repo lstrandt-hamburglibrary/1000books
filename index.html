@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '3.18.2';</script>
+    <script>window.APP_VERSION = '3.19.0';</script>
     <style>
         * {
             margin: 0;
@@ -468,6 +468,40 @@
 
         .badge-description {
             font-size: 0.9rem;
+        }
+
+        .certificate-btn {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .certificate-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .certificate-btn:active {
+            transform: translateY(0);
+        }
+
+        .badge-card.earned .certificate-btn {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .badge-card.earned .certificate-btn:hover {
+            background: white;
+            color: #667eea;
         }
 
         /* Recent Books */
@@ -4124,6 +4158,7 @@
                     <div class="badge-name">${badge.name}</div>
                     <div class="badge-description">${badge.description}</div>
                     <div class="badge-status"></div>
+                    <button class="certificate-btn" style="display: none;" onclick="generateCertificate('badge', ${JSON.stringify(badge).replace(/"/g, '&quot;')})">📄 Download Certificate</button>
                 </div>
             `).join('');
 
@@ -4142,6 +4177,7 @@
                 const element = document.getElementById(`badge-${badge.id}`);
                 if (element) {
                     const statusElement = element.querySelector('.badge-status');
+                    const certificateBtn = element.querySelector('.certificate-btn');
                     const isEarned = badge.condition(books);
 
                     if (isEarned) {
@@ -4158,10 +4194,25 @@
                         }
 
                         // Check if this badge was just earned
-                        if (!appData.earnedBadges?.includes(badge.id)) {
-                            if (!appData.earnedBadges) appData.earnedBadges = [];
-                            appData.earnedBadges.push(badge.id);
+                        if (!appData.earnedBadges) appData.earnedBadges = [];
+                        if (!appData.badgeDates) appData.badgeDates = {};
+
+                        const currentChild = appData.children[appData.currentChild];
+                        if (!currentChild.earnedBadges) currentChild.earnedBadges = [];
+                        if (!currentChild.badgeDates) currentChild.badgeDates = {};
+
+                        if (!currentChild.earnedBadges.includes(badge.id)) {
+                            currentChild.earnedBadges.push(badge.id);
+                            currentChild.badgeDates[badge.id] = new Date().toISOString();
+                            saveData();
                             console.log(`New badge earned: ${badge.name}`);
+                        }
+
+                        // Show download button and attach date
+                        if (certificateBtn) {
+                            certificateBtn.style.display = 'block';
+                            const dateEarned = currentChild.badgeDates?.[badge.id];
+                            certificateBtn.onclick = () => generateCertificate('badge', { ...badge, dateEarned });
                         }
                     } else {
                         element.classList.add('locked');
@@ -4174,6 +4225,11 @@
                             statusElement.style.color = '#6c757d';
                             statusElement.style.fontWeight = 'normal';
                             statusElement.style.marginTop = '5px';
+                        }
+
+                        // Hide download button for locked badges
+                        if (certificateBtn) {
+                            certificateBtn.style.display = 'none';
                         }
                     }
                 } else {
@@ -4202,6 +4258,7 @@
                     <div class="badge-name">${milestone.name}</div>
                     <div class="badge-description">${milestone.books} books</div>
                     <div class="badge-status"></div>
+                    <button class="certificate-btn" style="display: none;">📄 Download Certificate</button>
                 </div>
             `).join('');
 
@@ -4219,6 +4276,8 @@
                 const element = document.getElementById(`milestone-${milestone.books}`);
                 if (element) {
                     const statusElement = element.querySelector('.badge-status');
+                    const certificateBtn = element.querySelector('.certificate-btn');
+
                     if (bookCount >= milestone.books) {
                         element.classList.remove('locked');
                         element.classList.add('earned');
@@ -4230,6 +4289,23 @@
                             statusElement.style.color = '#28a745';
                             statusElement.style.fontWeight = 'bold';
                         }
+
+                        // Track when milestone was earned
+                        const currentChild = appData.children[appData.currentChild];
+                        if (!currentChild.milestoneDates) currentChild.milestoneDates = {};
+
+                        if (!currentChild.milestoneDates[milestone.books]) {
+                            currentChild.milestoneDates[milestone.books] = new Date().toISOString();
+                            saveData();
+                        }
+
+                        // Show download button and attach date
+                        if (certificateBtn) {
+                            certificateBtn.style.display = 'block';
+                            const dateEarned = currentChild.milestoneDates?.[milestone.books];
+                            certificateBtn.onclick = () => generateCertificate('milestone', { ...milestone, dateEarned });
+                        }
+
                         console.log(`Milestone earned: ${milestone.name} (${milestone.books} books)`);
                     } else {
                         element.classList.add('locked');
@@ -4242,10 +4318,152 @@
                             statusElement.style.color = '#6c757d';
                             statusElement.style.fontWeight = 'normal';
                         }
+
+                        // Hide download button for locked milestones
+                        if (certificateBtn) {
+                            certificateBtn.style.display = 'none';
+                        }
                     }
                 } else {
                     console.error(`Milestone element not found: milestone-${milestone.books}`);
                 }
+            });
+        }
+
+        // Generate Certificate
+        function generateCertificate(type, data) {
+            if (appData.currentChild === null) return;
+
+            const child = appData.children[appData.currentChild];
+            const childName = child.name || 'Reader';
+
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = 1200;
+            canvas.height = 900;
+            const ctx = canvas.getContext('2d');
+
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#f8f9fa');
+            gradient.addColorStop(1, '#e9ecef');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Decorative border
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 20;
+            ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+
+            // Inner border
+            ctx.strokeStyle = '#764ba2';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
+
+            // Title
+            ctx.fillStyle = '#667eea';
+            ctx.font = 'bold 70px "Segoe UI", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Certificate of Achievement', canvas.width / 2, 180);
+
+            // Decorative line under title
+            ctx.strokeStyle = '#764ba2';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(300, 210);
+            ctx.lineTo(900, 210);
+            ctx.stroke();
+
+            // "This certifies that" text
+            ctx.fillStyle = '#495057';
+            ctx.font = 'italic 32px "Segoe UI", Arial, sans-serif';
+            ctx.fillText('This certifies that', canvas.width / 2, 280);
+
+            // Child's name
+            ctx.fillStyle = '#212529';
+            ctx.font = 'bold 60px "Segoe UI", Arial, sans-serif';
+            ctx.fillText(childName, canvas.width / 2, 360);
+
+            // Decorative underline for name
+            const nameWidth = ctx.measureText(childName).width;
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo((canvas.width - nameWidth) / 2, 375);
+            ctx.lineTo((canvas.width + nameWidth) / 2, 375);
+            ctx.stroke();
+
+            // Achievement text
+            ctx.fillStyle = '#495057';
+            ctx.font = '32px "Segoe UI", Arial, sans-serif';
+
+            if (type === 'milestone') {
+                ctx.fillText('has achieved the milestone', canvas.width / 2, 440);
+
+                // Emoji (large)
+                ctx.font = '100px Arial';
+                ctx.fillText(data.emoji, canvas.width / 2, 560);
+
+                // Milestone name
+                ctx.fillStyle = '#667eea';
+                ctx.font = 'bold 50px "Segoe UI", Arial, sans-serif';
+                ctx.fillText(data.name, canvas.width / 2, 640);
+
+                // Books count
+                ctx.fillStyle = '#495057';
+                ctx.font = 'italic 36px "Segoe UI", Arial, sans-serif';
+                ctx.fillText(`by reading ${data.books} books!`, canvas.width / 2, 700);
+
+            } else if (type === 'badge') {
+                ctx.fillText('has earned the badge', canvas.width / 2, 440);
+
+                // Emoji (large)
+                ctx.font = '100px Arial';
+                ctx.fillText(data.emoji, canvas.width / 2, 560);
+
+                // Badge name
+                ctx.fillStyle = '#667eea';
+                ctx.font = 'bold 50px "Segoe UI", Arial, sans-serif';
+                ctx.fillText(data.name, canvas.width / 2, 640);
+
+                // Badge description
+                ctx.fillStyle = '#495057';
+                ctx.font = 'italic 32px "Segoe UI", Arial, sans-serif';
+                ctx.fillText(data.description, canvas.width / 2, 700);
+            }
+
+            // Date earned
+            const dateEarned = data.dateEarned ? new Date(data.dateEarned).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }) : new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            ctx.fillStyle = '#6c757d';
+            ctx.font = '26px "Segoe UI", Arial, sans-serif';
+            ctx.fillText(`Earned on ${dateEarned}`, canvas.width / 2, 780);
+
+            // Footer branding
+            ctx.fillStyle = '#adb5bd';
+            ctx.font = 'italic 24px "Segoe UI", Arial, sans-serif';
+            ctx.fillText('1000 Books Before Kindergarten', canvas.width / 2, 840);
+
+            // Convert canvas to blob and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const filename = type === 'milestone'
+                    ? `${childName}_${data.name}_Certificate.png`
+                    : `${childName}_${data.name}_Badge.png`;
+                link.download = filename.replace(/\s+/g, '_');
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('Certificate downloaded!');
             });
         }
 
